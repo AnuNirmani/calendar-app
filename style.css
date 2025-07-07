@@ -1,0 +1,164 @@
+body {
+    background: #f0f0f0;
+    font-family: Arial;
+    padding: 20px;
+}
+table {
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    padding: 8px 12px;
+}
+a {
+    text-decoration: none;
+    color: blue;
+}
+button {
+    padding: 6px 10px;
+}
+
+
+
+ body {
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+
+body.calendar-page {
+    background: navy;
+    color: white;
+}
+
+
+body.admin-page {
+    background: #f0f0f0;
+    color: #222;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    justify-content: center;
+    margin: auto;
+    max-width: 800px;
+}
+
+.calendar-box {
+    background: white;
+    color: black;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.calendar-box h3 {
+    margin: 0 0 10px;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 260px;
+}
+
+th, td {
+    border: 2px solid #ccc;
+    width: 14.2%;
+    height: 28px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px;
+
+}
+
+/* This ensures .today overrides any other border (like .holiday, .saturday, etc.) */
+td.today {
+    border: 3px solid black !important;
+
+}
+
+
+.holiday {
+    background: red;
+    color: white;
+}
+
+.poya {
+    background: red;
+    color: white;
+}
+
+.saturday {
+    background: rgb(255, 96, 123);
+}
+
+.sunday {
+    background: gold;
+}
+
+.today {
+    border: 2px solid black !important;
+} 
+
+.footer {
+    text-align: center;
+    padding: 15px 10px;
+    font-size: 13px;
+    color: #ccc;
+    margin-top: 30px;
+}
+
+/* Optional: Different colors for admin & calendar */
+body.calendar-page .footer {
+    color: #ccc;
+}
+body.admin-page .footer {
+    color: #555;
+}
+
+
+
+
+
+/* @media (max-width: 768px) {
+    .calendar-grid {
+        grid-template-columns: 1fr; 
+        gap: 15px;
+    }
+
+    .calendar-box h3 {
+        font-size: 1rem;
+    }
+
+    th, td {
+        font-size: 12px;
+        height: 28px;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    th, td {
+        font-size: 10px;
+        padding: 4px;
+    }
+
+    .calendar-box {
+        padding: 6px;
+    }
+} */

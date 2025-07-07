@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>4-Month Calendar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>Today is <?php echo $today->format('l, F d, Y'); ?></h2>
+    <body class="calendar-page">
+    <div class="calendar-grid">
+        <?php
+        for ($i = -3; $i <= 0; $i++) {
+            $target = (clone $today)->modify("$i month");
+            renderCalendar((int)$target->format('n'), (int)$target->format('Y'), $specialDates, $today);
+        }
+        ?>
+    </div>
+</body>
+<footer class="footer">
+    &copy; <?php echo date('Y'); ?> Developed and Maintained by Web Publishing Department in collaboration with WNL Time Office
+© All rights reserved, 2008 - Wijeya Newspapers Ltd.
+</footer>
+</html>
