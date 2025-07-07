@@ -1,45 +1,145 @@
-body {
-    background: #f0f0f0;
-    font-family: Arial;
-    padding: 20px;
-}
-table {
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-th, td {
-    padding: 8px 12px;
-}
-a {
-    text-decoration: none;
-    color: blue;
-}
-button {
-    padding: 6px 10px;
-}
-
-
-
- body {
-    color: white;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 20px;
-}
-
-body.calendar-page {
-    background: navy;
-    color: white;
-}
-
-
+/* Showing special dates */
 body.admin-page {
-    background: #f0f0f0;
-    color: #222;
+    background-color: #ffffff;
+    color: #000;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    padding: 40px 20px;
+    text-align: center;
 }
 
 h2 {
+    font-size: 24px;
+    color: #444;
+    margin-bottom: 25px;
+}
+
+.special-dates-table {
+    display: inline-block;
+    margin-top: 15px;
+}
+
+table {
+    border-collapse: collapse;
+    background: #f9f9f9;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+thead {
+    background-color: #e6e6e6;
+}
+
+th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+td:last-child {
+    text-align: center;
+}
+
+table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Delete link style */
+a {
+    color: #0066cc;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+
+
+
+/* Adding special dates */
+body.admin-page {
+    background-color: #ffffff;
+    color: #000000;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 16px;
+    text-align: center;
+}
+
+h2, h3 {
+    font-size: 24px;
+    color: #444;
     margin-bottom: 20px;
+}
+
+form {
+    display: inline-block;
+    text-align: left;
+    background: #f9f9f9;
+    padding: 30px 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    display: block;
+    margin: 12px 0 5px;
+    font-weight: bold;
+    color: #000000;
+}
+
+input[type="date"],
+select,
+input[type="text"],
+button {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #4a90e2;
+    color: white;
+    font-weight: bold;
+    margin-top: 15px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0077ff;
+}
+
+/* Back link */
+a {
+    color: #0066cc;
+    margin-left: 10px;
+    font-weight: bold;
+    font-size: 15px;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #000000;
+}
+
+
+
+/* Calendar */
+body.calendar-page {
+    background: navy;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #f9f9f9;
 }
 
 .calendar-grid {
@@ -55,14 +155,13 @@ h2 {
     background: white;
     color: black;
     padding: 10px;
-    border-radius: 8px;
+    border-radius: 5px;
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
 
 .calendar-box h3 {
     margin: 0 0 10px;
     padding: 8px;
-    border-radius: 8px;
 }
 
 table {
@@ -80,15 +179,15 @@ th, td {
     font-size: 12px;
     font-weight: bold;
     padding: 4px;
+    border-radius: 0; 
 
 }
 
-/* This ensures .today overrides any other border (like .holiday, .saturday, etc.) */
+
 td.today {
     border: 3px solid black !important;
 
 }
-
 
 .holiday {
     background: red;
@@ -108,9 +207,6 @@ td.today {
     background: gold;
 }
 
-.today {
-    border: 2px solid black !important;
-} 
 
 .footer {
     text-align: center;
@@ -120,7 +216,6 @@ td.today {
     margin-top: 30px;
 }
 
-/* Optional: Different colors for admin & calendar */
 body.calendar-page .footer {
     color: #ccc;
 }

@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
+    <center>
     <h2>➕ Add New Special Date</h2>
     <form method="POST" action="">
         <p>
@@ -41,15 +42,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </label>
         </p>
         <p>
-            <label>Description: <input type="text" name="description" placeholder="Optional"></label>
+            <label>Description: <input type="text" name="description" required placeholder="Optional"></label>
         </p>
         <p>
             <button type="submit">Add Date</button>
-            <a href="index.php">← Back</a>
+            &nbsp;
+            &nbsp;
+            <a href="index.php">Back</a>
         </p>
-        <?php if ($error): ?>
-            <p style="color:red;"><?= $error ?></p>
-        <?php endif; ?>
     </form>
+</center>
 </body>
 </html>
