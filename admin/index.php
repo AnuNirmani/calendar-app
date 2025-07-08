@@ -18,6 +18,7 @@ $result = $conn->query("SELECT * FROM special_dates ORDER BY date ASC");
 <head>
     <title>Admin - Special Dates</title>
     <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="images/logo.jpg" type="image/png">
 </head>
 <body class="admin-page">
 
