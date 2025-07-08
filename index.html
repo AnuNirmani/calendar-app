@@ -3,10 +3,43 @@
 <head>
     <title>4-Month Calendar</title>
     <link rel="stylesheet" href="style.css">
+
+    <!--tooltip for hover special dates-->
+    <style>
+        .tooltip-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 4px 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: opacity 0.3s;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .tooltip-wrapper:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+
 </head>
-<body>
+
+<body class="calendar-page">
+    <center> <img src="images/logo.jpg" alt = "Company Logo" class="header-image" style="width: 250px;"> </center>
     <h1>Today is <?php echo $today->format('l, F d, Y'); ?></h1>
-    <body class="calendar-page">
     <div class="calendar-grid">
         <?php
         for ($i = -3; $i <= 0; $i++) {
@@ -15,9 +48,9 @@
         }
         ?>
     </div>
+    <footer class="footer">
+        &copy; <?php echo date('Y'); ?> Developed and Maintained by Web Publishing Department in collaboration with WNL Time Office<br>
+        © All rights reserved, 2008 - Wijeya Newspapers Ltd.
+    </footer>
 </body>
-<footer class="footer">
-    &copy; <?php echo date('Y'); ?> Developed and Maintained by Web Publishing Department in collaboration with WNL Time Office
-© All rights reserved, 2008 - Wijeya Newspapers Ltd.
-</footer>
 </html>

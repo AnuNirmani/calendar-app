@@ -1,22 +1,8 @@
 <?php
 include '../db.php';
 
-$error = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $date = $_POST['date'];
-    $type = $_POST['type'];
-    $desc = $_POST['description'];
-
-    if (!$date || !$type) {
-        $error = "Please fill in all required fields.";
-    } else {
-        $stmt = $conn->prepare("INSERT INTO special_dates (date, type, description) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $date, $type, $desc);
-        $stmt->execute();
-        header("Location: index.php");
-        exit;
-    }
-}
+// Fetch special types
+$types = $conn->query("SELECT id, type, description FROM special_types");
 ?>
 
 <!DOCTYPE html>
@@ -25,32 +11,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Add Special Date</title>
     <link rel="stylesheet" href="../style.css">
 </head>
-<body>
-    <center>
+<body class="admin-page">
     <h2>➕ Add New Special Date</h2>
-    <form method="POST" action="">
-        <p>
-            <label>Date: <input type="date" name="date" required></label>
-        </p>
-        <p>
-            <label>Type:
-                <select name="type" required>
-                    <option value="">-- Select --</option>
-                    <option value="holiday">Holiday</option>
-                    <option value="poya">Poya</option>
-                </select>
-            </label>
-        </p>
-        <p>
-            <label>Description: <input type="text" name="description" required placeholder="Optional"></label>
-        </p>
-        <p>
-            <button type="submit">Add Date</button>
-            &nbsp;
-            &nbsp;
-            <a href="index.php">Back</a>
-        </p>
-    </form>
-</center>
+
+    <form action="save.php" method="POST" class="add-form">
+    <label for="date">Date:</label>
+    <input type="date" name="date" required>
+
+    <label for="type_id">Type:</label>
+    <select name="type_id" required>
+        <option value="">-- Select --</option>
+        <?php while($row = $types->fetch_assoc()): ?>
+            <option value="<?= $row['id'] ?>">
+                <?= htmlspecialchars($row['type']) ?> — <?= htmlspecialchars($row['description']) ?>
+            </option>
+        <?php endwhile; ?>
+    </select>
+
+    <label for="color">Color:</label>
+    <input type="color" name="color" value="#ff0000" required>
+
+    <button type="submit">Add Date</button>
+    <a href="index.php">← Back</a>
+</form>
+
 </body>
 </html>
