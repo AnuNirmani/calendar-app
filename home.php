@@ -11,8 +11,10 @@ $isAdmin = ($_SESSION['role'] === 'admin');
 <!DOCTYPE html>
 <html>
 <head>
-    <title>home Page</title>
+    <title>Home Page</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body.home-page {
             background: #f2f2f2;
@@ -47,24 +49,23 @@ $isAdmin = ($_SESSION['role'] === 'admin');
             transition: background 0.3s;
         }
 
-.home-container .button:hover {
-    background-color: #0077ff;
-}
-
-
-
-    </style>
+        .home-container .button:hover {
+            background-color: #0077ff;
+        }
+    </style> 
     <link rel="icon" href="images/logo.jpg" type="image/png">
 </head>
 <body class="home-page">
     <div class="home-container">
-        <h2>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></h2>
-        <a href="index.php" class="button">🗓 View Calendar</a>
-        <?php if ($isAdmin): ?>
-            <a href="admin/index.php" class="button">🔐 Admin Panel</a>
-        <?php endif; ?>
-        <br><br>
-        <a href="logout.php" class="button">Logout</a>
+        <h2>🎉 Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!</h2>
+        <div style="margin: 20px 0;">
+            <a href="index.php" class="button">🗓️ View Calendar</a>
+            <?php if ($isAdmin): ?>
+                <a href="admin/index.php" class="button">🔐 Admin Panel</a>
+            <?php endif; ?>
+        </div>
+        <br>
+        <a href="logout.php" class="button logout-button">🚪 Logout</a>
     </div>
 </body>
 </html>

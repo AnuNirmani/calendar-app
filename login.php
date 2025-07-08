@@ -35,6 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <title>Login Page</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body.login-page {
             background: #f2f2f2;
@@ -77,14 +79,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="login-page">
     <div class="login-container">
-        <h2>Login</h2>
+        <h2>🔐 Login</h2>
         <form method="POST">
-            <input type="text" name="username" placeholder="Username" required style="width: 300px; height: 40px; font-size: 16px;"><br><br>
-            <input type="password" name="password" placeholder="Password" required style="width: 300px; height: 40px; font-size: 16px;"><br><br>
+            <input type="text" name="username" placeholder="👤 Username" required style="width: 300px; height: 40px; font-size: 16px;"><br><br>
+            <input type="password" name="password" placeholder="🔒 Password" required style="width: 300px; height: 40px; font-size: 16px;"><br><br>
+
+
             <button type="submit">Login</button>
         </form>
         <?php if ($error): ?>
-            <p style="color:red"><?= $error ?></p>
+            <p style="color:#d32f2f; margin-top: 20px; padding: 10px; background: rgba(255,0,0,0.1); border-radius: 8px; font-weight: 500;"><?= $error ?></p>
         <?php endif; ?>
     </div>
 </body>

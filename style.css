@@ -1,40 +1,85 @@
-/* Showing special dates */
+/* Enhanced Beautiful UI for Calendar Application */
+
+/* Global Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* Admin Page Styles */
 body.admin-page {
-    background-color: #ffffff;
-    color: #000;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
+    /* background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); */
+    background: navy;
+    color: #333;
+    font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
     padding: 40px 20px;
     text-align: center;
+    min-height: 100vh;
 }
 
 h2 {
-    font-size: 24px;
-    color: #444;
-    margin-bottom: 25px;
+    font-size: 28px;
+    color: #fff;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    font-weight: 600;
 }
 
+h3 {
+    font-size: 22px;
+    color: #fff;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    font-weight: 600;
+}
+
+/* Special Dates Table */
 .special-dates-table {
     display: inline-block;
-    margin-top: 15px;
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
 }
 
 table {
     border-collapse: collapse;
-    background: #f9f9f9;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    border-radius: 8px;
+    background: transparent;
+    border-radius: 15px;
     overflow: hidden;
-    font-size: 14px;
+    font-size: 15px;
+    min-width: 600px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
 thead {
-    background-color: #e6e6e6;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
 }
 
 th, td {
-    padding: 10px 12px;
+    padding: 15px 20px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+th {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 13px;
 }
 
 td:last-child {
@@ -42,225 +87,543 @@ td:last-child {
 }
 
 table tr:hover {
-    background-color: #f1f1f1;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    transform: translateY(-2px);
 }
 
-/* Delete link style */
-a {
-    color: navy;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-
-
-
-/* Adding special dates */
-body.admin-page {
-    background-color: #ffffff;
-    color: #000000;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    font-size: 16px;
-    text-align: center;
-}
-
-h2, h3 {
-    font-size: 24px;
-    color: #444;
-    margin-bottom: 20px;
-}
-
+/* Form Styles */
 form {
     display: inline-block;
     text-align: left;
-    background: #f9f9f9;
-    padding: 30px 25px;
-    border-radius: 10px;
-    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 35px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 400px;
 }
 
 label {
     display: block;
-    margin: 12px 0 5px;
-    font-weight: bold;
-    color: #000000;
+    margin: 15px 0 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 input[type="date"],
 select,
 input[type="text"],
+input[type="color"],
 button {
     width: 100%;
-    padding: 10px;
-    font-size: 15px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    padding: 15px;
+    font-size: 16px;
+    border: 2px solid rgba(0,0,0,0.1);
+    border-radius: 12px;
     box-sizing: border-box;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+input[type="date"]:focus,
+select:focus,
+input[type="text"]:focus,
+input[type="color"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: white;
 }
 
 button {
-    background-color: navy;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    font-weight: bold;
-    margin-top: 15px;
+    font-weight: 600;
+    margin-top: 20px;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    font-size: 14px;
 }
 
 button:hover {
-    background-color: #0077ff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
 }
 
-/* Back link */
+button:active {
+    transform: translateY(0);
+}
+
+/* Links */
 a {
-    color: navy;
+    color: #fff;
     margin-left: 10px;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 15px;
     text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 10px 20px;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    display: inline-block;
+    margin-top: 10px;
 }
 
 a:hover {
-    color: #000000;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-
-
-/* Calendar */
+/* Calendar Styles */
 body.calendar-page {
-    background: navy;
+    background: navy 100%;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.header-image {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    border: 5px solid rgba(255, 255, 255, 0.2);
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 20px;
-    color: #f9f9f9;
+    margin-bottom: 30px;
+    color: #fff;
+    font-size: 28px;
+    font-weight: 300;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    letter-spacing: 1px;
 }
 
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 25px;
     justify-content: center;
     margin: auto;
-    max-width: 800px;
+    max-width: 900px;
 }
 
 .calendar-box {
-    background: white;
-    color: navy;
-    padding: 10px;
-    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.calendar-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
 }
 
 .calendar-box h3 {
+    font-size: 24px;
+    padding: 15px;
+    color: #1e3c72;
     text-align: center;
-    margin: 0 0 10px;
-    padding: 8px;
-    color: navy;
+    margin-bottom: 15px;
+    font-weight: 600;
+    text-shadow: none;
 }
 
-/* calendar table */
-table {
+/* Calendar Table */
+.calendar-box table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 260px;
-    border-radius: 0px;
+    min-width: 280px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
-th, td {
-    border: 2px solid #ccc;
+.calendar-box th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 8px;
+    text-align: center;
+}
+
+.calendar-box td {
+    border: 1px solid rgba(0,0,0,0.05);
     width: 14.2%;
-    height: 28px;
+    height: 55px;
     text-align: center;
     vertical-align: middle;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.calendar-box td:hover {
+    background: linear-gradient(135deg, rgba(30, 60, 114, 0.1) 0%, rgba(42, 82, 152, 0.1) 100%);
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.calendar-box td.today {
+    border: 3px solid #1e3c72 !important;
+    background: linear-gradient(135deg, rgba(30, 60, 114, 0.1) 0%, rgba(42, 82, 152, 0.1) 100%);
+    font-weight: 700;
+}
+
+.calendar-box td.saturday {
+    background: linear-gradient(135deg, #ff6b9d 0%, #ff8a9b 100%);
+    color: white;
+    font-weight: 600;
+}
+
+.calendar-box td.sunday {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4a 100%);
+    color: #333;
+    font-weight: 600;
+}
+
+/* Tooltip Styles */
+.tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip {
+    visibility: hidden;
+    background: linear-gradient(135deg, #333 0%, #555 100%);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    position: absolute;
+    z-index: 1000;
+    top: -45px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
     font-size: 12px;
-    font-weight: bold;
-    padding: 4px;
-    border-radius: 0; 
-
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: all 0.3s ease;
 }
 
-
-td.today {
-    border: 3px solid navy !important;
-
+.tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
 }
 
-/* .holiday {
-    background: red;
-    color: white;
+.tooltip-wrapper:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(-5px);
 }
 
-.poya {
-    background: red;
-    color: white;
-} */
-
-.saturday {
-    background: rgb(255, 96, 123);
-}
-
-.sunday {
-    background: gold;
-}
-
-
+/* Footer */
 .footer {
     text-align: center;
-    padding: 15px 10px;
+    padding: 20px 10px;
     font-size: 13px;
-    color: #ccc;
-    margin-top: 30px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 body.calendar-page .footer {
-    color: #ccc;
+    color: rgba(255, 255, 255, 0.7);
 }
+
 body.admin-page .footer {
-    color: #555;
+    color: rgba(255, 255, 255, 0.8);
 }
 
+/* Login Page Styles */
+body.login-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+    text-align: center;
+    padding: 50px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
+.login-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 50px 40px;
+    border-radius: 25px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 400px;
+    max-width: 500px;
+}
 
+.login-container h2 {
+    margin-bottom: 40px;
+    color: #333;
+    font-size: 32px;
+    font-weight: 600;
+    text-shadow: none;
+}
 
+.login-container input[type="text"],
+.login-container input[type="password"] {
+    width: 100%;
+    height: 50px;
+    font-size: 16px;
+    padding: 15px 20px;
+    border: 2px solid rgba(0,0,0,0.1);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
 
-/* @media (max-width: 768px) {
+.login-container input[type="text"]:focus,
+.login-container input[type="password"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: white;
+}
+
+.login-container button {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 10px;
+}
+
+.login-container button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.login-container p {
+    margin-top: 20px;
+    padding: 10px;
+    background: rgba(255, 0, 0, 0.1);
+    border-radius: 8px;
+    color: #d32f2f;
+    font-weight: 500;
+}
+
+/* Home Page Styles */
+body.home-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+    text-align: center;
+    padding: 50px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.home-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 50px 40px;
+    border-radius: 25px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 500px;
+}
+
+.home-container h2 {
+    margin-bottom: 40px;
+    color: #333;
+    font-size: 28px;
+    font-weight: 600;
+    text-shadow: none;
+}
+
+.home-container a.button {
+    display: inline-block;
+    padding: 15px 30px;
+    margin: 15px 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 180px;
+}
+
+.home-container .button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
     .calendar-grid {
-        grid-template-columns: 1fr; 
-        gap: 15px;
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .calendar-box {
+        padding: 20px;
     }
 
     .calendar-box h3 {
-        font-size: 1rem;
+        font-size: 20px;
     }
 
-    th, td {
-        font-size: 12px;
-        height: 28px;
+    .calendar-box td {
+        height: 45px;
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 24px;
     }
 
     h2 {
-        font-size: 1.2rem;
+        font-size: 24px;
+    }
+
+    .login-container,
+    .home-container {
+        margin: 20px;
+        padding: 40px 30px;
+        min-width: auto;
+    }
+
+    form {
+        min-width: auto;
+        padding: 30px 25px;
     }
 }
 
 @media (max-width: 480px) {
-    th, td {
-        font-size: 10px;
+    .calendar-box td {
+        height: 40px;
+        font-size: 12px;
         padding: 4px;
     }
 
     .calendar-box {
-        padding: 6px;
+        padding: 15px;
     }
-} */
 
+    .calendar-box h3 {
+        font-size: 18px;
+    }
 
+    .login-container,
+    .home-container {
+        padding: 30px 20px;
+    }
+}
+
+/* Animation for page load */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.calendar-box,
+.login-container,
+.home-container,
+.special-dates-table,
+form {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Additional enhancements */
+.calendar-box table {
+    background: white;
+}
+
+/* Admin panel specific enhancements */
+.go-calendar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    padding: 15px 30px !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin: 20px 0 !important;
+    display: inline-block !important;
+    transition: all 0.3s ease !important;
+}
+
+.go-calendar:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* Special date color indicators */
+.calendar-box td[style*="background-color"] {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Delete button enhancement */
+a[href*="delete"] {
+    background: navy;
+    color: white !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin: 0 !important;
+}
+
+a[href*="delete"]:hover {
+    background: red;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 5px 15px rgba(255, 107, 157, 0.3) !important;
+}
 
 

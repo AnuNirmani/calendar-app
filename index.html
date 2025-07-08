@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>4-Month Calendar</title>
+    <title>📅 4-Month Calendar</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!--tooltip for hover special dates-->
     <style>
@@ -11,27 +13,27 @@
             display: inline-block;
         }
 
+        .tooltip-wrapper {
+            position: relative;
+        }
+
         .tooltip {
             visibility: hidden;
-            opacity: 0;
-            background-color: black;
+            background-color: #333;
             color: #fff;
-            text-align: center;
+            padding: 6px 8px;
             border-radius: 4px;
-            padding: 4px 8px;
             position: absolute;
             z-index: 1;
-            bottom: 125%;
+            top: -35px;
             left: 50%;
             transform: translateX(-50%);
-            transition: opacity 0.3s;
-            font-size: 11px;
             white-space: nowrap;
+            font-size: 12px;
         }
 
         .tooltip-wrapper:hover .tooltip {
             visibility: visible;
-            opacity: 1;
         }
     </style>
 
@@ -40,8 +42,10 @@
 </head>
 
 <body class="calendar-page">
-    <center> <img src="images/logo.jpg" alt = "Company Logo" class="header-image" style="width: 250px;"> </center>
-    <h1>Today is <?php echo $today->format('l, F d, Y'); ?></h1>
+    <center> 
+        <img src="images/logo.jpg" style="width: 250px;"> 
+    </center>
+    <h1>✨ Today is <?php echo $today->format('l, F d, Y'); ?> ✨</h1>
     <div class="calendar-grid">
         <?php
         for ($i = -3; $i <= 0; $i++) {

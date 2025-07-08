@@ -6,9 +6,6 @@ if (!isset($_SESSION['username'])) {
 }
 ?>
 
-
-
-
 <?php
 include 'db.php';
 
@@ -25,7 +22,6 @@ while ($row = $datesQuery->fetch_assoc()) {
         'color' => $row['color']
     ];
 }
-
 
 // Function to render one month
 function renderCalendar($month, $year, $specialDates, $today) {
@@ -50,8 +46,13 @@ function renderCalendar($month, $year, $specialDates, $today) {
         $class = "";
         $tooltip = "";
 
-        if ($dow == 0) $class = "sunday";
-        else if ($dow == 6) $class = "saturday";
+        // Check if it's today
+        if ($dateStr === $today->format('Y-m-d')) {
+            $class .= " today";
+        }
+
+        if ($dow == 0) $class .= " sunday";
+        else if ($dow == 6) $class .= " saturday";
 
         $style = "";
         $tooltip = "";
@@ -59,20 +60,17 @@ function renderCalendar($month, $year, $specialDates, $today) {
         if (isset($specialDates[$dateStr])) {
             $type = $specialDates[$dateStr]['type'];
             $desc = htmlspecialchars($specialDates[$dateStr]['description']);
-            $color = $specialDates[$dateStr]['color'];
-
+            $color = htmlspecialchars($specialDates[$dateStr]['color']);
             $tooltip = "<span class='tooltip'>$desc</span>";
-            $style = "style='background-color: $color'";
+
+            if (!empty($color)) {
+                $style = "background: linear-gradient(135deg, $color 0%, " . adjustBrightness($color, 0.8) . " 100%);";
+            }
         }
 
-        // Highlight today
-        $tdClass = $class;
-        if ($dateStr == $today->format('Y-m-d')) {
-            $tdClass .= " today";
-        }
-
-        echo "<td class='$tdClass' $style><div class='tooltip-wrapper'>" . sprintf('%02d', $d) . "$tooltip</div></td>";
-
+        echo "<td class='$class' onclick=\"window.location.href='pdf.html'\" style='cursor: pointer; $style'>
+            <div class='tooltip-wrapper'>" . sprintf('%02d', $d) . "$tooltip</div>
+                </td>";
 
         if ((($d + $pad) % 7) == 0) echo "</tr><tr>";
     }
@@ -80,6 +78,26 @@ function renderCalendar($month, $year, $specialDates, $today) {
     echo "</tr></table></div>";
 }
 
-include 'index.html';
+// Helper function to adjust color brightness
+function adjustBrightness($hex, $percent) {
+    // Remove # if present
+    $hex = str_replace('#', '', $hex);
+    
+    // Convert to RGB
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+    
+    // Adjust brightness
+    $r = max(0, min(255, $r * $percent));
+    $g = max(0, min(255, $g * $percent));
+    $b = max(0, min(255, $b * $percent));
+    
+    // Convert back to hex
+    return '#' . str_pad(dechex($r), 2, '0', STR_PAD_LEFT) . 
+                 str_pad(dechex($g), 2, '0', STR_PAD_LEFT) . 
+                 str_pad(dechex($b), 2, '0', STR_PAD_LEFT);
+}
 
+include 'index.html';
 ?>
