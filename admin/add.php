@@ -12,6 +12,7 @@ $types = $conn->query("SELECT id, type, description FROM special_types");
     <link rel="stylesheet" href="../style.css">
     <link rel="icon" href="images/logo.jpg" type="image/png">
 </head>
+
 <body class="admin-page">
     <h2>➕ Add New Special Date</h2>
 
