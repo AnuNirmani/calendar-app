@@ -13,7 +13,18 @@ $today = new DateTime();
 
 // Load special dates
 // Update fetch to get color
-$datesQuery = $conn->query("SELECT date, type, description, color FROM special_dates");
+$datesQuery = $conn->query("
+    SELECT 
+        sd.date, 
+        sd.color, 
+        st.type, 
+        st.description 
+    FROM 
+        special_dates sd
+    LEFT JOIN 
+        special_types st ON sd.type_id = st.id
+");
+
 $specialDates = [];
 while ($row = $datesQuery->fetch_assoc()) {
     $specialDates[$row['date']] = [
