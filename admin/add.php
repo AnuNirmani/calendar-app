@@ -42,5 +42,10 @@ $types = $conn->query("SELECT id, type, description FROM special_types");
         </div>
     </form>
 
+    <footer class="footer">
+        &copy; <?php echo date('Y'); ?> Developed and Maintained by Web Publishing Department in collaboration with WNL Time Office<br>
+        © All rights reserved, 2008 - Wijeya Newspapers Ltd.
+    </footer>
+
 </body>
 </html>
