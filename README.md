@@ -28,3 +28,6 @@ Admins can:
 Add new special dates, 
 Delete existing dates, 
 Filter dates by year.
+
+### Developed and Maintained by [Anuttara Nirmani]
+© All rights reserved
