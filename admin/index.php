@@ -26,6 +26,8 @@ $result = $conn->query("
         special_dates sd
     LEFT JOIN 
         special_types st ON sd.type_id = st.id
+    WHERE 
+        YEAR(sd.date) = $currentYear
     ORDER BY 
         sd.date DESC
 ");
@@ -49,7 +51,7 @@ $result = $conn->query("
     <div class="special-dates-table">
         <div style="text-align: left; margin-bottom: 25px;">
 
-            <a href="add.php" style="background: linear-gradient(135deg,lightblue 0%,navy 100%) !important; 
+            <a href="add.php" style="background: linear-gradient(135deg,blue 0%,navy 100%) !important; 
             color: white !important; 
             padding: 12px 25px !important; 
             border-radius: 25px !important; 
@@ -90,12 +92,54 @@ $result = $conn->query("
 
             </tbody>
         </table>
+
+<!-- pagination part -->
+<?php
+$currentYear = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
+
+// Get all distinct years from DB
+$allYears = [];
+$yearsResult = $conn->query("SELECT DISTINCT YEAR(date) AS year FROM special_dates ORDER BY year DESC");
+while ($row = $yearsResult->fetch_assoc()) {
+    $allYears[] = (int)$row['year'];
+}
+
+// Filter only previous, current, and next year
+$filteredYears = array_filter($allYears, function($year) use ($currentYear) {
+    return ($year >= $currentYear - 1 && $year <= $currentYear + 1);
+});
+?>
+
+<div style="margin-top: 30px; text-align: center;">
+    <?php foreach ($filteredYears as $year): ?>
+        <a href="?year=<?= $year ?>" 
+           class="button" 
+           style="<?= ($year == $currentYear) ? 'background: #007bff; color: white;' : 'background: #f1f1f1; color: #000;' ?> 
+                  padding: 10px 20px; 
+                  margin: 5px; 
+                  border-radius: 30px; 
+                  font-weight: bold; 
+                  text-decoration: none; 
+                  display: inline-block;">
+            <?= $year ?>
+        </a>
+    <?php endforeach; ?>
+</div>
+
+
+</div> <!-- closes .special-dates-table -->
+
     </div>
 
     <div style="text-align: center; margin-top: 30px;">
         <a href="../index.php" class="go-calendar">📅 Go to Calendar</a>
         <a href="../home.php" style="background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important; color: white !important; padding: 15px 30px !important; border-radius: 25px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important; margin: 0 10px !important; display: inline-block !important; transition: all 0.3s ease !important;">🏠 Home</a>
     </div>
+
+    <footer class="footer">
+        &copy; <?php echo date('Y'); ?> Developed and Maintained by Web Publishing Department in collaboration with WNL Time Office<br>
+        © All rights reserved, 2008 - Wijeya Newspapers Ltd.
+    </footer>
 
 </body>
 </html>
