@@ -51,7 +51,7 @@ $result = $conn->query("
     <div class="special-dates-table">
         <div style="text-align: left; margin-bottom: 25px;">
 
-            <a href="add.php" style="background: linear-gradient(135deg,lightblue 0%,navy 100%) !important; 
+            <a href="add.php" style="background: linear-gradient(135deg,blue 0%,navy 100%) !important; 
             color: white !important; 
             padding: 12px 25px !important; 
             border-radius: 25px !important; 
@@ -93,31 +93,37 @@ $result = $conn->query("
             </tbody>
         </table>
 
+<!-- pagination part -->
 <?php
-// 🔹 Step 3: Pagination buttons by year
+$currentYear = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
+
+// Get all distinct years from DB
+$allYears = [];
 $yearsResult = $conn->query("SELECT DISTINCT YEAR(date) AS year FROM special_dates ORDER BY year DESC");
+while ($row = $yearsResult->fetch_assoc()) {
+    $allYears[] = (int)$row['year'];
+}
+
+// Filter only previous, current, and next year
+$filteredYears = array_filter($allYears, function($year) use ($currentYear) {
+    return ($year >= $currentYear - 1 && $year <= $currentYear + 1);
+});
 ?>
 
 <div style="margin-top: 30px; text-align: center;">
-    <?php while ($yearRow = $yearsResult->fetch_assoc()): ?>
-        <?php
-            $isActive = ($yearRow['year'] == $currentYear);
-            $buttonStyle = $isActive
-                ? "background: #007bff; color: white;"
-                : "background: #f0f0f0; color: #000;";
-        ?>
-        <a href="?year=<?= $yearRow['year'] ?>" 
+    <?php foreach ($filteredYears as $year): ?>
+        <a href="?year=<?= $year ?>" 
            class="button" 
-           style="<?= $buttonStyle ?> 
+           style="<?= ($year == $currentYear) ? 'background: #007bff; color: white;' : 'background: #f1f1f1; color: #000;' ?> 
                   padding: 10px 20px; 
                   margin: 5px; 
                   border-radius: 30px; 
                   font-weight: bold; 
                   text-decoration: none; 
                   display: inline-block;">
-            <?= $yearRow['year'] ?>
+            <?= $year ?>
         </a>
-    <?php endwhile; ?>
+    <?php endforeach; ?>
 </div>
 
 
