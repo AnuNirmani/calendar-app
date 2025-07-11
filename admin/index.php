@@ -18,19 +18,22 @@ if (isset($_GET['delete'])) {
 //     ORDER BY sd.date ASC
 // ");
 
+$currentYear = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
+
 $result = $conn->query("
     SELECT 
-        sd.id, sd.date, sd.color, sd.type_id, 
-        st.type AS joined_type, st.description AS joined_description
+        sd.id, sd.date, sd.color, 
+        st.type AS joined_type, 
+        st.description AS joined_description 
     FROM 
-        special_dates sd
+        special_dates sd 
     LEFT JOIN 
-        special_types st ON sd.type_id = st.id
+        special_types st ON sd.type_id = st.id 
     WHERE 
         YEAR(sd.date) = $currentYear
-    ORDER BY 
-        sd.date DESC
+    ORDER BY sd.date DESC
 ");
+
 
 
 ?>
@@ -77,8 +80,9 @@ $result = $conn->query("
                 <?php while($row = $result->fetch_assoc()): ?>
     <tr>
         <td style="font-weight: 600;"><?= htmlspecialchars($row['date']) ?></td>
-        <td style="font-weight: 600;"><?= htmlspecialchars($row['joined_type'] ?? 'N/A') ?></td>
+        <td><?= htmlspecialchars($row['joined_type'] ?? 'N/A') ?></td>
         <td><?= htmlspecialchars($row['joined_description'] ?? 'N/A') ?></td>
+
         <td style="text-align: center;">
             <div style="width: 30px; height: 30px; background: <?= htmlspecialchars($row['color']) ?>; border-radius: 50%; margin: auto; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
         </td>
