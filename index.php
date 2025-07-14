@@ -79,9 +79,16 @@ function renderCalendar($month, $year, $specialDates, $today) {
             }
         }
 
-        echo "<td class='$class' onclick=\"window.location.href='pdf.html'\" style='cursor: pointer; $style'>
-            <div class='tooltip-wrapper'>" . sprintf('%02d', $d) . "$tooltip</div>
-                </td>";
+        // echo "<td class='$class' onclick=\"window.location.href='pdf.html'\" style='cursor: pointer; $style'>
+        //     <div class='tooltip-wrapper'>" . sprintf('%02d', $d) . "$tooltip</div>
+        //         </td>";
+
+        $desc = htmlspecialchars($specialDates[$dateStr]['description'] ?? '');
+        $color = $specialDates[$dateStr]['color'] ?? '';
+        $dayText = sprintf('%02d', $d);
+
+        echo "<td class='$class' onclick=\"window.location.href='pdf.html'\" title='$desc' style='cursor: pointer; color: black; $style'>$dayText</td>";
+
 
         if ((($d + $pad) % 7) == 0) echo "</tr><tr>";
     }
