@@ -1,4 +1,3 @@
-````
 # 🗓️ PHP Calendar with Admin Panel
 
 This is a responsive PHP-based calendar web application that displays special dates (e.g. holidays, poya days, etc.) with color-coded cells and optional descriptions. An admin panel allows managing these special dates via a secure login system.
@@ -75,7 +74,32 @@ INSERT INTO users (username, password, role) VALUES ('user1', 'user123', 'user')
 
 ---
 
-<pre><code>## 📂 Folder Structure ``` calendar-app/ │ ├── admin/ │ ├── add.php │ ├── index.php │ └── save.php │ ├── images/ │ └── logo.jpg │ ├── css/ │ └── style.css │ ├── db.php ├── index.php ├── index.html ├── login.php ├── logout.php ├── home.php ├── pdf.html └── README.md ``` </code></pre>
+## 📂 Folder Structure
+
+```
+calendar-app/
+│
+├── admin/
+│   ├── add.php
+│   ├── index.php
+│   └── save.php
+│
+├── images/
+│   └── logo.jpg
+│
+├── css/
+│   └── style.css
+│
+├── db.php
+├── index.php
+├── index.html
+├── login.php
+├── logout.php
+├── home.php
+├── pdf.html
+└── README.md
+```
+
 
 ---
 
@@ -84,7 +108,7 @@ INSERT INTO users (username, password, role) VALUES ('user1', 'user123', 'user')
 1. ✅ Clone the repo:
 
    ```bash
-   git clone https://github.com/your-username/php-calendar-app.git
+   git clone https://github.com/AnuNirmani/php-calendar-app.git
    ```
 
 2. ✅ Start XAMPP or MAMP and place files in your `htdocs` folder.
@@ -98,16 +122,6 @@ INSERT INTO users (username, password, role) VALUES ('user1', 'user123', 'user')
    ```
    http://localhost/php-calendar-app/login.php
    ```
-
----
-
-## 🎨 Screenshots
-
-> You can add screenshots here for:
->
-> * Login Page
-> * Calendar UI
-> * Admin Panel with special dates
 
 ---
 
@@ -125,5 +139,3 @@ INSERT INTO users (username, password, role) VALUES ('user1', 'user123', 'user')
 📍Developed and Maintained by **Web Publishing Department** in collaboration with WNL Time Office. © All rights reserved, Wijeya Newspapers Ltd. — 2025
 
 ---
-
-```
