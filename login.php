@@ -81,8 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-container">
         <h2>🔐 Login</h2>
         <form method="POST">
-            <input type="text" name="username" placeholder="👤 Username" required style="width: 300px; height: 40px; font-size: 16px;"><br><br>
-            <input type="password" name="password" placeholder="🔒 Password" required style="width: 300px; height: 40px; font-size: 16px;"><br><br>
+            <input type="text" name="username" placeholder="Username" required onfocus="this.value=''">
+            <input type="password" name="password" placeholder="Password" required onfocus="this.value=''">
 
 
             <button type="submit">Login</button>
