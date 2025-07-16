@@ -1,8 +1,4 @@
-Here’s a complete and professional `README.md` file you can use for your GitHub repo to document your **PHP Calendar and Admin Panel Application**:
-
----
-
-````markdown
+````
 # 🗓️ PHP Calendar with Admin Panel
 
 This is a responsive PHP-based calendar web application that displays special dates (e.g. holidays, poya days, etc.) with color-coded cells and optional descriptions. An admin panel allows managing these special dates via a secure login system.
