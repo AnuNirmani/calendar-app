@@ -52,7 +52,6 @@ Stores the actual dates.
 CREATE TABLE special_dates (
   id INT AUTO_INCREMENT PRIMARY KEY,
   date DATE NOT NULL,
-  type_id INT,
   color VARCHAR(10),
   FOREIGN KEY (type_id) REFERENCES special_types(id)
 );

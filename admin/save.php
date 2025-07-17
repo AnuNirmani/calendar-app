@@ -1,5 +1,9 @@
 <?php
 include '../db.php';
+include '../auth.php';
+
+// Check if user is authenticated (both admin and super_admin can access)
+checkAuth();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $date = $_POST['date'];

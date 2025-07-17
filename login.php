@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'db.php';
+include 'auth.php';
 
 $error = "";
 
@@ -19,7 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($password === $user['password']) {
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
-            header("Location: home.php");
+            $_SESSION['user_id'] = $user['id'];
+            header("Location: admin/index.php");
             exit;
         } else {
             $error = "Invalid password";
@@ -74,6 +76,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .login-container a.button:hover {
             background-color: darkblue;
         }
+
+        .role-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1976d2;
+        }
+
     </style>
     <link rel="icon" href="images/logo.jpg" type="image/png">
 </head>
@@ -90,6 +102,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if ($error): ?>
             <p style="color:#d32f2f; margin-top: 20px; padding: 10px; background: rgba(255,0,0,0.1); border-radius: 8px; font-weight: 500;"><?= $error ?></p>
         <?php endif; ?>
+
+        <!-- <div class="role-info">
+            <strong>Role System:</strong><br>
+            • Super Admin: Can manage all users and access all features<br>
+            • Admin: Can access calendar management features
+        </div> -->
+        
     </div>
 </body>
 </html>
