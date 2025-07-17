@@ -49,12 +49,21 @@ CREATE TABLE special_types (
 Stores the actual dates.
 
 ```sql
-CREATE TABLE special_dates (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  date DATE NOT NULL,
-  color VARCHAR(10),
-  FOREIGN KEY (type_id) REFERENCES special_types(id)
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('super_admin', 'admin') NOT NULL DEFAULT 'admin',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INT,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
+
+INSERT INTO users (username, password, role) VALUES ('superadmin', 'super123', 'super_admin')
+ON DUPLICATE KEY UPDATE role = 'super_admin';
+
+INSERT INTO users (username, password, role, created_by) VALUES ('admin1', 'admin123', 'admin', 1)
+ON DUPLICATE KEY UPDATE role = 'admin';
 ```
 
 ---

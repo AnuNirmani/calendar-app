@@ -47,14 +47,6 @@ $result = $conn->query("
 
     <div style="text-align: center; margin-bottom: 30px;">
     <h1 style="font-size: 28px;">✨ Admin Panel - Special Dates</h1>
-    <!-- <div style="margin-top: 10px;">
-        <span style="background: <?= isSuperAdmin() ?>; color: white; padding: 8px 16px; border-radius: 20px; font-size: 18px; font-weight: 600;">
-            <?= isSuperAdmin() ? '👑 Super Admin' : '👤 Admin' ?>: <?= htmlspecialchars($_SESSION['username']) ?>
-        </span>
-        <a href="../logout.php" style="background: #f44336; color: white; padding: 8px 16px; border-radius: 20px; font-size: 16px; font-weight: 600; text-decoration: none; margin-left: 10px;">
-            🚪 Logout
-        </a>
-    </div> -->
     </div>
 
 
@@ -68,7 +60,7 @@ $result = $conn->query("
         <!-- <div style="text-align: center; margin-bottom: 25px; display: flex; gap: 15px; align-items: center;"> -->
              <div style="text-align: center; margin-bottom: 25px; display: flex; gap: 15px; justify-content: center; align-items: center; ">
 
-            <a href="add.php" style="background: linear-gradient(135deg,blue 0%,navy 100%) !important; 
+            <a href="add.php" style="background: linear-gradient(135deg,#2196f3 0%,#1976d2 100%) !important; 
             color: white !important; 
             padding: 12px 25px !important; 
             border-radius: 25px !important; 
@@ -80,7 +72,7 @@ $result = $conn->query("
             transition: all 0.3s ease !important;">➕ Add New Special Date</a>
 
             <?php if (isSuperAdmin()): ?>
-                <a href="manage_users.php" style="background: linear-gradient(135deg, blue 0%, navy 100%) !important; 
+                <a href="manage_users.php" style="background: linear-gradient(135deg, #2196f3 0%, #6f38bcff 100%) !important; 
                 color: white !important; 
                 padding: 12px 25px !important; 
                 border-radius: 25px !important; 

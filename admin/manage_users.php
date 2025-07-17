@@ -66,16 +66,9 @@ $result = $conn->query("
 </head>
 <body class="admin-page">
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-        <h2>👥 Manage Users</h2>
-        <div style="text-align: right;">
-            <span style="background: #4caf50; color: white; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;">
-                👑 Super Admin: <?= htmlspecialchars($_SESSION['username']) ?>
-            </span>
-            <a href="../logout.php" style="background: #f44336; color: white; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; text-decoration: none; margin-left: 10px;">
-                🚪 Logout
-            </a>
-        </div>
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2>✨ Manage Users</h2>
+        
     </div>
 
     <?php if (isset($error)): ?>
@@ -114,7 +107,7 @@ $result = $conn->query("
                 </select>
             </div>
             
-            <button type="submit" name="add_user" style="background: #4caf50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">
+            <button type="submit" name="add_user" style="background: #2196f3; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">
                 Add User
             </button>
         </form>
@@ -137,7 +130,7 @@ $result = $conn->query("
                 <tr>
                     <td style="font-weight: 600;"><?= htmlspecialchars($row['username']) ?></td>
                     <td>
-                        <span style="background: <?= $row['role'] === 'super_admin' ? '#4caf50' : '#2196f3' ?>; color: white; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: 600;">
+                        <span style="background: <?= $row['role'] === 'super_admin' ?>; color: black; padding: 4px 12px; border-radius: 15px; font-size: 14px; font-weight: 600;">
                             <?= $row['role'] === 'super_admin' ? '👑 Super Admin' : '👤 Admin' ?>
                         </span>
                     </td>
@@ -160,12 +153,14 @@ $result = $conn->query("
         </table>
     </div>
 
-    <div style="text-align: center; margin-top: 30px;">
-        <a href="index.php" style="background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%) !important; color: white !important; padding: 15px 30px !important; border-radius: 25px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important; margin: 0 10px !important; display: inline-block !important; transition: all 0.3s ease !important;">
-            ← Back to Special Dates
+
+            <div style="margin-top: 10px;">
+        <span style="background: <?= isSuperAdmin() ?>; color: white; padding: 8px 16px; border-radius: 20px; font-size: 18px; font-weight: 600;">
+            <?= isSuperAdmin() ? '👑 Super Admin' : '👤 Admin' ?>: <?= htmlspecialchars($_SESSION['username']) ?>
+        </span>
+        <a href="../logout.php" style="background: #f44336; color: white; padding: 8px 16px; border-radius: 20px; font-size: 16px; font-weight: 600; text-decoration: none; margin-left: 10px;">
+            🚪 Logout
         </a>
-        <a href="../index.php" class="go-calendar">📅 Go to Calendar</a>
-        <a href="../home.php" style="background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important; color: white !important; padding: 15px 30px !important; border-radius: 25px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important; margin: 0 10px !important; display: inline-block !important; transition: all 0.3s ease !important;">🏠 Home</a>
     </div>
 
     <footer class="footer">
