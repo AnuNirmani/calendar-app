@@ -1,9 +1,12 @@
 <?php
 // auth.php - Place this in your root directory
 
-function checkAuth($requiredRole = null) {
+// Start session only if not already started
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
-    
+}
+
+function checkAuth($requiredRole = null) {
     // Check if user is logged in
     if (!isset($_SESSION['username']) || !isset($_SESSION['role'])) {
         header("Location: ../login.php");
