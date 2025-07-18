@@ -12,7 +12,8 @@ This is a responsive PHP-based calendar web application that displays special da
 - ✅ **Tooltip hover for date descriptions**
 - ✅ **Clickable date cells (e.g. open PDFs)**
 - ✅ **Admin panel for managing special dates**
-- ✅ **Login system with admin/user roles**
+- ✅ **Login system with super admin/admin roles**
+- ✅ **Only super admins can add admins**
 - ✅ **Responsive layout (mobile/tablet friendly)**
 - ✅ **Color picker and dropdown for type selection**
 - ✅ **Pagination based on year (admin side)**
@@ -58,12 +59,6 @@ CREATE TABLE IF NOT EXISTS users (
     created_by INT,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
-
-INSERT INTO users (username, password, role) VALUES ('superadmin', 'super123', 'super_admin')
-ON DUPLICATE KEY UPDATE role = 'super_admin';
-
-INSERT INTO users (username, password, role, created_by) VALUES ('admin1', 'admin123', 'admin', 1)
-ON DUPLICATE KEY UPDATE role = 'admin';
 ```
 
 ---
@@ -71,14 +66,26 @@ ON DUPLICATE KEY UPDATE role = 'admin';
 ## 👤 Default Users
 
 ```sql
--- Admin User
-INSERT INTO users (username, password, role) VALUES ('admin', 'admin123', 'admin');
+INSERT INTO users (username, password, role) VALUES ('superadmin', 'super123', 'super_admin')
+ON DUPLICATE KEY UPDATE role = 'super_admin';
 
--- Normal User
-INSERT INTO users (username, password, role) VALUES ('user1', 'user123', 'user');
+INSERT INTO users (username, password, role, created_by) VALUES ('admin1', 'admin123', 'admin', 1)
+ON DUPLICATE KEY UPDATE role = 'admin';
 ```
 
 > 🔐 *Passwords are stored in plain text (for demonstration only). Can use hashing in production.*
+
+---
+
+---
+
+## 0️⃣ Default Special Dates
+
+```sql
+INSERT INTO special_types (type, description) VALUES
+('holiday', 'Public Holiday'),
+('poya', 'Full Moon Poya Day');
+```
 
 ---
 
@@ -90,22 +97,20 @@ calendar-app/
 ├── admin/
 │   ├── add.php
 │   ├── index.php
+│   ├── manage_users.php
 │   └── save.php
 │
 ├── images/
 │   └── logo.jpg
 │
-├── css/
-│   └── style.css
-│
+├── auth.php
 ├── db.php
 ├── index.php
 ├── index.html
 ├── login.php
 ├── logout.php
-├── home.php
-├── pdf.html
-└── README.md
+├── README.md
+└── style.css
 ```
 
 
@@ -116,7 +121,9 @@ calendar-app/
 1. ✅ Clone the repo:
 
    ```bash
-   git clone https://github.com/AnuNirmani/php-calendar-app.git
+   git clone https://github.com/AnuNirmani/calendar-app
+
+   get main2.0 branch
    ```
 
 2. ✅ Start XAMPP or MAMP and place files in your `htdocs` folder.
@@ -128,7 +135,8 @@ calendar-app/
 5. ✅ Access via browser:
 
    ```
-   http://localhost/php-calendar-app/login.php
+   http://localhost/calendar-app/index.php
+   http://localhost/calendar-app/login.php
    ```
 
 ---
@@ -137,8 +145,6 @@ calendar-app/
 
 * Add password hashing
 * Export calendar as PDF
-* Multilingual support
-* Event reminders/notifications
 
 ---
 
