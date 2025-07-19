@@ -25,21 +25,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
     $role = $_POST['role'];
     $created_by = getCurrentUserId();
 
-    // Check if username already exists
-    $checkStmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
-    $checkStmt->bind_param("s", $username);
-    $checkStmt->execute();
-    
-    if ($checkStmt->get_result()->num_rows > 0) {
-        $error = "Username already exists!";
+    // Validate password strength
+    if (strlen($password) < 8) {
+        $error = "Password must be at least 8 characters long!";
+    } elseif (!preg_match("/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/", $password)) {
+        $error = "Password must contain both letters and numbers!";
     } else {
-        $stmt = $conn->prepare("INSERT INTO users (username, password, role, created_by) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("sssi", $username, $password, $role, $created_by);
+        $password = password_hash($password, PASSWORD_DEFAULT); // Hash the password
+
+        // Check if username already exists
+        $checkStmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+        $checkStmt->bind_param("s", $username);
+        $checkStmt->execute();
         
-        if ($stmt->execute()) {
-            $success = "User added successfully!";
+        if ($checkStmt->get_result()->num_rows > 0) {
+            $error = "Username already exists!";
         } else {
-            $error = "Error adding user!";
+            $stmt = $conn->prepare("INSERT INTO users (username, password, role, created_by) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("sssi", $username, $password, $role, $created_by);
+            
+            if ($stmt->execute()) {
+                $success = "User added successfully!";
+            } else {
+                $error = "Error adding user!";
+            }
         }
     }
 }
@@ -95,9 +104,17 @@ $result = $conn->query("
             
             <div>
                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Password:</label>
-                <input type="password" name="password" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <div style="position: relative;">
+                    <input type="password" name="password" id="passwordInput" required
+                        style="width: 100%; padding: 10px 40px 10px 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <span id="togglePassword" onclick="togglePassword()" 
+                          style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%);
+                                 cursor: pointer; font-size: 20px;">
+                        🙈
+                    </span>
+                </div>
             </div>
-            
+
             <div>
                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Role:</label>
                 <select name="role" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
@@ -167,6 +184,24 @@ $result = $conn->query("
         &copy; <?php echo date('Y'); ?> Developed and Maintained by Web Publishing Department in collaboration with WNL Time Office<br>
         © All rights reserved, 2008 - Wijeya Newspapers Ltd.
     </footer>
+
+    <script>
+setTimeout(() => {
+    document.querySelectorAll('div[style*="border-left"]').forEach(el => el.style.display = 'none');
+}, 2000); // hides after 2 seconds
+</script>
+
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById("passwordInput");
+    const toggleIcon = document.getElementById("togglePassword");
+    const isPassword = passwordInput.type === "password";
+
+    passwordInput.type = isPassword ? "text" : "password";
+    toggleIcon.textContent = isPassword ? "🙉" : "🙈";
+}
+</script>
+
 
 </body>
 </html>

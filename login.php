@@ -15,17 +15,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $res = $stmt->get_result();
 
     if ($res->num_rows === 1) {
-        $user = $res->fetch_assoc();
+    $user = $res->fetch_assoc();
 
-        if ($password === $user['password']) {
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-            $_SESSION['user_id'] = $user['id'];
-            header("Location: admin/index.php");
-            exit;
-        } else {
-            $error = "Invalid password";
-        }
+    if (password_verify($password, $user['password'])) {
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'];
+        $_SESSION['user_id'] = $user['id'];
+        header("Location: admin/index.php");
+        exit;
+    } else {
+        $error = "Invalid password";
+    }
     } else {
         $error = "User not found";
     }
@@ -94,8 +94,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>🔐 Login</h2>
         <form method="POST">
             <input type="text" name="username" placeholder="Username" required onfocus="this.value=''">
-            <input type="password" name="password" placeholder="Password" required onfocus="this.value=''">
-
+            <div style="position: relative;">
+                <input type="password" name="password" id="passwordInput" placeholder="Password" required 
+                    onfocus="this.value=''" 
+                        style="width: 100%; padding: 10px 40px 10px 10px; box-sizing: border-box;">
+                    <span id="togglePassword" onclick="togglePassword()" 
+                        style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%);
+                            cursor: pointer; font-size: 20px;">
+                        🙉
+                    </span>
+                </div>
 
             <button type="submit">Login</button>
         </form>
@@ -111,4 +119,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
     </div>
 </body>
+
+<script>
+function togglePassword() {
+    const input = document.getElementById("passwordInput");
+    const icon = document.getElementById("togglePassword");
+    const isHidden = input.type === "password";
+
+    input.type = isHidden ? "text" : "password";
+    icon.textContent = isHidden ? "🙉" : "🙈";
+}
+</script>
+
 </html>
