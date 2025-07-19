@@ -5,10 +5,23 @@ include '../auth.php';
 // Check if user is authenticated (both admin and super_admin can access)
 checkAuth();
 
+// Auto logout after inactivity
+$timeout = 900; // 15 minutes = 900 seconds
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout) {
+    session_unset();
+    session_destroy();
+    header("Location: ../login.php"); // or "login.php" depending on path
+    exit;
+}
+$_SESSION['LAST_ACTIVITY'] = time();
+
+
 // Handle deletion
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
-    $conn->query("DELETE FROM special_dates WHERE id = $id");
+    $stmt = $conn->prepare("DELETE FROM special_dates WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
     header("Location: index.php");
     exit;
 }
@@ -18,7 +31,22 @@ $accessDeniedError = isset($_GET['error']) && $_GET['error'] === 'access_denied'
 
 $currentYear = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
 
-$result = $conn->query("
+// $result = $conn->query("
+//     SELECT 
+//         sd.id, sd.date, sd.color, 
+//         st.type AS joined_type, 
+//         st.description AS joined_description 
+//     FROM 
+//         special_dates sd 
+//     LEFT JOIN 
+//         special_types st ON sd.type_id = st.id 
+//     WHERE 
+//         YEAR(sd.date) = $currentYear
+//     ORDER BY sd.date DESC
+// ");
+
+// Base query
+$query = "
     SELECT 
         sd.id, sd.date, sd.color, 
         st.type AS joined_type, 
@@ -29,8 +57,49 @@ $result = $conn->query("
         special_types st ON sd.type_id = st.id 
     WHERE 
         YEAR(sd.date) = $currentYear
-    ORDER BY sd.date DESC
-");
+";
+
+// Bind filter parameters
+$conditions = [];
+$params = [];
+$types = "";
+
+// Search by description
+if (!empty($_GET['search'])) {
+    $conditions[] = "st.description LIKE ?";
+    $params[] = '%' . $_GET['search'] . '%';
+    $types .= "s";
+}
+
+// Filter by year
+if (!empty($_GET['year'])) {
+    $conditions[] = "YEAR(sd.date) = ?";
+    $params[] = $_GET['year'];
+    $types .= "i";
+}
+
+// Filter by type
+if (!empty($_GET['type'])) {
+    $conditions[] = "sd.type_id = ?";
+    $params[] = $_GET['type'];
+    $types .= "i";
+}
+
+// Add conditions to query
+if (!empty($conditions)) {
+    $query .= " AND " . implode(" AND ", $conditions);
+}
+
+$query .= " ORDER BY sd.date DESC";
+
+// Prepare and bind
+$stmt = $conn->prepare($query);
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+$stmt->execute();
+$result = $stmt->get_result();
+
 
 ?>
 
@@ -84,6 +153,7 @@ $result = $conn->query("
                 transition: all 0.3s ease !important;">👥 Manage Users</a>
             <?php endif; ?>
         </div>
+
 
         <table>
             <thead>
@@ -148,6 +218,50 @@ $result = $conn->query("
         </div>
 
     </div> <!-- closes .special-dates-table -->
+
+    <div style="margin-top: 35px;">
+
+    <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
+
+    <!-- 🔍 Description Search Form -->
+    <form method="GET" style="display: flex; gap: 10px; align-items: center;">
+        <input type="text" name="search" placeholder="Search by description..."
+               value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
+               style="padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px; width: 220px;">
+        <button type="submit" style="padding: 10px 25px; background: #03a9f4; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+            🔎 Search
+        </button>
+    </form>
+
+    <!-- 🎯 Year + Type Filter Form -->
+    <form method="GET" style="display: flex; gap: 10px; align-items: center;">
+        <select name="year" style="padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px;">
+            <option value="">All Years</option>
+            <?php
+            $currentYear = date('Y');
+            for ($y = $currentYear - 5; $y <= $currentYear + 5; $y++): ?>
+                <option value="<?= $y ?>" <?= isset($_GET['year']) && $_GET['year'] == $y ? 'selected' : '' ?>><?= $y ?></option>
+            <?php endfor; ?>
+        </select>
+
+        <select name="type" style="padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px;">
+            <option value="">All Types</option>
+            <?php
+            $typeRes = $conn->query("SELECT id, type FROM special_types");
+            while ($row = $typeRes->fetch_assoc()): ?>
+                <option value="<?= $row['id'] ?>" <?= isset($_GET['type']) && $_GET['type'] == $row['id'] ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($row['type']) ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+
+        <button type="submit" style="padding: 10px 25px; background: #03a9f4; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+            🎯 Filter
+        </button>
+    </form>
+
+</div>
+    
 
 
     <div style="margin-top: 10px;">

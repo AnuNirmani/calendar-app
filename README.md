@@ -17,7 +17,9 @@ This is a responsive PHP-based calendar web application that displays special da
 - ✅ **Responsive layout (mobile/tablet friendly)**
 - ✅ **Color picker and dropdown for type selection**
 - ✅ **Pagination based on year (admin side)**
+- ✅ **Search a date by dropdowns**
 - ✅ **Hashed passwords**
+- ✅ **SQL Injection Protection**
 
 ---
 

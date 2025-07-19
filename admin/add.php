@@ -5,6 +5,17 @@ include '../auth.php';
 // Check if user is authenticated (both admin and super_admin can access)
 checkAuth();
 
+// Auto logout after inactivity
+$timeout = 900; // 15 minutes = 900 seconds
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout) {
+    session_unset();
+    session_destroy();
+    header("Location: ../login.php"); // or "login.php" depending on path
+    exit;
+}
+$_SESSION['LAST_ACTIVITY'] = time();
+
+
 // Fetch special types
 $types = $conn->query("SELECT id, type, description FROM special_types");
 ?>

@@ -5,6 +5,17 @@ include '../auth.php';
 // Only super admin can access this page
 checkAuth('super_admin');
 
+// Auto logout after inactivity
+$timeout = 900; // 15 minutes = 900 seconds
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout) {
+    session_unset();
+    session_destroy();
+    header("Location: ../login.php"); // or "login.php" depending on path
+    exit;
+}
+$_SESSION['LAST_ACTIVITY'] = time();
+
+
 // Handle user deletion
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
@@ -13,7 +24,9 @@ if (isset($_GET['delete'])) {
     if ($id == $_SESSION['user_id']) {
         $error = "You cannot delete your own account!";
     } else {
-        $conn->query("DELETE FROM users WHERE id = $id");
+        $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
         $success = "User deleted successfully!";
     }
 }
@@ -72,6 +85,8 @@ $result = $conn->query("
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../images/logo.jpg" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
 <body class="admin-page">
 
@@ -107,11 +122,12 @@ $result = $conn->query("
                 <div style="position: relative;">
                     <input type="password" name="password" id="passwordInput" required
                         style="width: 100%; padding: 10px 40px 10px 10px; border: 1px solid #ddd; border-radius: 5px;">
-                    <span id="togglePassword" onclick="togglePassword()" 
-                          style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%);
-                                 cursor: pointer; font-size: 20px;">
-                        🙈
+                    <span id="togglePassword" onclick="togglePassword()"
+                        style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%);
+                            cursor: pointer; font-size: 20px; color: #666;">
+                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
                     </span>
+
                 </div>
             </div>
 
@@ -198,7 +214,21 @@ function togglePassword() {
     const isPassword = passwordInput.type === "password";
 
     passwordInput.type = isPassword ? "text" : "password";
-    toggleIcon.textContent = isPassword ? "🙉" : "🙈";
+    function togglePassword() {
+    const passwordInput = document.getElementById("passwordInput");
+    const eyeIcon = document.getElementById("eyeIcon");
+
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        eyeIcon.classList.remove("fa-eye");
+        eyeIcon.classList.add("fa-eye-slash");
+    } else {
+        passwordInput.type = "password";
+        eyeIcon.classList.remove("fa-eye-slash");
+        eyeIcon.classList.add("fa-eye");
+    }
+}
+
 }
 </script>
 
