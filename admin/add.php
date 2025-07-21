@@ -63,6 +63,11 @@ $types = $conn->query("SELECT id, type FROM special_types");
                 <span style="width: 20px; height: 20px; background: #ffea00; border-radius: 50%; border: 1px solid #333;"></span>
                 Full Moon Poya Day
             </label>
+            <label style="display: flex; align-items: center; gap: 8px;">
+                <input type="radio" name="color" value="#dbdbdbff">
+                <span style="width: 20px; height: 20px; background: #dbdbdbff; border-radius: 50%; border: 1px solid #333;"></span>
+                Other
+            </label>
         </div>
 
         <button type="submit">💾 Add Date</button>
