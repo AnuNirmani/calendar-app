@@ -75,8 +75,8 @@ function renderCalendar($month, $year, $specialDates, $today) {
         $color = $specialDates[$dateStr]['color'] ?? '';
         $dayText = sprintf('%02d', $d);
 
-        echo "<td class='$class' onclick=\"window.location.href='https://time.wnl/source/$dateStr/sheet.pdf'\" 
-        // title='$desc' style='cursor: pointer; color: black; $style'>$dayText</td>";
+        echo "<td class='$class' title='$desc' style='cursor: pointer; color: black; $style' 
+        onclick=\"window.open('https://time.wnl/source/" . str_replace('-', '/', $dateStr) . "/sheet.pdf', '_blank')\">$dayText</td>";
 
 
         //Opening with a new tab
