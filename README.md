@@ -12,10 +12,6 @@ This is a responsive PHP-based calendar web application that displays special da
 - ✅ **Tooltip hover for date descriptions**
 - ✅ **Clickable date cells (e.g. open PDFs)**
 - ✅ **Admin panel for managing special dates**
-- ✅ **Login system with super admin/admin roles**
-- ✅ **Only super admins can add admins**
-- ✅ **Responsive layout (mobile/tablet friendly)**
-- ✅ **Color picker and dropdown for type selection**
 - ✅ **Pagination based on year (admin side)**
 - ✅ **Search a date by dropdowns**
 - ✅ **Hashed passwords**
@@ -23,17 +19,38 @@ This is a responsive PHP-based calendar web application that displays special da
 
 ---
 
+## 🛠️ Tech Stack
+
+✅ Frontend: HTML5, CSS3, JavaScript
+✅ Backend: PHP 8+
+✅ Database: MySQL (via phpMyAdmin)
+✅ Server: WAMP / XAMPP (localhost testing)
+
+---
+
 ## 🗃️ Database Schema
 
-### 1. `users`  
+### 1. `users with default users`  
 Stores user login credentials and roles.
 ```sql
-CREATE TABLE users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(50) NOT NULL,
-  password VARCHAR(50) NOT NULL,
-  role ENUM('admin', 'user') DEFAULT 'user'
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('super_admin', 'admin') NOT NULL DEFAULT 'admin',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INT,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
+
+INSERT INTO users (username, password, role) VALUES ('superadmin', 'super123', 'super_admin')
+ON DUPLICATE KEY UPDATE role = 'super_admin';
+
+INSERT INTO users (username, password, role, created_by) VALUES ('admin1', 'admin123', 'admin', 1)
+ON DUPLICATE KEY UPDATE role = 'admin';
+
+> 🔐 *Passwords are stored in plain text (for demonstration only). Can use hashing in production.*
+
 ````
 
 ### 2. `special_types`
@@ -64,21 +81,6 @@ CREATE TABLE IF NOT EXISTS users (
 );
 ```
 
----
-
-## 👤 Default Users
-
-```sql
-INSERT INTO users (username, password, role) VALUES ('superadmin', 'super123', 'super_admin')
-ON DUPLICATE KEY UPDATE role = 'super_admin';
-
-INSERT INTO users (username, password, role, created_by) VALUES ('admin1', 'admin123', 'admin', 1)
-ON DUPLICATE KEY UPDATE role = 'admin';
-```
-
-> 🔐 *Passwords are stored in plain text (for demonstration only). Can use hashing in production.*
-
----
 
 ---
 
