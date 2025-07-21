@@ -1,12 +1,4 @@
 <?php
-session_start();
-if (!isset($_SESSION['username'])) {
-    header("Location: login.php");
-    exit;
-}
-?>
-
-<?php
 include 'db.php';
 
 $today = new DateTime();
@@ -79,15 +71,18 @@ function renderCalendar($month, $year, $specialDates, $today) {
             }
         }
 
-        // echo "<td class='$class' onclick=\"window.location.href='pdf.html'\" style='cursor: pointer; $style'>
-        //     <div class='tooltip-wrapper'>" . sprintf('%02d', $d) . "$tooltip</div>
-        //         </td>";
-
         $desc = htmlspecialchars($specialDates[$dateStr]['description'] ?? '');
         $color = $specialDates[$dateStr]['color'] ?? '';
         $dayText = sprintf('%02d', $d);
 
-        echo "<td class='$class' onclick=\"window.location.href='pdf.html'\" title='$desc' style='cursor: pointer; color: black; $style'>$dayText</td>";
+        echo "<td class='$class' onclick=\"window.location.href='https://time.wnl/source/$dateStr/sheet.pdf'\" 
+        // title='$desc' style='cursor: pointer; color: black; $style'>$dayText</td>";
+
+
+        //Opening with a new tab
+    //     echo "<td class='$class' title='$desc' style='color: black; $style'>
+    //     <a href='https://time.wnl/source/$dateStr/sheet.pdf' target='_blank' style='display: block; text-decoration: none; color: inherit;'>$dayText</a>
+    //   </td>";
 
 
         if ((($d + $pad) % 7) == 0) echo "</tr><tr>";

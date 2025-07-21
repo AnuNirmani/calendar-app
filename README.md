@@ -12,10 +12,14 @@ This is a responsive PHP-based calendar web application that displays special da
 - ✅ **Tooltip hover for date descriptions**
 - ✅ **Clickable date cells (e.g. open PDFs)**
 - ✅ **Admin panel for managing special dates**
-- ✅ **Login system with admin/user roles**
+- ✅ **Login system with super admin/admin roles**
+- ✅ **Only super admins can add admins**
 - ✅ **Responsive layout (mobile/tablet friendly)**
 - ✅ **Color picker and dropdown for type selection**
 - ✅ **Pagination based on year (admin side)**
+- ✅ **Search a date by dropdowns**
+- ✅ **Hashed passwords**
+- ✅ **SQL Injection Protection**
 
 ---
 
@@ -49,12 +53,14 @@ CREATE TABLE special_types (
 Stores the actual dates.
 
 ```sql
-CREATE TABLE special_dates (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  date DATE NOT NULL,
-  type_id INT,
-  color VARCHAR(10),
-  FOREIGN KEY (type_id) REFERENCES special_types(id)
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('super_admin', 'admin') NOT NULL DEFAULT 'admin',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INT,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 ```
 
@@ -63,14 +69,56 @@ CREATE TABLE special_dates (
 ## 👤 Default Users
 
 ```sql
--- Admin User
-INSERT INTO users (username, password, role) VALUES ('admin', 'admin123', 'admin');
+INSERT INTO users (username, password, role) VALUES ('superadmin', 'super123', 'super_admin')
+ON DUPLICATE KEY UPDATE role = 'super_admin';
 
--- Normal User
-INSERT INTO users (username, password, role) VALUES ('user1', 'user123', 'user');
+INSERT INTO users (username, password, role, created_by) VALUES ('admin1', 'admin123', 'admin', 1)
+ON DUPLICATE KEY UPDATE role = 'admin';
 ```
 
 > 🔐 *Passwords are stored in plain text (for demonstration only). Can use hashing in production.*
+
+---
+
+---
+
+## 0️⃣ Default Special Dates
+
+```sql
+INSERT INTO special_types (type, description) VALUES
+('holiday', 'Public Holiday'),
+('poya', 'Full Moon Poya Day');
+```
+
+---
+
+## #️⃣ To Hash Password
+
+```
+<?php
+// update_passwords.php
+include 'db.php';
+
+$users = [
+    ['username' => 'superadmin', 'password' => 'super123'],
+    ['username' => 'admin1', 'password' => 'admin123']
+];
+
+foreach ($users as $user) {
+    $hashedPassword = password_hash($user['password'], PASSWORD_DEFAULT);
+    $stmt = $conn->prepare("UPDATE users SET password = ? WHERE username = ?");
+    $stmt->bind_param("ss", $hashedPassword, $user['username']);
+    $stmt->execute();
+    if ($stmt->affected_rows > 0) {
+        echo "Updated password for {$user['username']}\n";
+    } else {
+        echo "No update needed for {$user['username']}\n";
+    }
+}
+
+echo "Password update complete.\n";
+?>
+```
 
 ---
 
@@ -82,22 +130,20 @@ calendar-app/
 ├── admin/
 │   ├── add.php
 │   ├── index.php
+│   ├── manage_users.php
 │   └── save.php
 │
 ├── images/
 │   └── logo.jpg
 │
-├── css/
-│   └── style.css
-│
+├── auth.php
 ├── db.php
 ├── index.php
 ├── index.html
 ├── login.php
 ├── logout.php
-├── home.php
-├── pdf.html
-└── README.md
+├── README.md
+└── style.css
 ```
 
 
@@ -108,7 +154,9 @@ calendar-app/
 1. ✅ Clone the repo:
 
    ```bash
-   git clone https://github.com/AnuNirmani/php-calendar-app.git
+   git clone https://github.com/AnuNirmani/calendar-app
+
+   get main2.0 branch
    ```
 
 2. ✅ Start XAMPP or MAMP and place files in your `htdocs` folder.
@@ -120,17 +168,15 @@ calendar-app/
 5. ✅ Access via browser:
 
    ```
-   http://localhost/php-calendar-app/login.php
+   http://localhost/calendar-app/index.php
+   http://localhost/calendar-app/login.php
    ```
 
 ---
 
 ## 💡 Future Improvements
 
-* Add password hashing
 * Export calendar as PDF
-* Multilingual support
-* Event reminders/notifications
 
 ---
 

@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'db.php';
+include 'auth.php';
 
 $error = "";
 
@@ -14,16 +15,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $res = $stmt->get_result();
 
     if ($res->num_rows === 1) {
-        $user = $res->fetch_assoc();
+    $user = $res->fetch_assoc();
 
-        if ($password === $user['password']) {
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-            header("Location: home.php");
-            exit;
-        } else {
-            $error = "Invalid password";
-        }
+    if (password_verify($password, $user['password'])) {
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'];
+        $_SESSION['user_id'] = $user['id'];
+        header("Location: admin/index.php");
+        exit;
+    } else {
+        $error = "Invalid password";
+    }
     } else {
         $error = "User not found";
     }
@@ -37,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body.login-page {
             background: #f2f2f2;
@@ -74,6 +77,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .login-container a.button:hover {
             background-color: darkblue;
         }
+
+        .role-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1976d2;
+        }
+
     </style>
     <link rel="icon" href="images/logo.jpg" type="image/png">
 </head>
@@ -82,14 +95,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>🔐 Login</h2>
         <form method="POST">
             <input type="text" name="username" placeholder="Username" required onfocus="this.value=''">
-            <input type="password" name="password" placeholder="Password" required onfocus="this.value=''">
+            <div style="position: relative;">
+                <input type="password" name="password" id="passwordInput" placeholder="Password" required 
+                    onfocus="this.value=''" 
+                        style="width: 100%; padding: 10px 40px 10px 10px; box-sizing: border-box;">
+                    <span id="togglePassword" onclick="togglePassword()"
+                        style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%);
+                            cursor: pointer; font-size: 20px; color: #666;">
+                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                    </span>
 
+                </div>
 
             <button type="submit">Login</button>
         </form>
         <?php if ($error): ?>
             <p style="color:#d32f2f; margin-top: 20px; padding: 10px; background: rgba(255,0,0,0.1); border-radius: 8px; font-weight: 500;"><?= $error ?></p>
         <?php endif; ?>
+
+        <!-- <div class="role-info">
+            <strong>Role System:</strong><br>
+            • Super Admin: Can manage all users and access all features<br>
+            • Admin: Can access calendar management features
+        </div> -->
+        
     </div>
 </body>
+
+<script>
+function togglePassword() {
+    const input = document.getElementById("passwordInput");
+    const icon = document.getElementById("togglePassword");
+    const isHidden = input.type === "password";
+
+    input.type = isHidden ? "text" : "password";
+    function togglePassword() {
+    const passwordInput = document.getElementById("passwordInput");
+    const eyeIcon = document.getElementById("eyeIcon");
+
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        eyeIcon.classList.remove("fa-eye");
+        eyeIcon.classList.add("fa-eye-slash");
+    } else {
+        passwordInput.type = "password";
+        eyeIcon.classList.remove("fa-eye-slash");
+        eyeIcon.classList.add("fa-eye");
+    }
+}
+
+}
+</script>
+
 </html>
