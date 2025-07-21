@@ -1,16 +1,16 @@
 <?php
-include 'db.php';
+include 'db.php'; // Ensure db.php is in the same directory or adjust the path
 
+// Define $today at the beginning
 $today = new DateTime();
 
 // Load special dates
-// Update fetch to get color
 $datesQuery = $conn->query("
     SELECT 
         sd.date, 
         sd.color, 
         st.type, 
-        st.description 
+        sd.description 
     FROM 
         special_dates sd
     LEFT JOIN 
@@ -48,6 +48,7 @@ function renderCalendar($month, $year, $specialDates, $today) {
 
         $class = "";
         $tooltip = "";
+        $desc = ''; // Initialize $desc with an empty string as default
 
         // Check if it's today
         if ($dateStr === $today->format('Y-m-d')) {
@@ -58,7 +59,6 @@ function renderCalendar($month, $year, $specialDates, $today) {
         else if ($dow == 6) $class .= " saturday";
 
         $style = "";
-        $tooltip = "";
 
         if (isset($specialDates[$dateStr])) {
             $type = $specialDates[$dateStr]['type'];
@@ -71,19 +71,10 @@ function renderCalendar($month, $year, $specialDates, $today) {
             }
         }
 
-        $desc = htmlspecialchars($specialDates[$dateStr]['description'] ?? '');
-        $color = $specialDates[$dateStr]['color'] ?? '';
         $dayText = sprintf('%02d', $d);
 
         echo "<td class='$class' title='$desc' style='cursor: pointer; color: black; $style' 
-        onclick=\"window.open('https://time.wnl/source/" . str_replace('-', '/', $dateStr) . "/sheet.pdf', '_blank')\">$dayText</td>";
-
-
-        //Opening with a new tab
-    //     echo "<td class='$class' title='$desc' style='color: black; $style'>
-    //     <a href='https://time.wnl/source/$dateStr/sheet.pdf' target='_blank' style='display: block; text-decoration: none; color: inherit;'>$dayText</a>
-    //   </td>";
-
+        onclick=\"window.open('https://time.wnl/source/" . str_replace('-', '/', $dateStr) . "/sheet.pdf', '_blank')\">$dayText$tooltip</td>";
 
         if ((($d + $pad) % 7) == 0) echo "</tr><tr>";
     }
@@ -93,24 +84,19 @@ function renderCalendar($month, $year, $specialDates, $today) {
 
 // Helper function to adjust color brightness
 function adjustBrightness($hex, $percent) {
-    // Remove # if present
     $hex = str_replace('#', '', $hex);
-    
-    // Convert to RGB
     $r = hexdec(substr($hex, 0, 2));
     $g = hexdec(substr($hex, 2, 2));
     $b = hexdec(substr($hex, 4, 2));
     
-    // Adjust brightness
     $r = max(0, min(255, $r * $percent));
     $g = max(0, min(255, $g * $percent));
     $b = max(0, min(255, $b * $percent));
     
-    // Convert back to hex
     return '#' . str_pad(dechex($r), 2, '0', STR_PAD_LEFT) . 
                  str_pad(dechex($g), 2, '0', STR_PAD_LEFT) . 
                  str_pad(dechex($b), 2, '0', STR_PAD_LEFT);
 }
-
-include 'index.html';
 ?>
+
+<?php include 'index.html'; ?>

@@ -15,9 +15,8 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) >
 }
 $_SESSION['LAST_ACTIVITY'] = time();
 
-
 // Fetch special types
-$types = $conn->query("SELECT id, type, description FROM special_types");
+$types = $conn->query("SELECT id, type FROM special_types");
 ?>
 
 <!DOCTYPE html>
@@ -44,10 +43,13 @@ $types = $conn->query("SELECT id, type, description FROM special_types");
             <option value="">-- Select Type --</option>
             <?php while($row = $types->fetch_assoc()): ?>
                 <option value="<?= $row['id'] ?>">
-                    <?= htmlspecialchars($row['type']) ?> — <?= htmlspecialchars($row['description']) ?>
+                    <?= htmlspecialchars($row['type']) ?>
                 </option>
             <?php endwhile; ?>
         </select>
+
+        <label for="description">📝 Description:</label>
+        <input type="text" name="description" placeholder="Enter description">
 
         <label>🎨 Optional Color:</label>
         <div style="display: flex; gap: 20px; margin: 10px 0;">
@@ -64,12 +66,10 @@ $types = $conn->query("SELECT id, type, description FROM special_types");
         </div>
 
         <button type="submit">💾 Add Date</button>
-
     </form>
 
-
     <div style="margin-top: 10px;">
-        <span style="background: <?= isSuperAdmin() ?>; color: white; padding: 8px 16px; border-radius: 20px; font-size: 18px; font-weight: 600;">
+        <span style="color: white; padding: 8px 16px; border-radius: 20px; font-size: 18px; font-weight: 600;">
             <?= isSuperAdmin() ? '👑 Super Admin' : '👤 Admin' ?>: <?= htmlspecialchars($_SESSION['username']) ?>
         </span>
         <a href="../logout.php" style="background: #f44336; color: white; padding: 8px 16px; border-radius: 20px; font-size: 16px; font-weight: 600; text-decoration: none; margin-left: 10px;">
@@ -77,9 +77,8 @@ $types = $conn->query("SELECT id, type, description FROM special_types");
         </a>
     </div>
 
-
     <footer class="footer">
-        &copy; <?php echo date('Y'); ?> Developed and Maintained by Web Publishing Department in collaboration with WNL Time Office<br>
+        © <?php echo date('Y'); ?> Developed and Maintained by Web Publishing Department in collaboration with WNL Time Office<br>
         © All rights reserved, 2008 - Wijeya Newspapers Ltd.
     </footer>
 </body>
