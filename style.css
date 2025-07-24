@@ -608,9 +608,32 @@ form {
     text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
-/* Delete button enhancement */
-a[href*="delete"] {
-    background: navy;
+/* Edit Button Styling */
+a.edit-button {
+    background-color: lightblue !important;
+    color: rgb(0, 0, 0) !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin: 0 5px 0 0 !important;
+    display: inline-block !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    border: none !important;
+}
+
+a.edit-button:hover {
+    background-color: rgb(164, 107, 166) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 5px 15px rgb(159, 124, 160) !important;
+}
+
+/* Delete Button Styling */
+a.delete-button {
+    background-color: navy !important;
     color: white !important;
     padding: 8px 16px !important;
     border-radius: 20px !important;
@@ -618,12 +641,15 @@ a[href*="delete"] {
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
     margin: 0 !important;
+    display: inline-block !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    border: none !important;
 }
 
-a[href*="delete"]:hover {
-    background: red;
+a.delete-button:hover {
+    background-color: red !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 5px 15px rgba(255, 107, 157, 0.3) !important;
+    box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3) !important;
 }
-
-

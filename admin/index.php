@@ -154,9 +154,8 @@ $result = $stmt->get_result();
                         <div style="width: 30px; height: 30px; background: <?= htmlspecialchars($row['color']) ?>; border-radius: 50%; margin: auto; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
                     </td>
                     <td>
-                        <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('⚠️ Are you sure you want to delete this date?')">
-                            🗑️ Delete
-                        </a>
+                    <a href="edit.php?id=<?= $row['id'] ?>" class="edit-button">✏️ Edit</a>
+                    <a href="?delete=<?= $row['id'] ?>" class="delete-button" onclick="return confirm('⚠️ Are you sure you want to delete this date?')">🗑️ Delete</a>
                     </td>
                 </tr>
                 <?php endwhile; ?>

@@ -2,25 +2,21 @@
 include '../db.php';
 include '../auth.php';
 
-// Only super admin can access this page
 checkAuth('super_admin');
 
 // Auto logout after inactivity
-$timeout = 900; // 15 minutes = 900 seconds
+$timeout = 900;
 if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout) {
     session_unset();
     session_destroy();
-    header("Location: ../login.php"); // or "login.php" depending on path
+    header("Location: ../login.php");
     exit;
 }
 $_SESSION['LAST_ACTIVITY'] = time();
 
-
-// Handle user deletion
+// Handle delete
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
-    
-    // Prevent super admin from deleting themselves
     if ($id == $_SESSION['user_id']) {
         $error = "You cannot delete your own account!";
     } else {
@@ -31,32 +27,28 @@ if (isset($_GET['delete'])) {
     }
 }
 
-// Handle adding new user
+// Handle add user
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
     $role = $_POST['role'];
     $created_by = getCurrentUserId();
 
-    // Validate password strength
     if (strlen($password) < 8) {
         $error = "Password must be at least 8 characters long!";
     } elseif (!preg_match("/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/", $password)) {
         $error = "Password must contain both letters and numbers!";
     } else {
-        $password = password_hash($password, PASSWORD_DEFAULT); // Hash the password
-
-        // Check if username already exists
+        $password = password_hash($password, PASSWORD_DEFAULT);
         $checkStmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
         $checkStmt->bind_param("s", $username);
         $checkStmt->execute();
-        
+
         if ($checkStmt->get_result()->num_rows > 0) {
             $error = "Username already exists!";
         } else {
             $stmt = $conn->prepare("INSERT INTO users (username, password, role, created_by) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("sssi", $username, $password, $role, $created_by);
-            
             if ($stmt->execute()) {
                 $success = "User added successfully!";
             } else {
@@ -66,15 +58,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
     }
 }
 
-// Fetch all users
+// Fetch users
 $result = $conn->query("
-    SELECT u.id, u.username, u.role, u.created_at, 
-           creator.username as created_by_username 
-    FROM users u 
-    LEFT JOIN users creator ON u.created_by = creator.id 
-    ORDER BY u.created_at DESC
-");
+    SELECT u.id, u.username, u.role, u.created_at,
+       creator.username as created_by_username,
+       editor.username as edited_by_username,
+       u.edited_at
+FROM users u
+LEFT JOIN users creator ON u.created_by = creator.id
+LEFT JOIN users editor ON u.edited_by = editor.id
+ORDER BY u.created_at DESC
 
+");
 ?>
 
 <!DOCTYPE html>
@@ -86,13 +81,11 @@ $result = $conn->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../images/logo.jpg" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 </head>
-<body class="admin-page">
 
+<body class="admin-page">
     <div style="text-align: center; margin-bottom: 30px;">
         <h2>✨ Manage Users</h2>
-        
     </div>
 
     <?php if (isset($error)): ?>
@@ -107,131 +100,106 @@ $result = $conn->query("
         </div>
     <?php endif; ?>
 
-    <!-- Add New User Form -->
+    <!-- Add User Form -->
     <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px;">
         <h3 style="margin-top: 0; color: #333;">➕ Add New User</h3>
-        
         <form method="POST" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
             <div>
-                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Username:</label>
-                <input type="text" name="username" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <label style="font-weight: 600;">Username:</label>
+                <input type="text" name="username" required style="width: 100%; padding: 10px;">
             </div>
-            
             <div>
-                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Password:</label>
+                <label style="font-weight: 600;">Password:</label>
                 <div style="position: relative;">
-                    <input type="password" name="password" id="passwordInput" required
-                        style="width: 100%; padding: 10px 40px 10px 10px; border: 1px solid #ddd; border-radius: 5px;">
-                    <span id="togglePassword" onclick="togglePassword()"
-                        style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%);
-                            cursor: pointer; font-size: 20px; color: #666;">
+                    <input type="password" name="password" id="passwordInput" required style="width: 100%; padding: 10px 40px 10px 10px;">
+                    <span onclick="togglePassword()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">
                         <i class="fa-solid fa-eye" id="eyeIcon"></i>
                     </span>
-
                 </div>
             </div>
-
             <div>
-                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Role:</label>
-                <select name="role" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <label style="font-weight: 600;">Role:</label>
+                <select name="role" required style="width: 100%; padding: 10px;">
                     <option value="">Select Role</option>
                     <option value="admin">Admin</option>
                     <option value="super_admin">Super Admin</option>
                 </select>
             </div>
-            
-            <button type="submit" name="add_user" style="background: #2196f3; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">
-                Add User
-            </button>
+            <button type="submit" name="add_user" style="background: #2196f3; color: white; padding: 10px 20px; border-radius: 5px;">Add User</button>
         </form>
     </div>
 
-    <!-- Users Table -->
+    <!-- User Table -->
     <div class="special-dates-table">
         <table>
             <thead>
-                <tr>
-                    <th>👤 Username</th>
-                    <th>🏷️ Role</th>
-                    <th>📅 Created</th>
-                    <th>👨‍💼 Created By</th>
-                    <th>⚡ Actions</th>
+                <tr style="background: linear-gradient(90deg, #6A5ACD, #7B68EE); color: white;">
+                    <th>👤 USERNAME</th>
+                    <th>🏷️ ROLE</th>
+                    <th>📅 CREATED AT</th>
+                    <th>👨‍💼 CREATED BY</th>
+                    <th>✏️ EDITED At</th>
+                    <th>🧑 EDITED BY</th>
+                    <th>⚡ ACTIONS</th>
                 </tr>
             </thead>
             <tbody>
-                <?php while($row = $result->fetch_assoc()): ?>
-                <tr>
-                    <td style="font-weight: 600;"><?= htmlspecialchars($row['username']) ?></td>
-                    <td>
-                        <span style="background: <?= $row['role'] === 'super_admin' ?>; color: black; padding: 4px 12px; border-radius: 15px; font-size: 14px; font-weight: 600;">
-                            <?= $row['role'] === 'super_admin' ? '👑 Super Admin' : '👤 Admin' ?>
-                        </span>
-                    </td>
-                    <td><?= date('M j, Y', strtotime($row['created_at'])) ?></td>
-                    <td><?= htmlspecialchars($row['created_by_username'] ?? 'System') ?></td>
-                    <td>
-                        <?php if ($row['id'] != $_SESSION['user_id']): ?>
-                            <a href="?delete=<?= $row['id'] ?>" 
-                               onclick="return confirm('⚠️ Are you sure you want to delete user: <?= htmlspecialchars($row['username']) ?>?')"
-                               style="background: #f44336; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">
-                                🗑️ Delete
-                            </a>
-                        <?php else: ?>
-                            <span style="color: #999; font-size: 12px;">Current User</span>
-                        <?php endif; ?>
-                    </td>
-                </tr>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td style="font-weight: 600;"><?= htmlspecialchars($row['username']) ?></td>
+                        <td><?= $row['role'] === 'super_admin' ? '👑 Super Admin' : '👤 Admin' ?></td>
+                        <td><?= date('M j, Y', strtotime($row['created_at'])) ?></td>
+                        <td><?= htmlspecialchars($row['created_by_username'] ?? 'System') ?></td>
+                        <td><?= $row['edited_at'] ? date('M j, Y', strtotime($row['edited_at'])) : '-' ?></td>
+                        <td><?= $row['edited_by_username'] ?? '-' ?></td>
+                        <td>
+                            <?php if ($row['id'] != $_SESSION['user_id']): ?>
+                                <a href="edit_user.php?id=<?= $row['id'] ?>" class="edit-button">✏️ Edit</a>
+                                <a href="?delete=<?= $row['id'] ?>" class="delete-button" onclick="return confirm('⚠️ Are you sure you want to delete this user?')">🗑️ Delete</a>
+                            <?php else: ?>
+                                <span style="color: #999; font-size: 12px;">Current User</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
     </div>
 
-
-            <div style="margin-top: 10px;">
-        <span style="background: <?= isSuperAdmin() ?>; color: white; padding: 8px 16px; border-radius: 20px; font-size: 18px; font-weight: 600;">
+    <!-- User Info + Logout -->
+    <div style="margin-top: 10px;">
+        <span style="color: white; padding: 8px 16px; border-radius: 20px; font-size: 18px; font-weight: 600;;">
             <?= isSuperAdmin() ? '👑 Super Admin' : '👤 Admin' ?>: <?= htmlspecialchars($_SESSION['username']) ?>
         </span>
-        <a href="../logout.php" style="background: #f44336; color: white; padding: 8px 16px; border-radius: 20px; font-size: 16px; font-weight: 600; text-decoration: none; margin-left: 10px;">
+        <a href="../logout.php" style="background: #f44336; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; margin-left: 10px;">
             🚪 Logout
         </a>
     </div>
 
-    <footer class="footer">
-        &copy; <?php echo date('Y'); ?> Developed and Maintained by Web Publishing Department in collaboration with WNL Time Office<br>
+    <footer class="footer" style="margin-top: 30px; text-align: center;">
+        &copy; <?= date('Y') ?> Developed by Web Publishing Dept. in collaboration with WNL Time Office<br>
         © All rights reserved, 2008 - Wijeya Newspapers Ltd.
     </footer>
 
     <script>
-setTimeout(() => {
-    document.querySelectorAll('div[style*="border-left"]').forEach(el => el.style.display = 'none');
-}, 2000); // hides after 2 seconds
-</script>
+        setTimeout(() => {
+            document.querySelectorAll('div[style*="border-left"]').forEach(el => el.style.display = 'none');
+        }, 2000);
 
-<script>
-function togglePassword() {
-    const passwordInput = document.getElementById("passwordInput");
-    const toggleIcon = document.getElementById("togglePassword");
-    const isPassword = passwordInput.type === "password";
+        function togglePassword() {
+            const passwordInput = document.getElementById("passwordInput");
+            const eyeIcon = document.getElementById("eyeIcon");
 
-    passwordInput.type = isPassword ? "text" : "password";
-    function togglePassword() {
-    const passwordInput = document.getElementById("passwordInput");
-    const eyeIcon = document.getElementById("eyeIcon");
-
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        eyeIcon.classList.remove("fa-eye");
-        eyeIcon.classList.add("fa-eye-slash");
-    } else {
-        passwordInput.type = "password";
-        eyeIcon.classList.remove("fa-eye-slash");
-        eyeIcon.classList.add("fa-eye");
-    }
-}
-
-}
-</script>
-
-
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeIcon.classList.remove("fa-eye");
+                eyeIcon.classList.add("fa-eye-slash");
+            } else {
+                passwordInput.type = "password";
+                eyeIcon.classList.remove("fa-eye-slash");
+                eyeIcon.classList.add("fa-eye");
+            }
+        }
+    </script>
 </body>
 </html>
