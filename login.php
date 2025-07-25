@@ -15,17 +15,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $res = $stmt->get_result();
 
     if ($res->num_rows === 1) {
-    $user = $res->fetch_assoc();
+        $user = $res->fetch_assoc();
 
-    if (password_verify($password, $user['password'])) {
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
-        $_SESSION['user_id'] = $user['id'];
-        header("Location: admin/index.php");
-        exit;
-    } else {
-        $error = "Invalid password";
-    }
+        // Check if user is active
+        if ($user['status'] == 0) {
+            $error = "Your account has been deactivated. Please contact the superuser.";
+        } elseif (password_verify($password, $user['password'])) {
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['user_id'] = $user['id'];
+            header("Location: admin/index.php");
+            exit;
+        } else {
+            $error = "Invalid password";
+        }
     } else {
         $error = "User not found";
     }
@@ -124,12 +127,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <script>
 function togglePassword() {
-    const input = document.getElementById("passwordInput");
-    const icon = document.getElementById("togglePassword");
-    const isHidden = input.type === "password";
-
-    input.type = isHidden ? "text" : "password";
-    function togglePassword() {
     const passwordInput = document.getElementById("passwordInput");
     const eyeIcon = document.getElementById("eyeIcon");
 
@@ -142,8 +139,6 @@ function togglePassword() {
         eyeIcon.classList.remove("fa-eye-slash");
         eyeIcon.classList.add("fa-eye");
     }
-}
-
 }
 </script>
 
