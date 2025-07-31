@@ -653,3 +653,80 @@ a.delete-button:hover {
     transform: translateY(-1px) !important;
     box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3) !important;
 }
+
+/* Add these CSS rules to your existing style.css for table alignment */
+
+/* Make tables consistent width and layout */
+table {
+    border-collapse: collapse;
+    background: transparent;
+    border-radius: 15px;
+    overflow: hidden;
+    font-size: 15px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    table-layout: fixed; /* This ensures consistent column widths */
+}
+
+/* Standardize table container width */
+.special-dates-table {
+    display: inline-block;
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    width: 90%;
+    max-width: 1200px; /* Set consistent max width */
+}
+
+/* Consistent cell alignment and padding */
+th, td {
+    padding: 15px 10px;
+    text-align: center; /* Center align all content */
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    word-wrap: break-word;
+}
+
+/* Specific column width classes for both tables */
+.col-username, .col-date { width: 15%; }
+.col-role, .col-type { width: 15%; }
+.col-status, .col-description { width: 15%; }
+.col-created-at, .col-color { width: 12%; }
+.col-created-by, .col-edited-at, .col-edited-by { width: 12%; }
+.col-actions { width: 19%; }
+
+/* Adjust action buttons to fit better in columns */
+a.edit-button {
+    background-color: lightblue !important;
+    color: rgb(0, 0, 0) !important;
+    padding: 8px 12px !important;
+    border-radius: 20px !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin: 0 3px !important;
+    display: inline-block !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    border: none !important;
+}
+
+a.delete-button {
+    background-color: navy !important;
+    color: white !important;
+    padding: 8px 12px !important;
+    border-radius: 20px !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin: 0 3px !important;
+    display: inline-block !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    border: none !important;
+}

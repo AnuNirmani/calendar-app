@@ -190,14 +190,14 @@ ORDER BY u.created_at DESC
         <table>
             <thead>
                 <tr style="background: linear-gradient(90deg, #6A5ACD, #7B68EE); color: white;">
-                    <th>👤 USERNAME</th>
-                    <th>🏷️ ROLE</th>
-                    <th>🔄 STATUS</th>
-                    <th>📅 CREATED AT</th>
-                    <th>👨‍💼 CREATED BY</th>
-                    <th>✏️ EDITED At</th>
-                    <th>🧑 EDITED BY</th>
-                    <th>⚡ ACTIONS</th>
+                    <th class="col-username">👤 USERNAME</th>
+                    <th class="col-role">🏷️ ROLE</th>
+                    <th class="col-status">🔄 STATUS</th>
+                    <th class="col-created-at">📅 CREATED AT</th>
+                    <th class="col-created-by">👨‍💼 CREATED BY</th>
+                    <th class="col-edited-at">✏️ EDITED AT</th>
+                    <th class="col-edited-by">🧑 EDITED BY</th>
+                    <th class="col-actions">⚡ ACTIONS</th>
                 </tr>
             </thead>
             <tbody>

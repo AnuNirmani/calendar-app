@@ -137,11 +137,11 @@ $result = $stmt->get_result();
         <table>
             <thead>
                 <tr>
-                    <th>📅 Date</th>
-                    <th>🏷️ Type</th>
-                    <th>📝 Description</th>
-                    <th>🎨 Color</th>
-                    <th>⚡ Action</th>
+                    <th class="col-date">📅 Date</th>
+                    <th class="col-type">🏷️ Type</th>
+                    <th class="col-description">📝 Description</th>
+                    <th class="col-color">🎨 Color</th>
+                    <th class="col-actions">⚡ Action</th>
                 </tr>
             </thead>
             <tbody>
