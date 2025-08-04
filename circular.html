@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wijeya Newspapers - Internal Communications</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --wijeya-primary: #87CEEB; /* Sky Blue */
+            --wijeya-dark: #4682B4; /* Steel Blue */
+            --wijeya-light: #E6F2F8; /* Light Sky Blue */
+        }
+        body {
+            font-family: 'Georgia', serif;
+        }
+        .navbar {
+            background-color: var(--wijeya-primary) !important;
+            border-bottom: 3px solid var(--wijeya-dark);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #fff !important;
+        }
+        .navbar-dark .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .circulation-card {
+            transition: transform 0.3s;
+            border-left: 4px solid transparent;
+            height: 100%;
+        }
+        .circulation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .unread {
+            border-left: 4px solid var(--wijeya-primary);
+        }
+        .btn-wijeya {
+            background-color: var(--wijeya-primary);
+            color: white;
+            border: none;
+        }
+        .btn-wijeya:hover {
+            background-color: var(--wijeya-dark);
+            color: white;
+        }
+        .badge-wijeya {
+            background-color: var(--wijeya-dark);
+        }
+        footer {
+            background-color: var(--wijeya-dark);
+            color: white;
+            padding: 2rem 0;
+        }
+        footer a {
+            color: #ddd;
+            text-decoration: none;
+        }
+        footer a:hover {
+            color: white;
+        }
+        .page-item.active .page-link {
+            background-color: var(--wijeya-primary);
+            border-color: var(--wijeya-primary);
+        }
+        .page-link {
+            color: var(--wijeya-primary);
+        }
+        .footer-heading {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: white;
+            font-weight: 600;
+        }
+        .footer-logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .footer-divider {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin: 1.5rem 0;
+        }
+        .footer-contact {
+            line-height: 1.8;
+        }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+        .circular-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--wijeya-primary);
+            margin-bottom: 1rem;
+        }
+                .btn-outline-wijeya {
+            color: var(--wijeya-primary);
+            border-color: var(--wijeya-primary);
+        }
+        .btn-outline-wijeya:hover {
+            color: white;
+            background-color: var(--wijeya-primary);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-newspaper me-2"></i>WIJEYA NEWSPAPERS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-bullhorn me-1"></i> Announcements</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-user-tie me-1"></i> Staff Portal</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h2><i class="fas fa-newspaper me-2"></i>Latest Internal Circulars</h2>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <button class="btn btn-wijeya">
+                    <i class="fas fa-plus me-1"></i> New Circular
+                </button>
+            </div>
+        </div>
+        
+        <!-- Simplified Filter Section -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <label class="form-label">Department</label>
+                <select class="form-select">
+                    <option selected>All Department</option>
+                    <option>Editorial</option>
+                    <option>Printing</option>
+                    <option>Distribution</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Type</label>
+                <select class="form-select">
+                    <option selected>All Types</option>
+                    <option>Policy Update</option>
+                    <option>Meeting Notice</option>
+                    <option>Staff Announcement</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-control" placeholder="mm/dd/yyyy">
+            </div>
+        </div>
+        
+        <!-- Circulations List - 3x3 Grid -->
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <!-- Card 1 -->
+            <div class="col">
+                <div class="card h-100 circulation-card unread">
+                    <div class="card-body">
+                        <div class="circular-number">Circular 1</div>
+                        <a href="circular2.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 2 -->
+            <div class="col">
+                <div class="card h-100 circulation-card">
+                    <div class="card-body">
+                        <div class="circular-number">Circular 2</div>
+                        <a href="circular2.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 3 -->
+            <div class="col">
+                <div class="card h-100 circulation-card">
+                    <div class="card-body">
+                        <div class="circular-number">Circular 3</div>
+                        <a href="circular3.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 4 -->
+            <div class="col">
+                <div class="card h-100 circulation-card">
+                    <div class="card-body">
+                        <div class="circular-number">Circular 4</div>
+                        <a href="circular4.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 5 -->
+            <div class="col">
+                <div class="card h-100 circulation-card unread">
+                    <div class="card-body">
+                        <div class="circular-number">Circular 5</div>
+                        <a href="circular5.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 6 -->
+            <div class="col">
+                <div class="card h-100 circulation-card">
+                    <div class="card-body">
+                        <div class="circular-number">Circular 6</div>
+                        <a href="circular6.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 7 -->
+            <div class="col">
+                <div class="card h-100 circulation-card">
+                    <div class="card-body">
+                        <div class="circular-number">Circular 7</div>
+                        <a href="circular7.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 8 -->
+            <div class="col">
+                <div class="card h-100 circulation-card">
+                    <div class="card-body">
+                        <div class="circular-number">Circular 8</div>
+                        <a href="circular8.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 9 -->
+            <div class="col">
+                <div class="card h-100 circulation-card">
+                    <div class="card-body">
+                        <div class="circular-number">Circular 9</div>
+                        <a href="circular9.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <span class="footer-logo"># WNL</span>
+                    <div class="footer-contact">
+                        <p>No. 8, Hunupitiya Cross Road,<br>
+                        Colombo 02.<br>
+                        Sri Lanka</p>
+                        <p><strong>Phone:</strong> 0112 479 479<br>
+                        <strong>Fax:</strong> 0112 448 323</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h3 class="footer-heading">Group Sites</h3>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">Lankadeepa</a></li>
+                        <li class="mb-2"><a href="#">Ada</a></li>
+                        <li class="mb-2"><a href="#">Sunday Times</a></li>
+                        <li class="mb-2"><a href="#">Daily FT</a></li>
+                        <li class="mb-2"><a href="#">Tamil Mirror</a></li>
+                        <li class="mb-2"><a href="#">Deshaya</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h3 class="footer-heading">Group Sites</h3>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">Dailymirror</a></li>
+                        <li class="mb-2"><a href="#">Middleeast Lankadeepa</a></li>
+                        <li class="mb-2"><a href="#">Mirror Edu</a></li>
+                        <li class="mb-2"><a href="#">Life Online</a></li>
+                        <li class="mb-2"><a href="#">Hi Online</a></li>
+                        <li class="mb-2"><a href="#">Lanka Women</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-2 col-6">
+                    <h3 class="footer-heading">Group Sites</h3>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">Kelimandala</a></li>
+                        <li class="mb-2"><a href="#">Wijeya</a></li>
+                        <li class="mb-2"><a href="#">Saaravita</a></li>
+                        <li class="mb-2"><a href="#">Wedo</a></li>
+                        <li class="mb-2"><a href="#">Vinow</a></li>
+                        <li class="mb-2"><a href="#">Tara</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-2 col-6">
+                    <h3 class="footer-heading">Quick Links</h3>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">Home</a></li>
+                        <li class="mb-2"><a href="#">Archives</a></li>
+                        <li class="mb-2"><a href="#">HR Portal</a></li>
+                        <li class="mb-2"><a href="#">Staff Directory</a></li>
+                        <li class="mb-2"><a href="#">Help Desk</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-divider"></div>
+            
+            <div class="text-center">
+                <small>© 2025 Wijeya Newspapers Ltd. All rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
