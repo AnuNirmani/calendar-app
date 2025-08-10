@@ -12,6 +12,7 @@ This is a responsive PHP-based calendar web application that displays special da
 - ✅ **Tooltip hover for date descriptions**
 - ✅ **Clickable date cells (e.g. open PDFs)**
 - ✅ **Admin panel for managing special dates**
+- ✅ **Super Admin panel for managing Admins**
 - ✅ **Pagination based on year (admin side)**
 - ✅ **Search a date by dropdowns**
 - ✅ **Hashed passwords**
