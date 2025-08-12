@@ -1,5 +1,8 @@
 /* Enhanced Beautiful UI for Calendar Application */
 
+/* Import Inter Font */
+@import url('fonts/fonts.css');
+
 /* Global Reset and Base Styles */
 * {
     margin: 0;
