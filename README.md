@@ -132,23 +132,46 @@ calendar-app/
 │
 ├── admin/
 │   ├── add.php
+│   ├── edit.php
+│   ├── edit_user.php
 │   ├── index.php
 │   ├── manage_users.php
 │   └── save.php
 │
+├── css/
+│   ├── fonts/
+│   │   └── static/
+│   │       ├── Inter-Bold.woff
+│   │       ├── Inter-Bold.woff2
+│   │       ├── Inter-Light.woff
+│   │       ├── Inter-Light.woff2
+│   │       ├── Inter-Medium.woff
+│   │       ├── Inter-Medium.woff2
+│   │       ├── Inter-Regular.woff
+│   │       ├── Inter-Regular.woff2
+│   │       ├── Inter-SemiBold.woff
+│   │       └── Inter-SemiBold.woff2
+│   ├── fonts.css
+│   └── style.css
+│
 ├── images/
 │   └── logo.jpg
 │
+├── .hintrc
 ├── auth.php
+├── circular.html
 ├── db.php
-├── index.php
 ├── index.html
+├── index.php
 ├── login.php
 ├── logout.php
 ├── README.md
-└── style.css
+├── update_passwords.php
 ```
-
+- **admin/**: Admin panel PHP files  
+- **css/**: Stylesheets and font files  
+- **images/**: App images  
+- Root: Main PHP/HTML files
 
 ---
 
