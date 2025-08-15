@@ -8,7 +8,7 @@ This is a responsive PHP-based calendar web application that displays special da
 
 - ✅ **4-month dynamic calendar view**
 - ✅ **Special dates from MySQL database**
-- ✅ **Color-coded cells for weekends, holidays, and poya days**
+- ✅ **Color-coded cells for holidays, and poya days**
 - ✅ **Tooltip hover for date descriptions**
 - ✅ **Clickable date cells (to open attendance PDFs)**
 - ✅ **Admin panel for managing special dates**
