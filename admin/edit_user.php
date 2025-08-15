@@ -69,8 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="icon" href="../images/logo.jpg" type="image/png">
 </head>
 <body class="admin-page">
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="font-size: 28px;">✏️ Edit User</h1>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; position: relative;">
+        <a href="index.php" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
+            ← Back
+        </a>
+        <h2>✨ Manage Users</h2>
     </div>
 
     <?php if ($error): ?>

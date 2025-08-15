@@ -291,17 +291,23 @@ h1 {
     font-weight: 700;
 }
 
-.calendar-box td.saturday {
-    background: hotpink;
-    color: white;
+/* no background fill for weekend cells */
+.calendar-box td.saturday,
+.calendar-box td.sunday {
+    background: none !important;
+}
+
+/* color only the number */
+.calendar-box td.saturday .day-number {
+    color: rgb(255, 0, 128);
     font-weight: 600;
 }
 
-.calendar-box td.sunday {
-    background: gold;
-    color: #333;
+.calendar-box td.sunday .day-number {
+    color: rgb(255, 0, 0);
     font-weight: 600;
 }
+
 
 /* Tooltip Styles */
 .tooltip-wrapper {

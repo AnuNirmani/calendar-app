@@ -31,6 +31,9 @@ $types = $conn->query("SELECT id, type FROM special_types");
 
 <body class="admin-page">
     <div style="text-align: center; margin-bottom: 30px;">
+        <a href="index.php" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
+            ← Back
+        </a>
     <h1 style="font-size: 28px;">✨ Add New Special Date</h1>
     </div>
 
