@@ -10,7 +10,7 @@ This is a responsive PHP-based calendar web application that displays special da
 - ✅ **Special dates from MySQL database**
 - ✅ **Color-coded cells for weekends, holidays, and poya days**
 - ✅ **Tooltip hover for date descriptions**
-- ✅ **Clickable date cells (e.g. open PDFs)**
+- ✅ **Clickable date cells (to open attendance PDFs)**
 - ✅ **Admin panel for managing special dates**
 - ✅ **Super Admin panel for managing Admins**
 - ✅ **Pagination based on year (admin side)**
