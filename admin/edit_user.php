@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="admin-page">
     <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; position: relative;">
-        <a href="index.php" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
+        <a href="manage_users.php" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
             ← Back
         </a>
         <h2>✨ Manage Users</h2>
