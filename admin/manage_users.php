@@ -101,8 +101,8 @@ ORDER BY u.created_at DESC
 <html>
 <head>
     <title>Manage Users - Super Admin</title>
-    <link rel="stylesheet" href="../style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/fonts/fonts.css">
+    <link rel="stylesheet" href="../css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../images/logo.jpg" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -136,11 +136,64 @@ ORDER BY u.created_at DESC
             background: linear-gradient(135deg, #4caf50, #45a049);
             transform: translateY(-1px);
         }
+
+        /* Password validation styles */
+        .password-validation {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #f44336;
+            display: none;
+        }
+
+        .password-validation.show {
+            display: block;
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        .password-input {
+            transition: border-color 0.3s ease;
+        }
+
+        .password-input.valid {
+            border-color: #4caf50;
+        }
+
+        .password-input.invalid {
+            border-color: #f44336;
+        }
+
+        .add-user-button {
+            background: #2196f3; 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-user-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .add-user-button:enabled:hover {
+            background: #1976d2;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 
 <body class="admin-page">
-    <div style="text-align: center; margin-bottom: 30px;">
+    <!-- Header with Back Button and Title -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; position: relative;">
+        <a href="index.php" style="background: #1976d2;position: absolute; left: 0;">
+            ← Back
+        </a>
         <h2>✨ Manage Users</h2>
     </div>
 
@@ -159,18 +212,24 @@ ORDER BY u.created_at DESC
     <!-- Add User Form -->
     <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px;">
         <h3 style="margin-top: 0; color: #333;">➕ Add New User</h3>
-        <form method="POST" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+        <form method="POST" id="addUserForm" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
             <div>
                 <label style="font-weight: 600;">Username:</label>
                 <input type="text" name="username" required style="width: 100%; padding: 10px;">
             </div>
             <div>
                 <label style="font-weight: 600;">Password:</label>
-                <div style="position: relative;">
-                    <input type="password" name="password" id="passwordInput" required style="width: 100%; padding: 10px 40px 10px 10px;">
+                <div class="password-input-container">
+                    <input type="password" name="password" id="passwordInput" required 
+                           class="password-input" style="width: 100%; padding: 10px 40px 10px 10px;"
+                           placeholder="At least 8 characters, Contains letters, Contains numbers"
+                           oninput="validatePassword()">
                     <span onclick="togglePassword()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">
                         <i class="fa-solid fa-eye" id="eyeIcon"></i>
                     </span>
+                </div>
+                <div class="password-validation" id="passwordValidation">
+                    ❌ At least 8 characters, Contains letters, Contains numbers, Contains special characters
                 </div>
             </div>
             <div>
@@ -181,7 +240,7 @@ ORDER BY u.created_at DESC
                     <option value="super_admin">Super Admin</option>
                 </select>
             </div>
-            <button type="submit" name="add_user" style="background: #2196f3; color: white; padding: 10px 20px; border-radius: 5px;">Add User</button>
+            <button type="submit" name="add_user" id="addUserButton" class="add-user-button" disabled>Add User</button>
         </form>
     </div>
 
@@ -252,10 +311,12 @@ ORDER BY u.created_at DESC
     </footer>
 
     <script>
+        // Auto-hide success/error messages
         setTimeout(() => {
             document.querySelectorAll('div[style*="border-left"]').forEach(el => el.style.display = 'none');
         }, 2000);
 
+        // Toggle password visibility
         function togglePassword() {
             const passwordInput = document.getElementById("passwordInput");
             const eyeIcon = document.getElementById("eyeIcon");
@@ -270,6 +331,54 @@ ORDER BY u.created_at DESC
                 eyeIcon.classList.add("fa-eye");
             }
         }
+
+        // Password validation function
+        function validatePassword() {
+            const password = document.getElementById('passwordInput').value;
+            const passwordInput = document.getElementById('passwordInput');
+            const passwordValidation = document.getElementById('passwordValidation');
+            const addUserButton = document.getElementById('addUserButton');
+            
+            // Check if password meets all requirements
+            const hasMinLength = password.length >= 8;
+            const hasLetters = /[A-Za-z]/.test(password);
+            const hasNumbers = /[0-9]/.test(password);
+            const isValid = hasMinLength && hasLetters && hasNumbers;
+            
+            // Show/hide validation message and update styling
+            if (password.length > 0 && !isValid) {
+                passwordValidation.classList.add('show');
+                passwordInput.classList.add('invalid');
+                passwordInput.classList.remove('valid');
+            } else if (password.length > 0 && isValid) {
+                passwordValidation.classList.remove('show');
+                passwordInput.classList.add('valid');
+                passwordInput.classList.remove('invalid');
+            } else {
+                passwordValidation.classList.remove('show');
+                passwordInput.classList.remove('valid', 'invalid');
+            }
+            
+            // Enable/disable submit button
+            addUserButton.disabled = !isValid || password.length === 0;
+        }
+
+        // Prevent form submission if password is invalid
+        document.getElementById('addUserForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('passwordInput').value;
+            
+            // Double check validation on submit
+            if (password.length < 8 || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
+                e.preventDefault();
+                alert('❌ Please ensure the password meets all requirements before submitting.');
+                return false;
+            }
+        });
+
+        // Initialize validation on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            validatePassword();
+        });
     </script>
 </body>
 </html>

@@ -30,7 +30,6 @@ function renderCalendar($month, $year, $specialDates, $today) {
     $firstDay = new DateTime("$year-$month-01");
     $daysInMonth = (int)$firstDay->format('t');
     $startWeekday = (int)$firstDay->format('w'); // Sunday = 0
-
     $pad = ($startWeekday + 6) % 7; // Adjust to Monday start
 
     echo "<div class='calendar-box'>";
@@ -47,9 +46,9 @@ function renderCalendar($month, $year, $specialDates, $today) {
 
         $class = "";
         $tooltip = "";
-        $desc = ''; // Initialize $desc with an empty string as default
+        $desc = '';
 
-        // Check if it's today
+        // today?
         if ($dateStr === $today->format('Y-m-d')) {
             $class .= " today";
         }
@@ -60,8 +59,8 @@ function renderCalendar($month, $year, $specialDates, $today) {
         $style = "";
 
         if (isset($specialDates[$dateStr])) {
-            $type = $specialDates[$dateStr]['type'];
-            $desc = htmlspecialchars($specialDates[$dateStr]['description']);
+            $type  = $specialDates[$dateStr]['type'];
+            $desc  = htmlspecialchars($specialDates[$dateStr]['description']);
             $color = htmlspecialchars($specialDates[$dateStr]['color']);
             $tooltip = "<span class='tooltip'>$desc</span>";
 
@@ -70,16 +69,20 @@ function renderCalendar($month, $year, $specialDates, $today) {
             }
         }
 
+        // ✅ Make sure $dayText is defined before use
         $dayText = sprintf('%02d', $d);
+        $dayNumber = "<span class='day-number'>$dayText</span>";
 
-        echo "<td class='$class' title='$desc' style='cursor: pointer; color: black; $style' 
-        onclick=\"window.open('https://time.wnl/source/" . str_replace('-', '/', $dateStr) . "/sheet.pdf', '_blank')\">$dayText$tooltip</td>";
+        echo "<td class='$class' title='$desc' style='cursor: pointer; color: black; $style'
+             onclick=\"window.open('https://time.wnl/source/" . str_replace('-', '/', $dateStr) . "/sheet.pdf', '_blank')\">
+             $dayNumber$tooltip</td>";
 
         if ((($d + $pad) % 7) == 0) echo "</tr><tr>";
     }
 
     echo "</tr></table></div>";
 }
+
 
 // Helper function to adjust color brightness
 function adjustBrightness($hex, $percent) {
