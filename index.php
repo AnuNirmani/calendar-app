@@ -9,8 +9,7 @@ $datesQuery = $conn->query("
     SELECT 
         sd.date, 
         sd.color, 
-        st.type, 
-        sd.description 
+        st.type
     FROM 
         special_dates sd
     LEFT JOIN 
