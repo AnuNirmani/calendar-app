@@ -291,9 +291,9 @@ h1 {
     font-weight: 700;
 }
 
-/* no background fill for weekend cells */
-.calendar-box td.saturday,
-.calendar-box td.sunday {
+/* no background fill for weekend cells, unless they are special dates */
+.calendar-box td.saturday:not([style*="background"]),
+.calendar-box td.sunday:not([style*="background"]) {
     background: none !important;
 }
 
@@ -306,6 +306,13 @@ h1 {
 .calendar-box td.sunday .day-number {
     color: rgb(255, 0, 0);
     font-weight: 600;
+}
+
+/* When weekend cells have special date backgrounds, make day number white for better contrast */
+.calendar-box td.saturday[style*="background"] .day-number,
+.calendar-box td.sunday[style*="background"] .day-number {
+    color: white !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 
