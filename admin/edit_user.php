@@ -179,7 +179,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <option value="super_admin" <?= $user['role'] === 'super_admin' ? 'selected' : '' ?>>Super Admin</option>
         </select>
 
-        <button type="submit" id="saveButton" style="margin-top: 20px;" disabled>💾 Save Changes</button>
+        <button type="submit" id="saveButton" style="margin-top: 20px;" disabled>
+        <i class="fas fa-save "></i>
+         Save Changes</button>
     </form>
 
     <div style="margin-top: 20px; text-align: center;">

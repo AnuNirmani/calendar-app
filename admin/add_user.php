@@ -220,8 +220,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
                 </select>
             </div>
 
-            <button type="submit" name="add_user" id="addUserButton" class="add-user-button" disabled>
-                ➕ Add User
+            <button type="submit" name="add_user" id="addUserButton">
+            <i class="fas fa-user-plus "></i>
+               Add User
             </button>
         </form>
     </div>

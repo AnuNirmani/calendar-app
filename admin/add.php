@@ -90,7 +90,9 @@ $types = $conn->query("SELECT id, type FROM special_types");
             </label>
         </div>
 
-        <button type="submit">💾 Add Date</button>
+        <button type="submit">
+        <i class="fas fa-plus-circle "></i>
+         Add Date</button>
     </form>
 
     <div style="margin-top: 10px;">
