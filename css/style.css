@@ -58,7 +58,7 @@ h3 {
     backdrop-filter: blur(10px);
     width: 100%;
     max-width: 900px;
-    border-color: #000000;
+    border: 0.5px solid #000000;
 }
 
 table {
@@ -109,7 +109,7 @@ form {
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: 0.5px solid #000000;
     min-width: 400px;
 }
 
@@ -234,7 +234,7 @@ h1 {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
-    border-color: #000000;
+    border: 0.5px solid #000000;
 }
 
 .calendar-box:hover {
@@ -704,6 +704,7 @@ table {
     backdrop-filter: blur(10px);
     width: 100%;
     max-width: 1500px; /* Set reasonable max width for better readability */
+    border: 0.5px solid #000000;
 }
 
 /* Consistent cell alignment and padding */
