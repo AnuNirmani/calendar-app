@@ -21,7 +21,7 @@ body {
 /* Admin Page Styles */
 body.admin-page {
     /* background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); */
-    background: rgb(255, 255, 255);
+    background: #f5f7fa;
     color: #333;
     font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
     padding: 20px 10px;
@@ -29,12 +29,14 @@ body.admin-page {
     min-height: 100vh;
 }
 
-h2 {
-    font-size: 28px;
-    color: #fff;
+h1 {
+    text-align: center;
     margin-bottom: 30px;
+    color: #1e3c72;
+    font-size: 30px;
+    font-weight: 350;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    font-weight: 600;
+    letter-spacing: 1px;
 }
 
 h3 {
@@ -189,7 +191,7 @@ a:hover {
 
 /* Calendar Styles */
 body.calendar-page {
-    background: white;
+    background: #f5f7fa;
     min-height: 100vh;
     padding: 20px;
 }
@@ -203,7 +205,7 @@ body.calendar-page {
 h1 {
     text-align: center;
     margin-bottom: 30px;
-    color: #000000;
+    color: #1e3c72;
     font-size: 30px;
     font-weight: 350;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
