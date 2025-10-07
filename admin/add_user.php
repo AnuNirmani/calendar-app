@@ -62,6 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../images/logo.jpg" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <style>
         /* Password validation styles */
         .password-validation {
@@ -125,6 +127,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
         .form-group select:focus {
             border-color: #2196f3;
             outline: none;
+        }
+
+        /* jQuery Validation Styles */
+        .form-group input.error,
+        .form-group select.error {
+            border-color: #f44336;
+            box-shadow: 0 0 5px rgba(244, 67, 54, 0.3);
+        }
+
+        .form-group input.valid,
+        .form-group select.valid {
+            border-color: #4caf50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        label.error {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+            font-weight: normal;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #f44336;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4caf50;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -221,74 +264,116 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
     </footer>
 
     <script>
-        // Auto-hide success/error messages
-        setTimeout(() => {
-            document.querySelectorAll('div[style*="border-left"]').forEach(el => {
-                if (el.textContent.includes('Success')) {
-                    el.style.display = 'none';
+        $(document).ready(function() {
+            // Auto-hide success messages
+            setTimeout(() => {
+                $('div[style*="border-left"]').each(function() {
+                    if ($(this).text().includes('Success')) {
+                        $(this).hide();
+                    }
+                });
+            }, 2000);
+
+            // Toggle password visibility
+            window.togglePassword = function() {
+                const passwordInput = $("#passwordInput");
+                const eyeIcon = $("#eyeIcon");
+
+                if (passwordInput.attr("type") === "password") {
+                    passwordInput.attr("type", "text");
+                    eyeIcon.removeClass("fa-eye").addClass("fa-eye-slash");
+                } else {
+                    passwordInput.attr("type", "password");
+                    eyeIcon.removeClass("fa-eye-slash").addClass("fa-eye");
+                }
+            };
+
+            // jQuery Validation Setup
+            $("#addUserForm").validate({
+                rules: {
+                    username: {
+                        required: true,
+                        minlength: 3,
+                        maxlength: 50
+                    },
+                    password: {
+                        required: true,
+                        minlength: 8,
+                        hasLetters: true,
+                        hasNumbers: true
+                    },
+                    role: {
+                        required: true
+                    }
+                },
+                messages: {
+                    username: {
+                        required: "👤 Username is required",
+                        minlength: "Username must be at least 3 characters",
+                        maxlength: "Username cannot exceed 50 characters"
+                    },
+                    password: {
+                        required: "🔒 Password is required",
+                        minlength: "Password must be at least 8 characters",
+                        hasLetters: "Password must contain letters",
+                        hasNumbers: "Password must contain numbers"
+                    },
+                    role: {
+                        required: "🏷️ Please select a role"
+                    }
+                },
+                errorElement: "div",
+                errorClass: "error-message",
+                validClass: "valid",
+                errorPlacement: function(error, element) {
+                    error.addClass("error-message");
+                    error.insertAfter(element);
+                },
+                success: function(label, element) {
+                    $(element).removeClass("error").addClass("valid");
+                    label.remove();
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).removeClass(validClass).addClass(errorClass);
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass(errorClass).addClass(validClass);
+                },
+                submitHandler: function(form) {
+                    // This will only run if client-side validation passes
+                    form.submit();
                 }
             });
-        }, 2000);
 
-        // Toggle password visibility
-        function togglePassword() {
-            const passwordInput = document.getElementById("passwordInput");
-            const eyeIcon = document.getElementById("eyeIcon");
+            // Custom validation methods
+            $.validator.addMethod("hasLetters", function(value, element) {
+                return this.optional(element) || /[A-Za-z]/.test(value);
+            }, "Password must contain at least one letter");
 
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                eyeIcon.classList.remove("fa-eye");
-                eyeIcon.classList.add("fa-eye-slash");
-            } else {
-                passwordInput.type = "password";
-                eyeIcon.classList.remove("fa-eye-slash");
-                eyeIcon.classList.add("fa-eye");
-            }
-        }
+            $.validator.addMethod("hasNumbers", function(value, element) {
+                return this.optional(element) || /[0-9]/.test(value);
+            }, "Password must contain at least one number");
 
-        // Password validation function
-        function validatePassword() {
-            const password = document.getElementById('passwordInput').value;
-            const passwordInput = document.getElementById('passwordInput');
-            const passwordValidation = document.getElementById('passwordValidation');
-            const addUserButton = document.getElementById('addUserButton');
-            const username = document.getElementById('username').value;
-            const role = document.getElementById('role').value;
-            
-            // Check if password meets all requirements
-            const hasMinLength = password.length >= 8;
-            const hasLetters = /[A-Za-z]/.test(password);
-            const hasNumbers = /[0-9]/.test(password);
-            const isValid = hasMinLength && hasLetters && hasNumbers;
-            
-            // Show/hide validation message and update styling
-            if (password.length > 0 && !isValid) {
-                passwordValidation.classList.add('show');
-                passwordInput.classList.add('invalid');
-                passwordInput.classList.remove('valid');
-            } else if (password.length > 0 && isValid) {
-                passwordValidation.classList.remove('show');
-                passwordInput.classList.add('valid');
-                passwordInput.classList.remove('invalid');
-            } else {
-                passwordValidation.classList.remove('show');
-                passwordInput.classList.remove('valid', 'invalid');
-            }
-            
-            // Always enable submit button to allow server-side validation
-            addUserButton.disabled = false;
-        }
-
-        // Add event listeners for all form fields
-        document.getElementById('username').addEventListener('input', validatePassword);
-        document.getElementById('role').addEventListener('change', validatePassword);
-
-        // Allow form submission to show server-side error messages
-        // The server-side validation will handle the error display
-
-        // Initialize validation on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            validatePassword();
+            // Real-time password validation feedback
+            $("#passwordInput").on('input', function() {
+                const password = $(this).val();
+                const hasMinLength = password.length >= 8;
+                const hasLetters = /[A-Za-z]/.test(password);
+                const hasNumbers = /[0-9]/.test(password);
+                
+                if (password.length > 0) {
+                    if (hasMinLength && hasLetters && hasNumbers) {
+                        $("#passwordValidation").removeClass('show');
+                        $(this).removeClass('invalid').addClass('valid');
+                    } else {
+                        $("#passwordValidation").addClass('show');
+                        $(this).removeClass('valid').addClass('invalid');
+                    }
+                } else {
+                    $("#passwordValidation").removeClass('show');
+                    $(this).removeClass('valid invalid');
+                }
+            });
         });
     </script>
 </body>

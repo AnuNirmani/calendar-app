@@ -28,6 +28,51 @@ $types = $conn->query("SELECT id, type FROM special_types");
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../images/logo.jpg" type="image/png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <style>
+        /* jQuery Validation Styles */
+        .add-form input.error,
+        .add-form select.error {
+            border-color: #f44336 !important;
+            box-shadow: 0 0 5px rgba(244, 67, 54, 0.3) !important;
+        }
+
+        .add-form input.valid,
+        .add-form select.valid {
+            border-color: #4caf50 !important;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3) !important;
+        }
+
+        label.error {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+            font-weight: normal;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin-top: 5px;
+            border-left: 4px solid #f44336;
+            font-size: 13px;
+        }
+
+        /* Radio button validation styling */
+        .add-form input[type="radio"].error + span {
+            border-color: #f44336 !important;
+            box-shadow: 0 0 5px rgba(244, 67, 54, 0.3) !important;
+        }
+
+        .add-form input[type="radio"].valid + span {
+            border-color: #4caf50 !important;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3) !important;
+        }
+    </style>
 </head>
 
 <body class="admin-page">
@@ -109,5 +154,91 @@ $types = $conn->query("SELECT id, type FROM special_types");
         © <?php echo date('Y'); ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
         © All rights reserved, 2008 - Wijeya Newspapers Ltd.
     </footer>
+
+    <script>
+        $(document).ready(function() {
+            // jQuery Validation Setup
+            $(".add-form").validate({
+                rules: {
+                    date: {
+                        required: true
+                    },
+                    type_id: {
+                        required: true
+                    },
+                    description: {
+                        required: true,
+                        minlength: 3,
+                        maxlength: 255
+                    },
+                    color: {
+                        required: true
+                    }
+                },
+                messages: {
+                    date: {
+                        required: "📅 Please select a date"
+                    },
+                    type_id: {
+                        required: "🏷️ Please select a type"
+                    },
+                    description: {
+                        required: "📝 Description is required",
+                        minlength: "Description must be at least 3 characters",
+                        maxlength: "Description cannot exceed 255 characters"
+                    },
+                    color: {
+                        required: "🎨 Please select a color"
+                    }
+                },
+                errorElement: "div",
+                errorClass: "error-message",
+                validClass: "valid",
+                errorPlacement: function(error, element) {
+                    if (element.attr("type") === "radio") {
+                        // For radio buttons, place error after the radio button group
+                        error.insertAfter(element.closest('div'));
+                    } else {
+                        // For other inputs, place error after the input
+                        error.insertAfter(element);
+                    }
+                },
+                success: function(label, element) {
+                    $(element).removeClass("error").addClass("valid");
+                    label.remove();
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).removeClass(validClass).addClass(errorClass);
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass(errorClass).addClass(validClass);
+                },
+                submitHandler: function(form) {
+                    // This will only run if client-side validation passes
+                    form.submit();
+                }
+            });
+
+            // Real-time validation for date field
+            $('input[name="date"]').on('change', function() {
+                $(this).valid();
+            });
+
+            // Real-time validation for select field
+            $('select[name="type_id"]').on('change', function() {
+                $(this).valid();
+            });
+
+            // Real-time validation for description field
+            $('input[name="description"]').on('input', function() {
+                $(this).valid();
+            });
+
+            // Real-time validation for radio buttons
+            $('input[name="color"]').on('change', function() {
+                $('input[name="color"]').valid();
+            });
+        });
+    </script>
 </body>
 </html>
