@@ -215,7 +215,7 @@ body {
 
 .action-buttons {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
 }
 
@@ -257,6 +257,10 @@ body {
     background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%) !important;
 }
 
+.action-btn.info {
+    background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%) !important;
+}
+
 .action-btn i {
     font-size: 48px;
     margin-bottom: 15px;
@@ -270,6 +274,12 @@ body {
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+    .action-buttons {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
     .sidebar {
         width: 100%;
@@ -291,7 +301,7 @@ body {
     }
 
     .action-buttons {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 

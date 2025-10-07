@@ -62,6 +62,7 @@ if (isSuperAdmin()) {
                 <li><a href="index.php"><i class="fas fa-calendar-day"></i> See Special Dates</a></li>
                 <li><a href="add.php"><i class="fas fa-plus-circle"></i> Add Special Dates</a></li>
                 <?php if (isSuperAdmin()): ?>
+                    <li><a href="add_user.php"><i class="fas fa-user-plus"></i> Add User</a></li>
                     <li><a href="manage_users.php"><i class="fas fa-users-cog"></i> Manage Users</a></li>
                 <?php endif; ?>
                 <li><a href="../index.php"><i class="fas fa-calendar"></i> View Calendar</a></li>
@@ -123,6 +124,11 @@ if (isSuperAdmin()) {
                     </a>
 
                     <?php if (isSuperAdmin()): ?>
+                    <a href="add_user.php" class="action-btn info">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Add User</span>
+                    </a>
+
                     <a href="manage_users.php" class="action-btn purple">
                         <i class="fas fa-users-cog"></i>
                         <span>Manage Users</span>
