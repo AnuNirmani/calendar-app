@@ -50,13 +50,15 @@ h3 {
 /* Special Dates Table */
 .special-dates-table {
     display: block;
-    margin-top: 20px;
+    margin: 20px auto 0;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 20px;
     padding: 30px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     backdrop-filter: blur(10px);
     width: 100%;
+    max-width: 900px;
+    border-color: #000000;
 }
 
 table {
@@ -65,8 +67,9 @@ table {
     border-radius: 15px;
     overflow: hidden;
     font-size: 15px;
-    min-width: 600px;
+    min-width: 400px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    border-color: #000000;
 }
 
 thead {
@@ -75,7 +78,7 @@ thead {
 }
 
 th, td {
-    padding: 15px 20px;
+    padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid rgba(0,0,0,0.05);
     transition: all 0.3s ease;
@@ -106,7 +109,7 @@ form {
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     min-width: 400px;
 }
 
@@ -693,19 +696,19 @@ table {
 /* Standardize table container width */
 .special-dates-table {
     display: block;
-    margin-top: 20px;
+    margin: 20px auto 0;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 20px;
     padding: 30px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     backdrop-filter: blur(10px);
     width: 100%;
-    max-width: none; /* Remove max width constraint for full width */
+    max-width: 1500px; /* Set reasonable max width for better readability */
 }
 
 /* Consistent cell alignment and padding */
 th, td {
-    padding: 15px 10px;
+    padding: 12px 10px;
     text-align: center; /* Center align all content */
     border-bottom: 1px solid rgba(0,0,0,0.05);
     transition: all 0.3s ease;
@@ -713,12 +716,12 @@ th, td {
 }
 
 /* Specific column width classes for both tables */
-.col-username, .col-date { width: 15%; }
-.col-role, .col-type { width: 15%; }
-.col-status, .col-description { width: 15%; }
-.col-created-at, .col-color { width: 12%; }
-.col-created-by, .col-edited-at, .col-edited-by { width: 12%; }
-.col-actions { width: 19%; }
+.col-username, .col-date { width: 12%; }
+.col-role, .col-type { width: 12%; }
+.col-status, .col-description { width: 20%; }
+.col-created-at, .col-color { width: 10%; }
+.col-created-by, .col-edited-at, .col-edited-by { width: 10%; }
+.col-actions { width: 16%; }
 
 /* Adjust action buttons to fit better in columns */
 a.edit-button {
