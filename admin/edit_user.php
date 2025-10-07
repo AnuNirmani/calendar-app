@@ -101,12 +101,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body class="admin-page">
-    <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; position: relative;">
-        <!-- <a href="manage_users.php" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
-            ← Back
-        </a> -->
+    <div style="text-align: center; margin-bottom: 30px;">
         <h1 style="font-size: 28px;">✏️ Edit User</h1>
-        <a href="index.php" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
+        <a href="manage_users.php" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
         color: white !important; 
         padding: 10px 20px !important; 
         border-radius: 20px !important; 
@@ -131,6 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         transition: all 0.3s ease !important;
         font-size: 14px !important;">
         <i class="fas fa-home"></i> Back to Dashboard
+    </a>
     </div>
 
     <?php if ($error): ?>

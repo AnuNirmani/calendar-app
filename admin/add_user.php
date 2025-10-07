@@ -115,10 +115,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
         }
 
         .form-container {
-            background: white;
+            background: transparent;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: none;
             max-width: 600px;
             margin: 0 auto;
         }
@@ -154,21 +154,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
 
 <body class="admin-page">
     <!-- Header with Back Button and Title -->
-    <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; position: relative;">
-        <h2>➕ Add New User</h2>
-        <a href="manage_users.php" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
-        color: white !important; 
-        padding: 10px 20px !important; 
-        border-radius: 20px !important; 
-        font-weight: 600 !important; 
-        text-transform: uppercase !important; 
-        letter-spacing: 0.5px !important; 
-        margin: 10px !important; 
-        display: inline-block !important; 
-        transition: all 0.3s ease !important;
-        font-size: 14px !important;">
-        <i class="fas fa-arrow-left"></i> Back to Manage Users
-        </a>
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="font-size: 28px;">➕ Add New User</h1>
+
         <a href="dashboard.php" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
         color: white !important; 
         padding: 10px 20px !important; 
@@ -180,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
         display: inline-block !important; 
         transition: all 0.3s ease !important;
         font-size: 14px !important;">
-        <i class="fas fa-home"></i> Dashboard
+        <i class="fas fa-home"></i> Back to Dashboard
         </a>
     </div>
 

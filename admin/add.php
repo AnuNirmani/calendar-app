@@ -38,7 +38,7 @@ $types = $conn->query("SELECT id, type FROM special_types");
         <a href="index.php" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 140px; font-weight: 600;">
             ← Back
         </a> -->
-    <h1 style="font-size: 28px;">✨ Add New Special Date</h1>
+    <h1 style="font-size: 28px;">➕ Add New Special Date</h1>
     <a href="dashboard.php" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
         color: white !important; 
         padding: 10px 20px !important; 

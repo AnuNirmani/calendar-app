@@ -21,10 +21,10 @@ body {
 /* Admin Page Styles */
 body.admin-page {
     /* background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); */
-    background: navy;
+    background: rgb(255, 255, 255);
     color: #333;
     font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
-    padding: 40px 20px;
+    padding: 20px 10px;
     text-align: center;
     min-height: 100vh;
 }
@@ -47,13 +47,14 @@ h3 {
 
 /* Special Dates Table */
 .special-dates-table {
-    display: inline-block;
+    display: block;
     margin-top: 20px;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 20px;
     padding: 30px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     backdrop-filter: blur(10px);
+    width: 100%;
 }
 
 table {
@@ -202,9 +203,9 @@ body.calendar-page {
 h1 {
     text-align: center;
     margin-bottom: 30px;
-    color: #fff;
-    font-size: 28px;
-    font-weight: 300;
+    color: #000000;
+    font-size: 30px;
+    font-weight: 350;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     letter-spacing: 1px;
 }
@@ -216,6 +217,7 @@ h1 {
     justify-content: center;
     margin: auto;
     max-width: 900px;
+    border-color: #000000;
 }
 
 .calendar-box {
@@ -227,6 +229,7 @@ h1 {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
+    border-color: #000000;
 }
 
 .calendar-box:hover {
@@ -687,15 +690,15 @@ table {
 
 /* Standardize table container width */
 .special-dates-table {
-    display: inline-block;
+    display: block;
     margin-top: 20px;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 20px;
     padding: 30px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     backdrop-filter: blur(10px);
-    width: 90%;
-    max-width: 1200px; /* Set consistent max width */
+    width: 100%;
+    max-width: none; /* Remove max width constraint for full width */
 }
 
 /* Consistent cell alignment and padding */
