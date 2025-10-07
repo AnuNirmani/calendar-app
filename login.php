@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['user_id'] = $user['id'];
-            header("Location: admin/index.php");
+            header("Location: admin/dashboard.php");
             exit;
         } else {
             $error = "Invalid password";

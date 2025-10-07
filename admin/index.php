@@ -92,6 +92,7 @@ $result = $stmt->get_result();
     <title>Admin - Special Dates</title>
     <link rel="stylesheet" href="../css/fonts/fonts.css">
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../images/logo.jpg" type="image/png">
 </head>
@@ -99,6 +100,19 @@ $result = $stmt->get_result();
 
     <div style="text-align: center; margin-bottom: 30px;">
     <h1 style="font-size: 28px;">✨ Admin Panel - Special Dates</h1>
+    <a href="dashboard.php" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
+        color: white !important; 
+        padding: 10px 20px !important; 
+        border-radius: 20px !important; 
+        font-weight: 600 !important; 
+        text-transform: uppercase !important; 
+        letter-spacing: 0.5px !important; 
+        margin: 10px !important; 
+        display: inline-block !important; 
+        transition: all 0.3s ease !important;
+        font-size: 14px !important;">
+        <i class="fas fa-home"></i> Back to Dashboard
+    </a>
     </div>
 
     <?php if ($accessDeniedError): ?>

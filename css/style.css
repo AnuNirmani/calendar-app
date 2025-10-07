@@ -188,10 +188,11 @@ a:hover {
 
 /* Calendar Styles */
 body.calendar-page {
-    background: navy 100%;
+    background: white;
     min-height: 100vh;
     padding: 20px;
 }
+
 
 .header-image {
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);

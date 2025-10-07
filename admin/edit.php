@@ -51,12 +51,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Admin - Edit Special Date</title>
     <link rel="stylesheet" href="../css/fonts/fonts.css">
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../images/logo.jpg" type="image/png">
 </head>
 <body class="admin-page">
     <div style="text-align: center; margin-bottom: 30px;">
-                <a href="index.php" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
+        <a href="dashboard.php" style="background: #667eea; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="index.php" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 140px; font-weight: 600;">
             ← Back
         </a>
         <h1 style="font-size: 28px;">✏️ Edit Special Date</h1>
