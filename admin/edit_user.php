@@ -102,13 +102,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="admin-page">
     <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; position: relative;">
-        <a href="dashboard.php" style="background: #667eea; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
-            <i class="fas fa-home"></i> Dashboard
-        </a>
-        <a href="manage_users.php" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 140px; font-weight: 600;">
+        <!-- <a href="manage_users.php" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
             ← Back
-        </a>
-        <h2>✨ Edit User</h2>
+        </a> -->
+        <h1 style="font-size: 28px;">✏️ Edit User</h1>
+        <a href="index.php" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
+        color: white !important; 
+        padding: 10px 20px !important; 
+        border-radius: 20px !important; 
+        font-weight: 600 !important; 
+        text-transform: uppercase !important; 
+        letter-spacing: 0.5px !important; 
+        margin: 10px !important; 
+        display: inline-block !important; 
+        transition: all 0.3s ease !important;
+        font-size: 14px !important;">
+            ← Back
+        </a> 
+        <a href="dashboard.php" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
+        color: white !important; 
+        padding: 10px 20px !important; 
+        border-radius: 20px !important; 
+        font-weight: 600 !important; 
+        text-transform: uppercase !important; 
+        letter-spacing: 0.5px !important; 
+        margin: 10px !important; 
+        display: inline-block !important; 
+        transition: all 0.3s ease !important;
+        font-size: 14px !important;">
+        <i class="fas fa-home"></i> Back to Dashboard
     </div>
 
     <?php if ($error): ?>
@@ -166,9 +188,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <span style="color: white; padding: 8px 16px; border-radius: 20px; font-size: 18px; font-weight: 600;">
             <?= isSuperAdmin() ? '👑 Super Admin' : '👤 Admin' ?>: <?= htmlspecialchars($_SESSION['username']) ?>
         </span>
-        <a href="../logout.php" style="background: #f44336; color: white; padding: 8px 16px; border-radius: 20px; font-size: 16px; font-weight: 600; text-decoration: none; margin-left: 10px;">
+        <!-- <a href="../logout.php" style="background: #f44336; color: white; padding: 8px 16px; border-radius: 20px; font-size: 16px; font-weight: 600; text-decoration: none; margin-left: 10px;">
             🚪 Logout
-        </a>
+        </a> -->
     </div>
 
     <footer class="footer">

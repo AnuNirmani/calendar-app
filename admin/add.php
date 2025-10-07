@@ -32,13 +32,26 @@ $types = $conn->query("SELECT id, type FROM special_types");
 
 <body class="admin-page">
     <div style="text-align: center; margin-bottom: 30px;">
-        <a href="dashboard.php" style="background: #667eea; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
+        <!-- <a href="dashboard.php" style="background: #667eea; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
             <i class="fas fa-home"></i> Dashboard
         </a>
         <a href="index.php" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 140px; font-weight: 600;">
             ← Back
-        </a>
+        </a> -->
     <h1 style="font-size: 28px;">✨ Add New Special Date</h1>
+    <a href="dashboard.php" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
+        color: white !important; 
+        padding: 10px 20px !important; 
+        border-radius: 20px !important; 
+        font-weight: 600 !important; 
+        text-transform: uppercase !important; 
+        letter-spacing: 0.5px !important; 
+        margin: 10px !important; 
+        display: inline-block !important; 
+        transition: all 0.3s ease !important;
+        font-size: 14px !important;">
+        <i class="fas fa-home"></i> Back to Dashboard
+    </a>
     </div>
 
     <form action="save.php" method="POST" class="add-form">

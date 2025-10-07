@@ -115,6 +115,46 @@ $result = $stmt->get_result();
     </a>
     </div>
 
+    <div style="margin-top: 35px;">
+        <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
+            <!-- 🔍 Description Search Form -->
+            <form method="GET" style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" name="search" placeholder="Search by description..."
+                       value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
+                       style="padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px; width: 220px;">
+                <button type="submit" style="padding: 10px 25px; background: #03a9f4; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                    🔎 Search
+                </button>
+            </form>
+
+            <!-- 🎯 Year + Type Filter Form -->
+            <form method="GET" style="display: flex; gap: 10px; align-items: center;">
+                <select name="year" style="padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px;">
+                    <option value="">Select Year</option>
+                    <?php
+                    $currentYear = date('Y');
+                    for ($y = $currentYear - 5; $y <= $currentYear + 5; $y++): ?>
+                        <option value="<?= $y ?>" <?= isset($_GET['year']) && $_GET['year'] == $y ? 'selected' : '' ?>><?= $y ?></option>
+                    <?php endfor; ?>
+                </select>
+
+                <select name="type" style="padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px;">
+                    <option value="">All Types</option>
+                    <?php
+                    $typeRes = $conn->query("SELECT id, type FROM special_types");
+                    while ($row = $typeRes->fetch_assoc()): ?>
+                        <option value="<?= $row['id'] ?>" <?= isset($_GET['type']) && $_GET['type'] == $row['id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($row['type']) ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+
+                <button type="submit" style="padding: 10px 25px; background: #03a9f4; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                    🎯 Filter
+                </button>
+            </form>
+        </div>
+
     <?php if ($accessDeniedError): ?>
         <div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f44336;">
             <strong>⚠️ Access Denied:</strong> You don't have permission to access that feature.
@@ -122,7 +162,7 @@ $result = $stmt->get_result();
     <?php endif; ?>
 
     <div class="special-dates-table">
-        <div style="text-align: center; margin-bottom: 25px; display: flex; gap: 15px; justify-content: center; align-items: center;">
+        <!-- <div style="text-align: center; margin-bottom: 25px; display: flex; gap: 15px; justify-content: center; align-items: center;">
             <a href="add.php" style="background: linear-gradient(135deg,#2196f3 0%,#1976d2 100%) !important; 
             color: white !important; 
             padding: 12px 25px !important; 
@@ -146,7 +186,7 @@ $result = $stmt->get_result();
                 display: inline-block !important; 
                 transition: all 0.3s ease !important;">👥 Manage Users</a>
             <?php endif; ?>
-        </div>
+        </div> -->
 
         <table>
             <thead>
@@ -209,45 +249,7 @@ $result = $stmt->get_result();
         </div>
     </div>
 
-    <div style="margin-top: 35px;">
-        <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
-            <!-- 🔍 Description Search Form -->
-            <form method="GET" style="display: flex; gap: 10px; align-items: center;">
-                <input type="text" name="search" placeholder="Search by description..."
-                       value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
-                       style="padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px; width: 220px;">
-                <button type="submit" style="padding: 10px 25px; background: #03a9f4; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                    🔎 Search
-                </button>
-            </form>
-
-            <!-- 🎯 Year + Type Filter Form -->
-            <form method="GET" style="display: flex; gap: 10px; align-items: center;">
-                <select name="year" style="padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px;">
-                    <option value="">Select Year</option>
-                    <?php
-                    $currentYear = date('Y');
-                    for ($y = $currentYear - 5; $y <= $currentYear + 5; $y++): ?>
-                        <option value="<?= $y ?>" <?= isset($_GET['year']) && $_GET['year'] == $y ? 'selected' : '' ?>><?= $y ?></option>
-                    <?php endfor; ?>
-                </select>
-
-                <select name="type" style="padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px;">
-                    <option value="">All Types</option>
-                    <?php
-                    $typeRes = $conn->query("SELECT id, type FROM special_types");
-                    while ($row = $typeRes->fetch_assoc()): ?>
-                        <option value="<?= $row['id'] ?>" <?= isset($_GET['type']) && $_GET['type'] == $row['id'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($row['type']) ?>
-                        </option>
-                    <?php endwhile; ?>
-                </select>
-
-                <button type="submit" style="padding: 10px 25px; background: #03a9f4; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                    🎯 Filter
-                </button>
-            </form>
-        </div>
+    
 
         <div style="margin-top: 10px;">
             <span style="background: <?= isSuperAdmin() ?>; color: white; padding: 8px 16px; border-radius: 20px; font-size: 18px; font-weight: 600;">

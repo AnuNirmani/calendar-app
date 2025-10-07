@@ -191,13 +191,26 @@ ORDER BY u.created_at DESC
 <body class="admin-page">
     <!-- Header with Back Button and Title -->
     <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; position: relative;">
-        <a href="dashboard.php" style="background: #667eea; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
+        <!-- <a href="dashboard.php" style="background: #667eea; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 0; font-weight: 600;">
             <i class="fas fa-home"></i> Dashboard
         </a>
         <a href="index.php" style="background: #1976d2; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: absolute; left: 140px; font-weight: 600;">
             ← Back
-        </a>
+        </a> -->
         <h2>✨ Manage Users</h2>
+        <a href="dashboard.php" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
+        color: white !important; 
+        padding: 10px 20px !important; 
+        border-radius: 20px !important; 
+        font-weight: 600 !important; 
+        text-transform: uppercase !important; 
+        letter-spacing: 0.5px !important; 
+        margin: 10px !important; 
+        display: inline-block !important; 
+        transition: all 0.3s ease !important;
+        font-size: 14px !important;">
+        <i class="fas fa-home"></i> Back to Dashboard
+    </a>
     </div>
 
     <?php if (isset($error)): ?>
