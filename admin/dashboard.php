@@ -76,8 +76,13 @@ if (isSuperAdmin()) {
         <!-- Main Content -->
         <main class="main-content">
             <div class="page-header">
-                <h1>Welcome to WNL</h1>
-                <p>Manage special dates and calendar events</p>
+                <div class="header-content">
+                    <img src="../images/logo.png" alt="WNL Logo" class="header-logo">
+                    <div class="header-text">
+                        <h1>Welcome to WNL</h1>
+                        <p>Manage calendar events</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Statistics Cards -->
@@ -142,8 +147,9 @@ if (isSuperAdmin()) {
                 </div>
             </div>
 
+            <div class="footer-divider"></div>
             <footer class="footer">
-                &copy; <?php echo date('Y'); ?> Developed and Maintained by Web Publishing Department in collaboration with WNL Time Office<br>
+                &copy; <?php echo date('Y'); ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
                 © All rights reserved, 2008 - Wijeya Newspapers Ltd.
             </footer>
         </main>

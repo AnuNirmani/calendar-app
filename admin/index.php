@@ -260,8 +260,9 @@ $result = $stmt->get_result();
             </a>
         </div>
 
+        <div class="footer-divider"></div>
         <footer class="footer">
-            &copy; <?php echo date('Y'); ?> Developed and Maintained by Web Publishing Department in collaboration with WNL Time Office<br>
+            &copy; <?php echo date('Y'); ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
             © All rights reserved, 2008 - Wijeya Newspapers Ltd.
         </footer>
     </div>

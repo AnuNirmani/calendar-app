@@ -102,8 +102,9 @@ $types = $conn->query("SELECT id, type FROM special_types");
         </a>
     </div>
 
+    <div class="footer-divider"></div>
     <footer class="footer">
-        © <?php echo date('Y'); ?> Developed and Maintained by Web Publishing Department in collaboration with WNL Time Office<br>
+        © <?php echo date('Y'); ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
         © All rights reserved, 2008 - Wijeya Newspapers Ltd.
     </footer>
 </body>

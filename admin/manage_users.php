@@ -200,8 +200,9 @@ ORDER BY u.created_at DESC
         </a>
     </div>
 
-    <footer class="footer" style="margin-top: 30px; text-align: center;">
-        &copy; <?= date('Y') ?> Developed by Web Publishing Dept. in collaboration with WNL Time Office<br>
+    <div class="footer-divider"></div>
+    <footer class="footer" style="margin-top: 0; text-align: center;">
+        &copy; <?= date('Y') ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
         © All rights reserved, 2008 - Wijeya Newspapers Ltd.
     </footer>
 
