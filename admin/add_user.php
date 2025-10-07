@@ -24,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
 
     if (empty($username)) {
         $error = "Username is required!";
+    } elseif (empty($role)) {
+        $error = "Role is required!";
     } elseif (strlen($password) < 8) {
         $error = "Password must be at least 8 characters long!";
     } elseif (!preg_match("/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/", $password)) {
@@ -87,31 +89,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
 
         .password-input.invalid {
             border-color: #f44336;
-        }
-
-        .add-user-button {
-            background: #2196f3; 
-            color: white; 
-            padding: 12px 30px; 
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 16px;
-            font-weight: 600;
-            margin-top: 20px;
-        }
-
-        .add-user-button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .add-user-button:enabled:hover {
-            background: #1976d2;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
         }
 
         .form-container {
@@ -298,32 +275,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
                 passwordInput.classList.remove('valid', 'invalid');
             }
             
-            // Enable/disable submit button (check all fields)
-            addUserButton.disabled = !isValid || password.length === 0 || username.trim() === '' || role === '';
+            // Always enable submit button to allow server-side validation
+            addUserButton.disabled = false;
         }
 
         // Add event listeners for all form fields
         document.getElementById('username').addEventListener('input', validatePassword);
         document.getElementById('role').addEventListener('change', validatePassword);
 
-        // Prevent form submission if password is invalid
-        document.getElementById('addUserForm').addEventListener('submit', function(e) {
-            const password = document.getElementById('passwordInput').value;
-            const username = document.getElementById('username').value;
-            
-            // Double check validation on submit
-            if (username.trim() === '') {
-                e.preventDefault();
-                alert('❌ Please enter a username.');
-                return false;
-            }
-            
-            if (password.length < 8 || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
-                e.preventDefault();
-                alert('❌ Please ensure the password meets all requirements before submitting.');
-                return false;
-            }
-        });
+        // Allow form submission to show server-side error messages
+        // The server-side validation will handle the error display
 
         // Initialize validation on page load
         document.addEventListener('DOMContentLoaded', function() {
