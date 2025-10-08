@@ -106,13 +106,13 @@ if (isSuperAdmin()) {
                 </li>
                 <?php if (isSuperAdmin()): ?>
                     <li>
-                        <a href="add_user.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
-                            <i class="fas fa-user-plus w-6 text-center mr-3"></i> Add User
+                        <a href="manage_users.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                            <i class="fas fa-users-cog w-6 text-center mr-3"></i> Manage Users
                         </a>
                     </li>
                     <li>
-                        <a href="manage_users.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
-                            <i class="fas fa-users-cog w-6 text-center mr-3"></i> Manage Users
+                        <a href="add_user.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                            <i class="fas fa-user-plus w-6 text-center mr-3"></i> Add User
                         </a>
                     </li>
                 <?php endif; ?>
