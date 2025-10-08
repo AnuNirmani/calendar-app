@@ -190,15 +190,17 @@ if (isSuperAdmin()) {
                     </a>
 
                     <?php if (isSuperAdmin()): ?>
-                    <a href="add_user.php" class="flex flex-col items-center justify-center p-6 lg:p-8 bg-gradient-to-br from-cyan-500 to-cyan-700 text-white rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[140px] text-center">
-                        <i class="fas fa-user-plus text-4xl lg:text-5xl mb-3"></i>
-                        <span class="text-sm lg:text-base font-semibold uppercase tracking-wide">Add User</span>
-                    </a>
 
                     <a href="manage_users.php" class="flex flex-col items-center justify-center p-6 lg:p-8 bg-gradient-to-br from-purple-500 to-purple-700 text-white rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[140px] text-center">
                         <i class="fas fa-users-cog text-4xl lg:text-5xl mb-3"></i>
                         <span class="text-sm lg:text-base font-semibold uppercase tracking-wide">Manage Users</span>
                     </a>
+
+                    <a href="add_user.php" class="flex flex-col items-center justify-center p-6 lg:p-8 bg-gradient-to-br from-cyan-500 to-cyan-700 text-white rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[140px] text-center">
+                        <i class="fas fa-user-plus text-4xl lg:text-5xl mb-3"></i>
+                        <span class="text-sm lg:text-base font-semibold uppercase tracking-wide">Add User</span>
+                    </a>
+
                     <?php endif; ?>
 
                     <a href="../index.php" class="flex flex-col items-center justify-center p-6 lg:p-8 bg-gradient-to-br from-orange-500 to-orange-700 text-white rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[140px] text-center">
