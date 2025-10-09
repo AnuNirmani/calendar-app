@@ -1,9 +1,151 @@
+<?php
+include '../db.php';
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$successMessage = "";
+$errorMessage = "";
+
+// Handle logout
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: login.php");
+    exit();
+}
+
+// Fetch active categories for dropdown
+function getActiveCategories() {
+    global $conn;
+    $categories = [];
+    
+    $sql = "SELECT id, name FROM categories WHERE status = 'active' ORDER BY name ASC";
+    $result = mysqli_query($conn, $sql);
+    
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $categories[] = $row;
+        }
+    }
+    
+    return $categories;
+}
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $postTitle = mysqli_real_escape_string($conn, trim($_POST['postTitle']));
+    $postCategory = intval($_POST['postCategory']);
+    $postAuthor = mysqli_real_escape_string($conn, trim($_POST['postAuthor']));
+    $postExcerpt = mysqli_real_escape_string($conn, trim($_POST['postExcerpt']));
+    $postContent = mysqli_real_escape_string($conn, trim($_POST['postContent']));
+    $publishDate = mysqli_real_escape_string($conn, $_POST['publishDate']);
+    $status = isset($_POST['status']) ? mysqli_real_escape_string($conn, $_POST['status']) : 'published';
+    
+    $errors = [];
+    
+    if (empty($postTitle)) {
+        $errors[] = "Post title is required";
+    }
+    
+    if ($postCategory <= 0) {
+        $errors[] = "Please select a valid category";
+    }
+    
+    if (empty($postAuthor)) {
+        $errors[] = "Author name is required";
+    }
+    
+    if (empty($postContent)) {
+        $errors[] = "Post content is required";
+    }
+    
+    // Handle file upload
+    $featuredImage = null;
+    if (isset($_FILES['featuredImage']) && $_FILES['featuredImage']['error'] === UPLOAD_ERR_OK) {
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        $maxSize = 5 * 1024 * 1024;
+        
+        $fileType = $_FILES['featuredImage']['type'];
+        $fileSize = $_FILES['featuredImage']['size'];
+        
+        if (!in_array($fileType, $allowedTypes)) {
+            $errors[] = "Invalid file type. Only JPG, PNG, WebP, and GIF are allowed";
+        }
+        
+        if ($fileSize > $maxSize) {
+            $errors[] = "File size exceeds 5MB limit";
+        }
+        
+        if (empty($errors)) {
+            $uploadDir = '../uploads/posts/';
+            
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            $fileExtension = pathinfo($_FILES['featuredImage']['name'], PATHINFO_EXTENSION);
+            $fileName = 'post_' . time() . '_' . uniqid() . '.' . $fileExtension;
+            $uploadPath = $uploadDir . $fileName;
+            
+            if (move_uploaded_file($_FILES['featuredImage']['tmp_name'], $uploadPath)) {
+                $featuredImage = mysqli_real_escape_string($conn, $fileName);
+            } else {
+                $errors[] = "Failed to upload image";
+            }
+        }
+    }
+    
+    if (empty($errors)) {
+        $sql = "INSERT INTO posts (title, category_id, author, excerpt, content, featured_image, publish_date, status, created_at) 
+                VALUES ('$postTitle', $postCategory, '$postAuthor', '$postExcerpt', '$postContent', " . 
+                ($featuredImage ? "'$featuredImage'" : "NULL") . ", '$publishDate', '$status', NOW())";
+        
+        if (mysqli_query($conn, $sql)) {
+            if ($status === 'draft') {
+                $_SESSION['success'] = "Draft saved successfully!";
+            } else {
+                $_SESSION['success'] = "Post published successfully!";
+            }
+            header("Location: add_post.php");
+            exit();
+        } else {
+            $errorMessage = "Failed to save post: " . mysqli_error($conn);
+        }
+    } else {
+        $errorMessage = implode("<br>", $errors);
+    }
+}
+
+// Get messages from session
+if (isset($_SESSION['success'])) {
+    $successMessage = $_SESSION['success'];
+    unset($_SESSION['success']);
+}
+
+if (isset($_SESSION['error'])) {
+    $errorMessage = $_SESSION['error'];
+    unset($_SESSION['error']);
+}
+
+$categories = getActiveCategories();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../images/logo.jpg" type="image/png">
     <title>Add New Post</title>
+    
+    <!-- jQuery and jQuery Validation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
@@ -35,6 +177,36 @@
             border-bottom: 1px solid #e2e8f0;
             padding: 30px 40px;
             margin-bottom: 30px;
+            position: relative;
+        }
+
+        .logout-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
 
         .logo-container {
@@ -118,6 +290,12 @@
             font-weight: 600;
             margin-bottom: 12px;
             font-size: 1.1em;
+        }
+
+        .required-indicator {
+            color: #dc2626;
+            margin-left: 3px;
+            font-weight: bold;
         }
 
         input, textarea, select {
@@ -260,7 +438,7 @@
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
 
-        .success-message, .draft-message {
+        .success-message, .error-message, .draft-message {
             position: fixed;
             top: 20px;
             left: 50%;
@@ -268,7 +446,6 @@
             width: calc(100% - 40px);
             max-width: 500px;
             background: #ffffff;
-            color: #166534;
             padding: 16px 20px;
             border-radius: 12px;
             text-align: center;
@@ -279,6 +456,10 @@
             transition: all 0.3s ease;
             display: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .success-message {
+            color: #166534;
             border-left: 4px solid #10b981;
         }
 
@@ -287,37 +468,15 @@
             border-left: 4px solid #f59e0b;
         }
 
-        .success-message.show, .draft-message.show {
+        .error-message {
+            color: #991b1b;
+            border-left: 4px solid #dc2626;
+        }
+
+        .success-message.show, .draft-message.show, .error-message.show {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
             display: block;
-        }
-
-        .back-btn {
-            position: fixed;
-            top: 30px;
-            left: 30px;
-            background: #3b82f6;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 12px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-
-        .back-btn:hover {
-            background: #2563eb;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
         .section-divider {
@@ -336,30 +495,24 @@
             letter-spacing: -0.025em;
         }
 
-        /* Form validation styles */
-        input:invalid:not(:placeholder-shown),
-        textarea:invalid:not(:placeholder-shown),
-        select:invalid:not(:placeholder-shown) {
-            border-color: #ef4444;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        /* jQuery Validation Styles */
+        label.error {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: block;
+            font-weight: 500;
         }
 
-        input:valid:not(:placeholder-shown),
-        textarea:valid:not(:placeholder-shown),
-        select:valid:not(:placeholder-shown) {
+        input.error, textarea.error, select.error {
+            border-color: #dc2626 !important;
+            background-color: #fef2f2;
+        }
+
+        input.valid, textarea.valid, select.valid {
             border-color: #10b981;
         }
 
-        /* Better focus indicators for accessibility */
-        button:focus-visible,
-        input:focus-visible,
-        textarea:focus-visible,
-        select:focus-visible {
-            outline: 2px solid #3b82f6;
-            outline-offset: 2px;
-        }
-
-        /* Enhanced drag and drop styles */
         .file-upload-label.drag-over {
             border-color: #3b82f6;
             background: #eff6ff;
@@ -371,6 +524,19 @@
             .header-section {
                 padding: 20px;
                 margin-bottom: 20px;
+            }
+
+            .logout-container {
+                position: static;
+                text-align: center;
+                margin-top: 15px;
+                margin-bottom: 10px;
+            }
+
+            .logout-btn {
+                display: inline-flex;
+                padding: 8px 16px;
+                font-size: 0.85rem;
             }
 
             .content-section {
@@ -400,7 +566,7 @@
                 max-width: 300px;
             }
             
-            .success-message, .draft-message {
+            .success-message, .error-message, .draft-message {
                 width: calc(100% - 20px);
                 padding: 12px 16px;
                 font-size: 0.9rem;
@@ -408,13 +574,6 @@
 
             .page-title h1 {
                 font-size: 2rem;
-            }
-
-            .back-btn {
-                top: 20px;
-                left: 20px;
-                padding: 10px 16px;
-                font-size: 0.8rem;
             }
 
             .file-upload-label {
@@ -445,9 +604,13 @@
                 padding: 14px 24px;
                 font-size: 0.9rem;
             }
+
+            .logout-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
         }
 
-        /* Enhanced scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -466,93 +629,72 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
-
-        /* Print styles */
-        @media print {
-            .back-btn,
-            .success-message,
-            .draft-message,
-            .btn-group {
-                display: none !important;
-            }
-            
-            body {
-                background: white;
-            }
-            
-            .header-section,
-            .form-container {
-                box-shadow: none;
-                border: 1px solid #e2e8f0;
-            }
-        }
-
-        /* Loading states */
-        .btn-loading {
-            opacity: 0.7;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
     </style>
+    <!-- CKEditor CDN -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
 </head>
 <body>
     <div class="main-container">
         <div class="header-section">
+            <div class="logout-container">
+                <a href="?logout=true" class="logout-btn" onclick="return confirm('Are you sure you want to logout?')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </a>
+            </div>
+
             <div class="logo-container">
-                <img src="images/logo.jpg" alt="Logo">
+                <img src="../images/logo.jpg" alt="Logo">
             </div>
 
             <div class="page-title">
                 <h1>Create New Post</h1>
+                <p>Fill in the details below to create a new blog post</p>
             </div>
         </div>
 
         <div class="content-section">
             <div class="form-container">
-                <div class="success-message" id="successMessage">
-                    Post published successfully!
-                </div>
+                <?php if ($successMessage): ?>
+                    <div class="success-message show" id="successMessage">
+                        <?= htmlspecialchars($successMessage) ?>
+                    </div>
+                <?php endif; ?>
 
-                <div class="draft-message" id="draftMessage">
-                    Draft saved successfully!
-                </div>
+                <?php if ($errorMessage): ?>
+                    <div class="error-message show" id="errorMessage">
+                        <?= $errorMessage ?>
+                    </div>
+                <?php endif; ?>
 
-                <form id="postForm">
+                <form id="postForm" method="POST" action="" enctype="multipart/form-data">
+                    <input type="hidden" name="status" id="postStatus" value="published">
+                    
                     <div class="section-title">Basic Information</div>
                     
                     <div class="form-group full-width">
-                        <label for="postTitle">Post Title</label>
-                        <input type="text" id="postTitle" name="postTitle" placeholder="Enter an engaging title that captures attention..." required>
+                        <label for="postTitle">Post Title <span class="required-indicator">*</span></label>
+                        <input type="text" id="postTitle" name="postTitle" placeholder="Enter an engaging title that captures attention...">
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="postCategory">Category</label>
-                            <select id="postCategory" name="postCategory" required>
+                            <label for="postCategory">Category <span class="required-indicator">*</span></label>
+                            <select id="postCategory" name="postCategory">
                                 <option value="">Select Category</option>
-                                <option value="circulars">Circulars</option>
-                                <option value="awards">Awards</option>
-                                <option value="news">News</option>
-                                <option value="events">Events</option>
+                                <?php foreach ($categories as $category): ?>
+                                    <option value="<?= $category['id'] ?>"><?= htmlspecialchars($category['name']) ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="postAuthor">Author</label>
-                            <input type="text" id="postAuthor" name="postAuthor" placeholder="Author name" required>
+                            <label for="postAuthor">Author <span class="required-indicator">*</span></label>
+                            <input type="text" id="postAuthor" name="postAuthor" placeholder="Author name">
                         </div>
                     </div>
 
@@ -564,11 +706,7 @@
                     <div class="section-divider"></div>
                     <div class="section-title">Content</div>
 
-                    <div class="form-group full-width">
-                        <label for="postContent">Post Content</label>
-                        <textarea id="postContent" name="postContent" class="content-textarea" placeholder="Write your full post content here. Share your story, insights, or information in detail..." required></textarea>
-                    </div>
-
+                    
                     <div class="section-divider"></div>
                     <div class="section-title">Publishing Options</div>
 
@@ -585,7 +723,7 @@
                             <input type="file" id="featuredImage" name="featuredImage" accept="image/*">
                             <div class="file-upload-label">
                                 <span>Click to upload featured image or drag and drop here<br>
-                                <small style="opacity: 0.7;">Recommended size: 1200x630px (JPG, PNG, WebP)</small></span>
+                                <small style="opacity: 0.7;">Recommended size: 1200x630px (JPG, PNG, WebP) - Max 5MB</small></span>
                             </div>
                         </div>
                         <div class="file-preview" id="filePreview"></div>
@@ -598,6 +736,9 @@
                         <button type="submit" class="btn-primary">
                             Publish Post
                         </button>
+                        <button type="button" class="btn-secondary" onclick="goBack()">
+                            Back to Categories
+                        </button>
                     </div>
                 </form>
             </div>
@@ -605,9 +746,68 @@
     </div>
 
     <script>
-        let posts = [];
-        let drafts = [];
-        
+        $(document).ready(function() {
+            // Set default publish date to now
+            document.getElementById('publishDate').value = new Date().toISOString().slice(0, 16);
+
+            // Initialize form validation
+            $("#postForm").validate({
+                rules: {
+                    postTitle: {
+                        required: true,
+                        minlength: 3,
+                        maxlength: 200
+                    },
+                    postCategory: {
+                        required: true
+                    },
+                    postAuthor: {
+                        required: true,
+                        minlength: 2,
+                        maxlength: 100
+                    },
+                    postContent: {
+                        required: true,
+                        minlength: 10
+                    },
+                    postExcerpt: {
+                        maxlength: 500
+                    }
+                },
+                messages: {
+                    postTitle: {
+                        required: "This field is required.",
+                        minlength: "Title must be at least 3 characters long.",
+                        maxlength: "Title cannot exceed 200 characters."
+                    },
+                    postCategory: {
+                        required: "This field is required."
+                    },
+                    postAuthor: {
+                        required: "This field is required.",
+                        minlength: "Author name must be at least 2 characters long.",
+                        maxlength: "Author name cannot exceed 100 characters."
+                    },
+                    postContent: {
+                        required: "This field is required.",
+                        minlength: "Content must be at least 10 characters long."
+                    },
+                    postExcerpt: {
+                        maxlength: "Excerpt cannot exceed 500 characters."
+                    }
+                },
+                errorElement: "label",
+                errorClass: "error",
+                validClass: "valid",
+                errorPlacement: function(error, element) {
+                    error.insertAfter(element);
+                },
+                submitHandler: function(form) {
+                    form.submit();
+                }
+            });
+        });
+
         // File upload preview
         document.getElementById('featuredImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -621,140 +821,37 @@
             }
         });
 
-        // Set default publish date to now
-        document.getElementById('publishDate').value = new Date().toISOString().slice(0, 16);
-
-        // Form submission handler
-        document.getElementById('postForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            publishPost();
-        });
-
-        function createPostObject(status = 'published') {
-            const formData = new FormData(document.getElementById('postForm'));
-            const post = {
-                id: Date.now(),
-                title: formData.get('postTitle'),
-                category: formData.get('postCategory'),
-                excerpt: formData.get('postExcerpt'),
-                content: formData.get('postContent'),
-                author: formData.get('postAuthor'),
-                publishDate: formData.get('publishDate'),
-                featuredImage: formData.get('featuredImage')?.name || null,
-                status: status,
-                createdAt: new Date().toISOString()
-            };
-            return post;
-        }
-
-        function publishPost() {
-            // Check if required fields are filled
-            const requiredFields = [
-                { id: 'postTitle', name: 'Post Title' },
-                { id: 'postCategory', name: 'Category' },
-                { id: 'postContent', name: 'Content' },
-                { id: 'postAuthor', name: 'Author' }
-            ];
-            
-            let isValid = true;
-            let missingFields = [];
-            
-            requiredFields.forEach(field => {
-                const element = document.getElementById(field.id);
-                if (!element.value.trim()) {
-                    element.style.borderColor = '#ef4444';
-                    element.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
-                    missingFields.push(field.name);
-                    isValid = false;
-                } else {
-                    element.style.borderColor = '#e2e8f0';
-                    element.style.boxShadow = 'none';
-                }
-            });
-
-            if (!isValid) {
-                alert(`Please fill in the following required fields:\n• ${missingFields.join('\n• ')}`);
-                return;
-            }
-
-            const post = createPostObject('published');
-            posts.push(post);
-            
-            // Store in localStorage for persistence
-            localStorage.setItem('publishedPosts', JSON.stringify(posts));
-            
-            console.log('Published Posts:', posts);
-            
-            // Show success message
-            showMessage('successMessage');
-            
-            // Clear form after successful submission
-            setTimeout(() => {
-                if (confirm('Post published successfully! Would you like to create another post?')) {
-                    document.getElementById('postForm').reset();
-                    document.getElementById('filePreview').style.display = 'none';
-                    document.getElementById('publishDate').value = new Date().toISOString().slice(0, 16);
-                }
-            }, 2000);
-        }
-
         function saveDraft() {
-            // Check if at least title is filled
-            const titleField = document.getElementById('postTitle');
-            if (!titleField.value.trim()) {
-                titleField.style.borderColor = '#ef4444';
-                titleField.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
-                alert('Please enter a title before saving as draft.');
-                titleField.focus();
-                return;
+            if ($("#postForm").valid()) {
+                document.getElementById('postStatus').value = 'draft';
+                document.getElementById('postForm').submit();
             }
-
-            const draft = createPostObject('draft');
-            drafts.push(draft);
-            
-            // Store in localStorage for persistence
-            localStorage.setItem('draftPosts', JSON.stringify(drafts));
-            
-            console.log('Saved Drafts:', drafts);
-            
-            // Show draft saved message
-            showMessage('draftMessage');
-        }
-
-        function showMessage(messageId) {
-            const message = document.getElementById(messageId);
-            message.classList.add('show');
-            
-            // Hide message after 4 seconds
-            setTimeout(() => {
-                message.classList.remove('show');
-            }, 4000);
         }
 
         function goBack() {
             if (confirm('Are you sure you want to leave? Any unsaved changes will be lost.')) {
-                window.history.back();
+                window.location.href = 'add_category_type.php';
             }
         }
 
-        // Add drag and drop functionality for file upload
-        const fileUpload = document.querySelector('.file-upload-label');
+        // Add drag and drop functionality
+        const fileUploadLabel = document.querySelector('.file-upload-label');
         
         ['dragover', 'dragenter'].forEach(eventName => {
-            fileUpload.addEventListener(eventName, function(e) {
+            fileUploadLabel.addEventListener(eventName, function(e) {
                 e.preventDefault();
                 this.classList.add('drag-over');
             });
         });
 
         ['dragleave', 'dragend'].forEach(eventName => {
-            fileUpload.addEventListener(eventName, function(e) {
+            fileUploadLabel.addEventListener(eventName, function(e) {
                 e.preventDefault();
                 this.classList.remove('drag-over');
             });
         });
 
-        fileUpload.addEventListener('drop', function(e) {
+        fileUploadLabel.addEventListener('drop', function(e) {
             e.preventDefault();
             this.classList.remove('drag-over');
             
@@ -762,45 +859,17 @@
             if (files.length > 0 && files[0].type.startsWith('image/')) {
                 const fileInput = document.getElementById('featuredImage');
                 fileInput.files = files;
-                
-                // Trigger the change event
-                const event = new Event('change', { bubbles: true });
-                fileInput.dispatchEvent(event);
+                fileInput.dispatchEvent(new Event('change', { bubbles: true }));
             }
         });
 
-        // Load saved data on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load existing posts and drafts from localStorage
-            const savedPosts = localStorage.getItem('publishedPosts');
-            const savedDrafts = localStorage.getItem('draftPosts');
-            
-            if (savedPosts) {
-                posts = JSON.parse(savedPosts);
-            }
-            
-            if (savedDrafts) {
-                drafts = JSON.parse(savedDrafts);
-            }
-        });
-
-        // Auto-save draft functionality (optional)
-        let autoSaveTimeout;
-        function autoSaveDraft() {
-            clearTimeout(autoSaveTimeout);
-            autoSaveTimeout = setTimeout(() => {
-                const title = document.getElementById('postTitle').value.trim();
-                if (title) {
-                    // Auto-save logic could go here
-                    console.log('Auto-saving draft...');
-                }
-            }, 30000); // Auto-save after 30 seconds of inactivity
-        }
-
-        // Add auto-save listeners to form fields
-        document.querySelectorAll('#postForm input, #postForm textarea, #postForm select').forEach(field => {
-            field.addEventListener('input', autoSaveDraft);
-        });
+        // Auto-hide messages after 5 seconds
+        setTimeout(() => {
+            const messages = document.querySelectorAll('.success-message, .error-message, .draft-message');
+            messages.forEach(msg => {
+                msg.classList.remove('show');
+            });
+        }, 5000);
     </script>
 </body>
 </html>

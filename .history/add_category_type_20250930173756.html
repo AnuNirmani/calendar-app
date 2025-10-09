@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Category Type</title>
+    <link rel="stylesheet" href="add_category_type.css">
+</head>
+<body>
+    <button class="floating-btn" onclick="addNewPost()">
+        <span>+</span> Add New Post
+    </button>
+
+    <div class="main-container">
+        <div class="header-section">
+            <div class="logo-container">
+                <img src="images/logo.jpg" alt="Logo">
+            </div>
+
+            <div class="page-title">
+                <h1>Add Category Type</h1>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div id="successMessage" class="success-message">
+                Category created successfully!
+            </div>
+
+            <div id="errorMessage" class="error-message">
+                Error: Could not create category.
+            </div>
+
+            <div class="form-container">
+                <form id="categoryForm">
+                    <div class="form-group">
+                        <label for="categoryName">Category Name</label>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <input type="text" id="categoryName" name="categoryName" placeholder="Enter category name" required minlength="2" maxlength="50">
+                            </div>
+                            <button type="submit" class="btn-primary" id="submitButton">
+                                <span id="buttonSpinner" class="spinner" style="display: none;"></span>
+                                <span id="buttonText">Create Category</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="categories-section">
+                <h2 class="section-title">All Categories</h2>
+                <div class="table-container">
+                    <table id="categoriesTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Category Name</th>
+                                <th>Created Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTableBody">
+                            <tr>
+                                <td colspan="4" class="empty-state">
+                                    <div class="empty-icon">📁</div>
+                                    <div>Loading categories...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Integration
+        const API = {
+            baseUrl: 'category_api.php',
+            
+            async request(method, endpoint = '', data = null) {
+                try {
+                    console.log(`Making ${method} request to ${this.baseUrl}${endpoint}`, data);
+                    
+                    const options = {
+                        method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    };
+
+                    if (data) {
+                        options.body = JSON.stringify(data);
+                    }
+
+                    const response = await fetch(this.baseUrl + endpoint, options);
+                    const text = await response.text();
+                    
+                    console.log('Raw response:', text);
+                    
+                    try {
+                        const result = JSON.parse(text);
+                        console.log('Parsed response:', result);
+                        
+                        if (result.status === 'error') {
+                            throw new Error(result.message);
+                        }
+                        
+                        return result;
+                    } catch (e) {
+                        console.error('Failed to parse response:', e);
+                        throw new Error('Invalid server response');
+                    }
+                } catch (error) {
+                    console.error('API Error:', error);
+                    throw error;
+                }
+            }
+        };
+
+        const DB = {
+            saveCategory: async function(category) {
+                const result = await API.request('POST', '', { name: category.name });
+                return { success: true, data: result.data };
+            },
+            
+            getCategories: async function() {
+                const result = await API.request('GET');
+                return result.data || [];
+            },
+            
+            deleteCategory: async function(id) {
+                await API.request('DELETE', `?id=${id}`);
+                return { success: true };
+            }
+        };
+
+        document.getElementById('categoryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const categoryName = formData.get('categoryName').trim();
+            const submitButton = document.getElementById('submitButton');
+            const buttonText = document.getElementById('buttonText');
+            const buttonSpinner = document.getElementById('buttonSpinner');
+            
+            if (categoryName === '') {
+                showError('Please enter a category name');
+                return;
+            }
+            
+            submitButton.classList.add('loading');
+            buttonText.textContent = 'Creating...';
+            buttonSpinner.style.display = 'inline-block';
+            
+            try {
+                const existingCategories = await DB.getCategories();
+                if (existingCategories.some(cat => cat.name.toLowerCase() === categoryName.toLowerCase())) {
+                    showError('Category with this name already exists');
+                    submitButton.classList.remove('loading');
+                    buttonText.textContent = 'Create Category';
+                    buttonSpinner.style.display = 'none';
+                    return;
+                }
+                
+                const category = { name: categoryName };
+                const result = await DB.saveCategory(category);
+                
+                if (result.success) {
+                    document.getElementById('categoryName').value = '';
+                    await loadCategories();
+                    showSuccess('Category created successfully!');
+                } else {
+                    showError('Failed to create category');
+                }
+            } catch (error) {
+                console.error('Error creating category:', error);
+                showError('An error occurred while creating the category');
+            } finally {
+                submitButton.classList.remove('loading');
+                buttonText.textContent = 'Create Category';
+                buttonSpinner.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadCategories();
+        });
+
+        async function loadCategories() {
+            try {
+                const categories = await DB.getCategories();
+                updateTable(categories);
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                showError('Failed to load categories');
+            }
+        }
+
+        function updateTable(categories) {
+            const tbody = document.getElementById('categoriesTableBody');
+            
+            if (categories.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-state">
+                            <div class="empty-icon">📁</div>
+                            <div>No categories added yet. Create your first category above!</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = categories.map((category, index) => `
+                <tr>
+                    <td data-label="#">${index + 1}</td>
+                    <td data-label="Category Name">${category.name}</td>
+                    <td data-label="Created Date">${category.createdAt}</td>
+                    <td data-label="Actions">
+                        <button class="delete-btn" onclick="deleteCategory(${category.id})" aria-label="Delete ${category.name}">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function deleteCategory(id) {
+            if (confirm('Are you sure you want to delete this category?')) {
+                try {
+                    const result = await DB.deleteCategory(id);
+                    
+                    if (result.success) {
+                        await loadCategories();
+                        showSuccess('Category deleted successfully!');
+                    } else {
+                        showError('Failed to delete category');
+                    }
+                } catch (error) {
+                    console.error('Error deleting category:', error);
+                    showError('An error occurred while deleting the category');
+                }
+            }
+        }
+
+        function showSuccess(message) {
+            const successMsg = document.getElementById('successMessage');
+            successMsg.textContent = message;
+            successMsg.classList.add('show');
+            
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 3000);
+        }
+
+        function showError(message) {
+            const errorMsg = document.getElementById('errorMessage');
+            errorMsg.textContent = message;
+            errorMsg.classList.add('show');
+            
+            setTimeout(() => {
+                errorMsg.classList.remove('show');
+            }, 3000);
+        }
+
+        function addNewPost() {
+            window.location.href = 'add_post.html';
+        }
+    </script>
+</body>
+</html>

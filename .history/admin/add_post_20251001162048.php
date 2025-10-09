@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Post</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #f1f5f9 100%);
+            min-height: 100vh;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .main-container {
+            min-height: 100vh;
+            width: 100%;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-section {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 30px 40px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        /* Logout Button Styles */
+        .logout-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .logo-container img {
+            width: 200px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.02);
+        }
+
+        .page-title {
+            text-align: center;
+        }
+
+        .page-title h1 {
+            color: #1e293b;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
+        }
+
+        .page-title p {
+            color: #64748b;
+            font-size: 1.1em;
+            font-weight: 400;
+        }
+
+        .content-section {
+            flex: 1;
+            padding: 0 40px 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .form-container {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 50px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            width: 100%;
+            max-width: 1000px;
+            position: relative;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .form-container:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            flex: 1;
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            flex: 1 1 100%;
+        }
+
+        label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            color: #374151;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #9ca3af;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 140px;
+        }
+
+        .content-textarea {
+            min-height: 250px;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 25px;
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+            text-align: center;
+            color: #6b7280;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .file-upload:hover .file-upload-label {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+            color: #3b82f6;
+        }
+
+        .file-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            color: #166534;
+            font-size: 1rem;
+            font-weight: 500;
+            display: none;
+            text-align: center;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 160px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-draft {
+            background: #f59e0b;
+            color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-draft:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .success-message, .draft-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            width: calc(100% - 40px);
+            max-width: 500px;
+            background: #ffffff;
+            color: #166534;
+            padding: 16px 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            opacity: 0;
+            z-index: 10000;
+            transition: all 0.3s ease;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-left: 4px solid #10b981;
+        }
+
+        .draft-message {
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .success-message.show, .draft-message.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            display: block;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: #3b82f6;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .section-divider {
+            margin: 40px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .section-title {
+            color: #1e293b;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #3b82f6;
+            display: inline-block;
+            letter-spacing: -0.025em;
+        }
+
+        /* Form validation styles */
+        input:invalid:not(:placeholder-shown),
+        textarea:invalid:not(:placeholder-shown),
+        select:invalid:not(:placeholder-shown) {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        input:valid:not(:placeholder-shown),
+        textarea:valid:not(:placeholder-shown),
+        select:valid:not(:placeholder-shown) {
+            border-color: #10b981;
+        }
+
+        /* Better focus indicators for accessibility */
+        button:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible,
+        select:focus-visible {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+
+        /* Enhanced drag and drop styles */
+        .file-upload-label.drag-over {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            color: #3b82f6;
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 768px) {
+            .header-section {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .logout-container {
+                position: static;
+                text-align: center;
+                margin-top: 15px;
+                margin-bottom: 10px;
+            }
+
+            .logout-btn {
+                display: inline-flex;
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+
+            .content-section {
+                padding: 0 20px 20px;
+            }
+
+            .form-container {
+                padding: 30px 25px;
+            }
+            
+            .logo-container img {
+                width: 160px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            button {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .success-message, .draft-message {
+                width: calc(100% - 20px);
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+
+            .page-title h1 {
+                font-size: 2rem;
+            }
+
+            .back-btn {
+                top: 20px;
+                left: 20px;
+                padding: 10px 16px;
+                font-size: 0.8rem;
+            }
+
+            .file-upload-label {
+                padding: 40px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-container img {
+                width: 140px;
+            }
+
+            .page-title h1 {
+                font-size: 1.75rem;
+            }
+
+            input, textarea, select {
+                padding: 14px 16px;
+                font-size: 0.9rem;
+            }
+
+            .form-container {
+                padding: 25px 20px;
+            }
+
+            button {
+                padding: 14px 24px;
+                font-size: 0.9rem;
+            }
+
+            .logout-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Enhanced scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Print styles */
+        @media print {
+            .back-btn,
+            .logout-btn,
+            .success-message,
+            .draft-message,
+            .btn-group {
+                display: none !important;
+            }
+            
+            body {
+                background: white;
+            }
+            
+            .header-section,
+            .form-container {
+                box-shadow: none;
+                border: 1px solid #e2e8f0;
+            }
+        }
+
+        /* Loading states */
+        .btn-loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header-section">
+            <!-- Logout Button -->
+            <div class="logout-container">
+                <a href="add_category_type.php?logout=true" class="logout-btn" onclick="return confirmLogout()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </a>
+            </div>
+
+            <div class="logo-container">
+                <img src="../images/logo.jpg" alt="Logo">
+            </div>
+
+            <div class="page-title">
+                <h1>Create New Post</h1>
+                <p>Fill in the details below to create a new blog post</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="form-container">
+                <div class="success-message" id="successMessage">
+                    Post published successfully!
+                </div>
+
+                <div class="draft-message" id="draftMessage">
+                    Draft saved successfully!
+                </div>
+
+                <form id="postForm">
+                    <div class="section-title">Basic Information</div>
+                    
+                    <div class="form-group full-width">
+                        <label for="postTitle">Post Title</label>
+                        <input type="text" id="postTitle" name="postTitle" placeholder="Enter an engaging title that captures attention..." required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="postCategory">Category</label>
+                            <select id="postCategory" name="postCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="circulars">Circulars</option>
+                                <option value="awards">Awards</option>
+                                <option value="news">News</option>
+                                <option value="events">Events</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="postAuthor">Author</label>
+                            <input type="text" id="postAuthor" name="postAuthor" placeholder="Author name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="postExcerpt">Excerpt</label>
+                        <textarea id="postExcerpt" name="postExcerpt" placeholder="Write a compelling summary that will make readers want to read more..."></textarea>
+                    </div>
+
+                    <div class="section-divider"></div>
+                    <div class="section-title">Content</div>
+
+                    <div class="form-group full-width">
+                        <label for="postContent">Post Content</label>
+                        <textarea id="postContent" name="postContent" class="content-textarea" placeholder="Write your full post content here. Share your story, insights, or information in detail..." required></textarea>
+                    </div>
+
+                    <div class="section-divider"></div>
+                    <div class="section-title">Publishing Options</div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="publishDate">Publish Date & Time</label>
+                            <input type="datetime-local" id="publishDate" name="publishDate">
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="featuredImage">Featured Image</label>
+                        <div class="file-upload">
+                            <input type="file" id="featuredImage" name="featuredImage" accept="image/*">
+                            <div class="file-upload-label">
+                                <span>Click to upload featured image or drag and drop here<br>
+                                <small style="opacity: 0.7;">Recommended size: 1200x630px (JPG, PNG, WebP)</small></span>
+                            </div>
+                        </div>
+                        <div class="file-preview" id="filePreview"></div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="button" class="btn-draft" onclick="saveDraft()">
+                            Save as Draft
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            Publish Post
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="goBack()">
+                            Back to Categories
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let posts = [];
+        let drafts = [];
+        
+        // File upload preview
+        document.getElementById('featuredImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('filePreview');
+            
+            if (file) {
+                preview.innerHTML = `Selected: <strong>${file.name}</strong> (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        // Set default publish date to now
+        document.getElementById('publishDate').value = new Date().toISOString().slice(0, 16);
+
+        // Form submission handler
+        document.getElementById('postForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            publishPost();
+        });
+
+        function createPostObject(status = 'published') {
+            const formData = new FormData(document.getElementById('postForm'));
+            const post = {
+                id: Date.now(),
+                title: formData.get('postTitle'),
+                category: formData.get('postCategory'),
+                excerpt: formData.get('postExcerpt'),
+                content: formData.get('postContent'),
+                author: formData.get('postAuthor'),
+                publishDate: formData.get('publishDate'),
+                featuredImage: formData.get('featuredImage')?.name || null,
+                status: status,
+                createdAt: new Date().toISOString()
+            };
+            return post;
+        }
+
+        function publishPost() {
+            // Check if required fields are filled
+            const requiredFields = [
+                { id: 'postTitle', name: 'Post Title' },
+                { id: 'postCategory', name: 'Category' },
+                { id: 'postContent', name: 'Content' },
+                { id: 'postAuthor', name: 'Author' }
+            ];
+            
+            let isValid = true;
+            let missingFields = [];
+            
+            requiredFields.forEach(field => {
+                const element = document.getElementById(field.id);
+                if (!element.value.trim()) {
+                    element.style.borderColor = '#ef4444';
+                    element.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                    missingFields.push(field.name);
+                    isValid = false;
+                } else {
+                    element.style.borderColor = '#e2e8f0';
+                    element.style.boxShadow = 'none';
+                }
+            });
+
+            if (!isValid) {
+                alert(`Please fill in the following required fields:\n• ${missingFields.join('\n• ')}`);
+                return;
+            }
+
+            const post = createPostObject('published');
+            posts.push(post);
+            
+            // Store in localStorage for persistence
+            localStorage.setItem('publishedPosts', JSON.stringify(posts));
+            
+            console.log('Published Posts:', posts);
+            
+            // Show success message
+            showMessage('successMessage');
+            
+            // Clear form after successful submission
+            setTimeout(() => {
+                if (confirm('Post published successfully! Would you like to create another post?')) {
+                    document.getElementById('postForm').reset();
+                    document.getElementById('filePreview').style.display = 'none';
+                    document.getElementById('publishDate').value = new Date().toISOString().slice(0, 16);
+                }
+            }, 2000);
+        }
+
+        function saveDraft() {
+            // Check if at least title is filled
+            const titleField = document.getElementById('postTitle');
+            if (!titleField.value.trim()) {
+                titleField.style.borderColor = '#ef4444';
+                titleField.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                alert('Please enter a title before saving as draft.');
+                titleField.focus();
+                return;
+            }
+
+            const draft = createPostObject('draft');
+            drafts.push(draft);
+            
+            // Store in localStorage for persistence
+            localStorage.setItem('draftPosts', JSON.stringify(drafts));
+            
+            console.log('Saved Drafts:', drafts);
+            
+            // Show draft saved message
+            showMessage('draftMessage');
+        }
+
+        function showMessage(messageId) {
+            const message = document.getElementById(messageId);
+            message.classList.add('show');
+            
+            // Hide message after 4 seconds
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 4000);
+        }
+
+        function goBack() {
+            if (confirm('Are you sure you want to leave? Any unsaved changes will be lost.')) {
+                window.location.href = 'add_category_type.php';
+            }
+        }
+
+        function confirmLogout() {
+            return confirm('Are you sure you want to logout?');
+        }
+
+        // Add drag and drop functionality for file upload
+        const fileUpload = document.querySelector('.file-upload-label');
+        
+        ['dragover', 'dragenter'].forEach(eventName => {
+            fileUpload.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+        });
+
+        ['dragleave', 'dragend'].forEach(eventName => {
+            fileUpload.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+            });
+        });
+
+        fileUpload.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                const fileInput = document.getElementById('featuredImage');
+                fileInput.files = files;
+                
+                // Trigger the change event
+                const event = new Event('change', { bubbles: true });
+                fileInput.dispatchEvent(event);
+            }
+        });
+
+        // Load saved data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load existing posts and drafts from localStorage
+            const savedPosts = localStorage.getItem('publishedPosts');
+            const savedDrafts = localStorage.getItem('draftPosts');
+            
+            if (savedPosts) {
+                posts = JSON.parse(savedPosts);
+            }
+            
+            if (savedDrafts) {
+                drafts = JSON.parse(savedDrafts);
+            }
+        });
+
+        // Auto-save draft functionality (optional)
+        let autoSaveTimeout;
+        function autoSaveDraft() {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                const title = document.getElementById('postTitle').value.trim();
+                if (title) {
+                    // Auto-save logic could go here
+                    console.log('Auto-saving draft...');
+                }
+            }, 30000); // Auto-save after 30 seconds of inactivity
+        }
+
+        // Add auto-save listeners to form fields
+        document.querySelectorAll('#postForm input, #postForm textarea, #postForm select').forEach(field => {
+            field.addEventListener('input', autoSaveDraft);
+        });
+    </script>
+</body>
+</html>
