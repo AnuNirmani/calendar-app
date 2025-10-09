@@ -240,7 +240,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
                 </select>
             </div>
 
-            <button type="submit" name="add_user" id="addUserButton">
+            <button type="submit" 
+            class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-md font-semibold hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center gap-2">
             <i class="fas fa-user-plus "></i>
                Add User
             </button>

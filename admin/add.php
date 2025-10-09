@@ -26,7 +26,6 @@ $types = $conn->query("SELECT id, type FROM special_types");
     <link rel="stylesheet" href="../css/fonts/fonts.css">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../images/logo.jpg" type="image/png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -73,29 +72,6 @@ $types = $conn->query("SELECT id, type FROM special_types");
             border-color: #4caf50 !important;
             box-shadow: 0 0 5px rgba(76, 175, 80, 0.3) !important;
         }
-
-        /* Custom radio button styling */
-        .add-form input[type="radio"]:checked + span {
-            border-color: #3b82f6 !important;
-            background-color: #eff6ff !important;
-        }
-
-        .add-form input[type="radio"]:checked + span > span {
-            opacity: 1 !important;
-        }
-
-        .add-form input[type="radio"] + span > span {
-            opacity: 0.3;
-            transition: opacity 0.2s ease;
-        }
-
-        /* Mobile responsive adjustments */
-        @media (max-width: 640px) {
-            .max-w-md {
-                max-width: 95% !important;
-                margin: 0 auto !important;
-            }
-        }
     </style>
 </head>
 
@@ -123,67 +99,46 @@ $types = $conn->query("SELECT id, type FROM special_types");
     </a>
     </div>
 
-    <div>
-        <form action="save.php" method="POST" class="add-form space-y-4">
-            <div class="space-y-2">
-                <label for="date" class="block text-sm font-medium text-gray-700">📅 Date:</label>
-                <input type="date" name="date" required 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
+    <form action="save.php" method="POST" class="add-form">
+        <label for="date">📅 Date:</label>
+        <input type="date" name="date" required>
 
-            <div class="space-y-2">
-                <label for="type_id" class="block text-sm font-medium text-gray-700">🏷️ Type:</label>
-                <select name="type_id" required 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">-- Select Type --</option>
-                    <?php while($row = $types->fetch_assoc()): ?>
-                        <option value="<?= $row['id'] ?>">
-                            <?= htmlspecialchars($row['type']) ?>
-                        </option>
-                    <?php endwhile; ?>
-                </select>
-            </div>
+        <label for="type_id">🏷️ Type:</label>
+        <select name="type_id" required>
+            <option value="">-- Select Type --</option>
+            <?php while($row = $types->fetch_assoc()): ?>
+                <option value="<?= $row['id'] ?>">
+                    <?= htmlspecialchars($row['type']) ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
 
-            <div class="space-y-2">
-                <label for="description" class="block text-sm font-medium text-gray-700">📝 Description:</label>
-                <input type="text" name="description" placeholder="Enter description" required 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
+        <label for="description">📝 Description:</label>
+        <input type="text" name="description" placeholder="Enter description" required>
 
-            <div class="space-y-3">
-                <label class="block text-sm font-medium text-gray-700">🎨 Optional Color:</label>
-                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                    <label class="flex items-center gap-2 cursor-pointer p-2 rounded-md hover:bg-gray-50 transition-colors">
-                        <input type="radio" name="color" value="#ff0000" required class="sr-only">
-                        <span class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                            <span class="w-3 h-3 rounded-full bg-red-500"></span>
-                        </span>
-                        <span class="text-sm text-gray-700">Mercantile Holiday</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer p-2 rounded-md hover:bg-gray-50 transition-colors">
-                        <input type="radio" name="color" value="#ffea00" required class="sr-only">
-                        <span class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                            <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
-                        </span>
-                        <span class="text-sm text-gray-700">Poya Day</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer p-2 rounded-md hover:bg-gray-50 transition-colors">
-                        <input type="radio" name="color" value="#dbdbdbff" required class="sr-only">
-                        <span class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                            <span class="w-3 h-3 rounded-full bg-gray-300"></span>
-                        </span>
-                        <span class="text-sm text-gray-700">Other</span>
-                    </label>
-                </div>
-            </div>
+        <label>🎨 Optional Color:</label>
+        <div style="display: flex; gap: 20px; margin: 10px 0;">
+            <label style="display: flex; align-items: center; gap: 8px;">
+                <input type="radio" name="color" value="#ff0000" required>
+                <span style="width: 20px; height: 20px; background: #ff0000; border-radius: 50%; border: 1px solid #333;"></span>
+                Mercantile Holiday
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px;">
+                <input type="radio" name="color" value="#ffea00" required>
+                <span style="width: 20px; height: 20px; background: #ffea00; border-radius: 50%; border: 1px solid #333;"></span>
+                Poya Day
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px;">
+                <input type="radio" name="color" value="#dbdbdbff" required>
+                <span style="width: 20px; height: 20px; background: #dbdbdbff; border-radius: 50%; border: 1px solid #333;"></span>
+                Other
+            </label>
+        </div>
 
-            <button type="submit" 
-                    class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-md font-semibold hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center gap-2">
-                <i class="fas fa-plus-circle"></i>
-                Add Date
-            </button>
-        </form>
-    </div>
+        <button type="submit">
+        <i class="fas fa-plus-circle "></i>
+         Add Date</button>
+    </form>
 
     <div style="margin-top: 10px;">
         <span style="color: navy; padding: 8px 16px; border-radius: 20px; font-size: 18px; font-weight: 600;">
