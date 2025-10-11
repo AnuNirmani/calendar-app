@@ -45,13 +45,13 @@ CREATE TABLE IF NOT EXISTS users (
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
-INSERT INTO users (username, password, role) VALUES ('superadmin', 'super123', 'super_admin')
+INSERT INTO users (username, password, role) VALUES ('superadmin', 'YOUR_HASHED_PASSWORD', 'super_admin')
 ON DUPLICATE KEY UPDATE role = 'super_admin';
 
-INSERT INTO users (username, password, role, created_by) VALUES ('admin1', 'admin123', 'admin', 1)
+INSERT INTO users (username, password, role, created_by) VALUES ('admin1', 'YOUR_HASHED_PASSWORD', 'admin', 1)
 ON DUPLICATE KEY UPDATE role = 'admin';
 
-> 🔐 *Passwords are stored in plain text (for demonstration only). Can use hashing in production.*
+> 🔐 *Use the update_passwords.php script to set secure passwords. Never commit actual passwords to the repository.*
 
 ````
 
@@ -98,31 +98,13 @@ INSERT INTO special_types (type, description) VALUES
 
 ## #️⃣ To Hash Password
 
-```
-<?php
-// update_passwords.php
-include 'db.php';
+Use the included `update_passwords.php` script:
 
-$users = [
-    ['username' => 'superadmin', 'password' => 'super123'],
-    ['username' => 'admin1', 'password' => 'admin123']
-];
+1. Edit the script with YOUR secure passwords
+2. Run: `php update_passwords.php`
+3. Delete or secure the script after use
 
-foreach ($users as $user) {
-    $hashedPassword = password_hash($user['password'], PASSWORD_DEFAULT);
-    $stmt = $conn->prepare("UPDATE users SET password = ? WHERE username = ?");
-    $stmt->bind_param("ss", $hashedPassword, $user['username']);
-    $stmt->execute();
-    if ($stmt->affected_rows > 0) {
-        echo "Updated password for {$user['username']}\n";
-    } else {
-        echo "No update needed for {$user['username']}\n";
-    }
-}
-
-echo "Password update complete.\n";
-?>
-```
+**⚠️ SECURITY WARNING:** Never commit real passwords to your repository!
 
 ---
 
@@ -182,17 +164,25 @@ calendar-app/
 
    ```bash
    git clone https://github.com/AnuNirmani/calendar-app
-
-   get main2.0 branch
+   cd calendar-app
+   git checkout main2.0
    ```
 
 2. ✅ Start XAMPP or MAMP and place files in your `htdocs` folder.
 
-3. ✅ Create a MySQL database called `calendar_db` and run the SQL scripts from the schema section above.
+3. ✅ Create a MySQL database called `calendar_app` and run the SQL scripts from the schema section above.
 
-4. ✅ Update `db.php` with your database credentials.
+4. ✅ **Configure Database Connection:**
+   - Copy `db.example.php` to `db.php`
+   - Update `db.php` with your actual database credentials
+   - **NEVER commit db.php to the repository**
 
-5. ✅ Access via browser:
+5. ✅ **Set Secure Passwords:**
+   - Edit `update_passwords.php` with your desired passwords
+   - Run it once: `php update_passwords.php`
+   - Delete or secure `update_passwords.php` after running
+
+6. ✅ Access via browser:
 
    ```
    http://localhost/calendar-app/index.php
