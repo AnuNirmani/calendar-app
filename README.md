@@ -165,7 +165,7 @@ calendar-app/
    ```bash
    git clone https://github.com/AnuNirmani/calendar-app
    cd calendar-app
-   git checkout main2.0
+   git checkout main
    ```
 
 2. ✅ Start XAMPP or MAMP and place files in your `htdocs` folder.
