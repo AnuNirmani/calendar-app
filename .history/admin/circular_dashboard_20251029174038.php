@@ -267,6 +267,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
                             <div class="bg-white rounded-lg px-4 py-2 shadow-md">
                                 <p class="text-gray-600 text-sm"><i class="fas fa-calendar-day text-indigo-500 mr-2"></i><?php echo date('F j, Y'); ?></p>
                             </div>
+                            <div class="bg-white rounded-lg px-4 py-2 shadow-md">
+                                <p class="text-gray-600 text-sm"><i class="fas fa-clock text-green-500 mr-2"></i><?php echo date('h:i A'); ?></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+
+                    <!-- Total Contacts Card -->
+                    <div class="stat-card rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="feature-icon bg-teal-100 text-teal-600">
+                                <i class="fas fa-address-book"></i>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-gray-800 stat-number" data-target="<?php echo $stats['total_contacts']; ?>">0</div>
+                                <div class="text-gray-500 text-sm">Total Contacts</div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-teal-500 h-2 rounded-full progress-bar" style="width: 0%" data-target="<?php echo min(($stats['total_contacts'] / max($stats['total_contacts'] + 1, 1)) * 100, 100); ?>"></div>
                         </div>
                     </div>
                 </div>

@@ -22,28 +22,6 @@ if (isset($_GET['logout'])) {
 function getActiveCategories() {
     global $conn;
     $categories = [];
-    
-    // Check if posts table exists, if not create it
-    $table_check = "SHOW TABLES LIKE 'posts'";
-    $table_result = mysqli_query($conn, $table_check);
-    if (mysqli_num_rows($table_result) == 0) {
-        // Create posts table
-        $create_table = "CREATE TABLE posts (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(255) NOT NULL,
-            category_id INT NOT NULL,
-            author VARCHAR(100) NOT NULL,
-            excerpt TEXT,
-            content LONGTEXT NOT NULL,
-            featured_image VARCHAR(255),
-            publish_date DATETIME,
-            status ENUM('published', 'draft') DEFAULT 'published',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )";
-        mysqli_query($conn, $create_table);
-    }
-    
     // Predefined categories
     $predefined_categories = [
         ['id' => 1, 'name' => 'News'],
@@ -56,16 +34,14 @@ function getActiveCategories() {
     // Check if categories table is empty, if so, insert predefined categories
     $sql_check = "SELECT COUNT(*) as count FROM categories";
     $result_check = mysqli_query($conn, $sql_check);
-    if ($result_check) {
-        $row_check = mysqli_fetch_assoc($result_check);
-        
-        if ($row_check['count'] == 0) {
-            foreach ($predefined_categories as $category) {
-                $name = mysqli_real_escape_string($conn, $category['name']);
-                $sql_insert = "INSERT INTO categories (id, name, status, created_at) 
-                              VALUES ({$category['id']}, '$name', 'active', NOW())";
-                mysqli_query($conn, $sql_insert);
-            }
+    $row_check = mysqli_fetch_assoc($result_check);
+    
+    if ($row_check['count'] == 0) {
+        foreach ($predefined_categories as $category) {
+            $name = mysqli_real_escape_string($conn, $category['name']);
+            $sql_insert = "INSERT INTO categories (id, name, status, created_at) 
+                          VALUES ({$category['id']}, '$name', 'active', NOW())";
+            mysqli_query($conn, $sql_insert);
         }
     }
     
@@ -92,11 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $errors = [];
     
-    // Validation
     if (empty($postTitle)) $errors[] = "Post title is required";
     if ($postCategory <= 0) $errors[] = "Please select a valid category";
     if (empty($postAuthor)) $errors[] = "Author name is required";
-    if (empty($postContent) || $postContent === '<p><br></p>') $errors[] = "Post content is required";
+    if (empty($postContent)) $errors[] = "Post content is required";
     
     // Handle file upload
     $featuredImage = null;
@@ -129,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     if (empty($errors)) {
-        // CORRECTED SQL QUERY - Fixed column names
+        // FIXED: Corrected 'except' to 'excerpt' in the SQL query
         $sql = "INSERT INTO posts (title, category_id, author, excerpt, content, featured_image, publish_date, status, created_at) 
                 VALUES ('$postTitle', $postCategory, '$postAuthor', '$postExcerpt', '$postContent', " . 
                 ($featuredImage ? "'$featuredImage'" : "NULL") . ", '$publishDate', '$status', NOW())";
@@ -139,10 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: add_post.php");
             exit();
         } else {
-            // Detailed error information
-            $errorMessage = "Database error: " . mysqli_error($conn);
-            // Log the actual SQL query for debugging
-            error_log("SQL Error: " . $sql);
+            $errorMessage = "Failed to save post: " . mysqli_error($conn);
         }
     } else {
         $errorMessage = implode("<br>", $errors);
@@ -171,10 +143,9 @@ $categories = getActiveCategories();
     <link rel="icon" href="../images/logo.jpg" type="image/png">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- jQuery -->
+    <!-- jQuery and jQuery Validation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <!-- Quill Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
@@ -199,6 +170,18 @@ $categories = getActiveCategories();
         }
         .logout-btn:hover svg {
             transform: translateX(4px);
+        }
+        .error {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        input.error, textarea.error, select.error {
+            border-color: #dc2626 !important;
+            background-color: #fef2f2;
+        }
+        input.valid, textarea.valid, select.valid {
+            border-color: #10b981;
         }
         #editor-container {
             height: 300px;
@@ -232,18 +215,13 @@ $categories = getActiveCategories();
             background: #f0fdf4;
             border-radius: 0.375rem;
             color: #166534;
+            display: none;
         }
         .preview-image {
             max-width: 200px;
             max-height: 150px;
             margin-top: 10px;
             border-radius: 0.375rem;
-        }
-        .char-counter {
-            font-size: 0.75rem;
-            color: #6b7280;
-            text-align: right;
-            margin-top: 0.25rem;
         }
     </style>
 </head>
@@ -302,17 +280,7 @@ $categories = getActiveCategories();
                 <?php endif; ?>
 
                 <?php if ($errorMessage): ?>
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
-                        <?php echo $errorMessage; ?>
-                        <?php if (strpos($errorMessage, 'Unknown column') !== false): ?>
-                            <div class="mt-2">
-                                <p class="text-sm">Database table structure issue detected.</p>
-                                <button onclick="createPostsTable()" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                                    Fix Database Table
-                                </button>
-                            </div>
-                        <?php endif; ?>
-                    </div>
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded"><?php echo $errorMessage; ?></div>
                 <?php endif; ?>
 
                 <div class="bg-white p-6 rounded-lg shadow-md">
@@ -320,21 +288,13 @@ $categories = getActiveCategories();
                         <input type="hidden" name="status" id="postStatus" value="published">
                         <input type="hidden" name="postContent" id="postContent">
                         
-                        <!-- Basic Information -->
                         <div class="mb-6">
                             <h2 class="text-xl font-semibold text-gray-800 mb-4">Basic Information</h2>
-                            
                             <div class="mb-4">
                                 <label for="postTitle" class="block text-gray-700 font-semibold mb-2">
                                     Post Title <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" id="postTitle" name="postTitle" 
-                                       class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                       placeholder="Enter post title" 
-                                       value="<?php echo isset($_POST['postTitle']) ? htmlspecialchars($_POST['postTitle']) : ''; ?>"
-                                       maxlength="200"
-                                       required>
-                                <div class="char-counter" id="titleCounter">0/200 characters</div>
+                                <input type="text" id="postTitle" name="postTitle" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" placeholder="Enter an engaging title..." value="<?php echo isset($_POST['postTitle']) ? htmlspecialchars($_POST['postTitle']) : ''; ?>">
                             </div>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -342,13 +302,10 @@ $categories = getActiveCategories();
                                     <label for="postCategory" class="block text-gray-700 font-semibold mb-2">
                                         Category <span class="text-red-500">*</span>
                                     </label>
-                                    <select id="postCategory" name="postCategory" 
-                                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                            required>
+                                    <select id="postCategory" name="postCategory" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                                         <option value="">Select Category</option>
                                         <?php foreach ($categories as $category): ?>
-                                            <option value="<?php echo $category['id']; ?>" 
-                                                <?php echo (isset($_POST['postCategory']) && $_POST['postCategory'] == $category['id']) ? 'selected' : ''; ?>>
+                                            <option value="<?php echo $category['id']; ?>" <?php echo (isset($_POST['postCategory']) && $_POST['postCategory'] == $category['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($category['name']); ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -358,26 +315,17 @@ $categories = getActiveCategories();
                                     <label for="postAuthor" class="block text-gray-700 font-semibold mb-2">
                                         Author <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" id="postAuthor" name="postAuthor" 
-                                           class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                           placeholder="Author name"
-                                           value="<?php echo isset($_POST['postAuthor']) ? htmlspecialchars($_POST['postAuthor']) : ''; ?>"
-                                           required>
+                                    <input type="text" id="postAuthor" name="postAuthor" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" placeholder="Author name" value="<?php echo isset($_POST['postAuthor']) ? htmlspecialchars($_POST['postAuthor']) : ''; ?>">
                                 </div>
                             </div>
                             
                             <div class="mb-4">
                                 <label for="postExcerpt" class="block text-gray-700 font-semibold mb-2">Excerpt</label>
-                                <textarea id="postExcerpt" name="postExcerpt" 
-                                          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                          placeholder="Brief description of the post"
-                                          rows="3"
-                                          maxlength="500"><?php echo isset($_POST['postExcerpt']) ? htmlspecialchars($_POST['postExcerpt']) : ''; ?></textarea>
-                                <div class="char-counter" id="excerptCounter">0/500 characters</div>
+                                <textarea id="postExcerpt" name="postExcerpt" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" placeholder="Write a compelling summary..." rows="3"><?php echo isset($_POST['postExcerpt']) ? htmlspecialchars($_POST['postExcerpt']) : ''; ?></textarea>
+                                <p class="text-gray-500 text-sm mt-1">A brief summary of your post (optional)</p>
                             </div>
                         </div>
 
-                        <!-- Content -->
                         <div class="mb-6">
                             <h2 class="text-xl font-semibold text-gray-800 mb-4">Content</h2>
                             <div class="mb-4">
@@ -388,32 +336,30 @@ $categories = getActiveCategories();
                             </div>
                         </div>
 
-                        <!-- Publishing Options -->
                         <div class="mb-6">
                             <h2 class="text-xl font-semibold text-gray-800 mb-4">Publishing Options</h2>
                             
                             <div class="mb-4">
                                 <label for="publishDate" class="block text-gray-700 font-semibold mb-2">Publish Date & Time</label>
-                                <input type="datetime-local" id="publishDate" name="publishDate" 
-                                       class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                       value="<?php echo isset($_POST['publishDate']) ? $_POST['publishDate'] : date('Y-m-d\TH:i'); ?>">
+                                <input type="datetime-local" id="publishDate" name="publishDate" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" value="<?php echo isset($_POST['publishDate']) ? $_POST['publishDate'] : date('Y-m-d\TH:i'); ?>">
                             </div>
                             
                             <div class="mb-4">
                                 <label for="featuredImage" class="block text-gray-700 font-semibold mb-2">Featured Image</label>
-                                <input type="file" id="featuredImage" name="featuredImage" accept="image/*" class="hidden">
-                                <label for="featuredImage" class="file-upload-label block cursor-pointer">
-                                    <div class="text-center">
-                                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                                        <p class="text-gray-600 font-medium">Click to upload or drag and drop</p>
-                                        <p class="text-gray-500 text-sm mt-1">JPG, PNG, WebP, GIF - Max 5MB</p>
-                                    </div>
-                                </label>
-                                <div class="file-preview hidden" id="filePreview"></div>
+                                <div class="file-upload">
+                                    <input type="file" id="featuredImage" name="featuredImage" accept="image/*" class="hidden">
+                                    <label for="featuredImage" class="file-upload-label cursor-pointer">
+                                        <div class="text-center">
+                                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                            <p class="text-gray-600 font-medium">Click to upload or drag and drop</p>
+                                            <p class="text-gray-500 text-sm mt-1">Recommended: 1200x630px (JPG, PNG, WebP) - Max 5MB</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="file-preview" id="filePreview"></div>
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
                         <div class="flex flex-col sm:flex-row gap-4 justify-center pt-6 border-t border-gray-200">
                             <button type="button" class="py-3 px-6 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-semibold" onclick="saveDraft()">
                                 <i class="fas fa-save mr-2"></i>Save as Draft
@@ -421,9 +367,9 @@ $categories = getActiveCategories();
                             <button type="submit" class="py-3 px-6 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold">
                                 <i class="fas fa-paper-plane mr-2"></i>Publish Post
                             </button>
-                            <a href="dashboard.php" class="py-3 px-6 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold text-center">
+                            <button type="button" class="py-3 px-6 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold" onclick="goBack()">
                                 <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
-                            </a>
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -453,172 +399,198 @@ $categories = getActiveCategories();
             quill.root.innerHTML = `<?php echo addslashes($_POST['postContent']); ?>`;
         <?php endif; ?>
 
-        // Character counters
-        function updateCharacterCount(element, counterId, maxLength) {
-            const count = element.value.length;
-            const counter = document.getElementById(counterId);
-            counter.textContent = `${count}/${maxLength} characters`;
-            if (count > maxLength) {
-                counter.classList.add('text-red-600');
-            } else {
-                counter.classList.remove('text-red-600');
-            }
-        }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set default publish date
+        $(document).ready(function() {
+            // Set default publish date to current datetime
             if (!document.getElementById('publishDate').value) {
                 document.getElementById('publishDate').value = new Date().toISOString().slice(0, 16);
             }
 
-            // Initialize character counters
-            const titleInput = document.getElementById('postTitle');
-            const excerptInput = document.getElementById('postExcerpt');
-            
-            updateCharacterCount(titleInput, 'titleCounter', 200);
-            updateCharacterCount(excerptInput, 'excerptCounter', 500);
-            
-            titleInput.addEventListener('input', function() {
-                updateCharacterCount(this, 'titleCounter', 200);
-            });
-            
-            excerptInput.addEventListener('input', function() {
-                updateCharacterCount(this, 'excerptCounter', 500);
+            // Form validation
+            $("#postForm").validate({
+                rules: {
+                    postTitle: { 
+                        required: true, 
+                        minlength: 3, 
+                        maxlength: 200 
+                    },
+                    postCategory: { 
+                        required: true 
+                    },
+                    postAuthor: { 
+                        required: true, 
+                        minlength: 2, 
+                        maxlength: 100 
+                    },
+                    postExcerpt: { 
+                        maxlength: 500 
+                    }
+                },
+                messages: {
+                    postTitle: {
+                        required: "Please enter a post title",
+                        minlength: "Title must be at least 3 characters long",
+                        maxlength: "Title cannot exceed 200 characters"
+                    },
+                    postCategory: { 
+                        required: "Please select a category" 
+                    },
+                    postAuthor: {
+                        required: "Please enter author name",
+                        minlength: "Author name must be at least 2 characters long",
+                        maxlength: "Author name cannot exceed 100 characters"
+                    },
+                    postExcerpt: { 
+                        maxlength: "Excerpt cannot exceed 500 characters" 
+                    }
+                },
+                errorElement: "div",
+                errorClass: "error text-red-600 text-sm mt-1",
+                highlight: function(element) {
+                    $(element).addClass('border-red-500').removeClass('border-gray-300');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('border-red-500').addClass('border-gray-300');
+                },
+                submitHandler: function(form) {
+                    var content = quill.root.innerHTML;
+                    if (content === '<p><br></p>' || content.trim() === '') {
+                        alert("Please enter post content");
+                        quill.focus();
+                        return false;
+                    }
+                    document.getElementById('postContent').value = content;
+                    return true;
+                }
             });
 
-            // File upload handling
+            // Auto-hide messages after 5 seconds
+            setTimeout(() => {
+                $('.bg-green-100, .bg-red-100').fadeOut('slow');
+            }, 5000);
+
+            // File upload preview
             document.getElementById('featuredImage').addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 const preview = document.getElementById('filePreview');
                 
                 if (file) {
-                    // Validate file
+                    // Check file size
                     if (file.size > 5 * 1024 * 1024) {
-                        alert('File size must be less than 5MB');
+                        alert('File size exceeds 5MB limit');
                         this.value = '';
+                        preview.style.display = 'none';
                         return;
                     }
                     
+                    // Check file type
+                    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+                    if (!allowedTypes.includes(file.type)) {
+                        alert('Please select a valid image file (JPG, PNG, WebP, GIF)');
+                        this.value = '';
+                        preview.style.display = 'none';
+                        return;
+                    }
+                    
+                    // Create preview
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         preview.innerHTML = `
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <strong>Selected:</strong> ${file.name}<br>
-                                    <small>Size: ${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                                    <strong>${file.name}</strong> (${(file.size / 1024 / 1024).toFixed(2)} MB)
                                     <img src="${e.target.result}" class="preview-image" alt="Preview">
                                 </div>
-                                <button type="button" onclick="clearFilePreview()" class="text-red-500 hover:text-red-700">
+                                <button type="button" onclick="clearFilePreview()" class="text-red-500 hover:text-red-700 ml-4">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
                         `;
-                        preview.classList.remove('hidden');
+                        preview.style.display = 'block';
                     };
                     reader.readAsDataURL(file);
+                } else {
+                    preview.style.display = 'none';
                 }
             });
-
-            // Auto-hide messages
-            setTimeout(() => {
-                document.querySelectorAll('.bg-green-100, .bg-red-100').forEach(el => {
-                    el.style.display = 'none';
-                });
-            }, 5000);
         });
 
-        // Drag and drop for file upload
+        // Drag and drop functionality
         const fileUploadLabel = document.querySelector('.file-upload-label');
         ['dragover', 'dragenter'].forEach(eventName => {
             fileUploadLabel.addEventListener(eventName, function(e) {
                 e.preventDefault();
-                this.classList.add('border-indigo-500', 'bg-blue-50');
+                this.classList.add('border-indigo-500', 'bg-blue-50', 'border-2');
             });
         });
         
         ['dragleave', 'dragend'].forEach(eventName => {
             fileUploadLabel.addEventListener(eventName, function(e) {
                 e.preventDefault();
-                this.classList.remove('border-indigo-500', 'bg-blue-50');
+                this.classList.remove('border-indigo-500', 'bg-blue-50', 'border-2');
             });
         });
         
         fileUploadLabel.addEventListener('drop', function(e) {
             e.preventDefault();
-            this.classList.remove('border-indigo-500', 'bg-blue-50');
+            this.classList.remove('border-indigo-500', 'bg-blue-50', 'border-2');
             const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                document.getElementById('featuredImage').files = files;
-                document.getElementById('featuredImage').dispatchEvent(new Event('change'));
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                const fileInput = document.getElementById('featuredImage');
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change', { bubbles: true }));
             }
         });
 
         function saveDraft() {
-            document.getElementById('postStatus').value = 'draft';
-            submitForm();
-        }
-
-        function submitForm() {
-            const content = quill.root.innerHTML;
+            var content = quill.root.innerHTML;
             if (content === '<p><br></p>' || content.trim() === '') {
-                alert('Please enter post content');
+                alert("Please enter post content before saving as draft");
                 quill.focus();
                 return false;
             }
-            
-            // Basic validation
-            const title = document.getElementById('postTitle').value.trim();
-            const category = document.getElementById('postCategory').value;
-            const author = document.getElementById('postAuthor').value.trim();
-            
-            if (!title) {
-                alert('Please enter a post title');
-                document.getElementById('postTitle').focus();
-                return false;
-            }
-            
-            if (!category) {
-                alert('Please select a category');
-                document.getElementById('postCategory').focus();
-                return false;
-            }
-            
-            if (!author) {
-                alert('Please enter author name');
-                document.getElementById('postAuthor').focus();
-                return false;
-            }
-            
             document.getElementById('postContent').value = content;
+            document.getElementById('postStatus').value = 'draft';
+            
+            // Validate required fields
+            if (!$("#postForm").valid()) {
+                return false;
+            }
+            
             document.getElementById('postForm').submit();
-            return true;
         }
 
         function clearFilePreview() {
             document.getElementById('featuredImage').value = '';
-            document.getElementById('filePreview').classList.add('hidden');
-            document.getElementById('filePreview').innerHTML = '';
+            document.getElementById('filePreview').style.display = 'none';
         }
 
-        function createPostsTable() {
-            if (confirm('This will create the posts table. Continue?')) {
-                fetch('create_posts_table.php')
-                    .then(response => response.text())
-                    .then(data => {
-                        alert(data);
-                        location.reload();
-                    })
-                    .catch(error => {
-                        alert('Error: ' + error);
-                    });
+        function goBack() {
+            if (confirm('Are you sure you want to leave? Any unsaved changes will be lost.')) {
+                window.location.href = 'dashboard.php';
             }
         }
 
-        // Form submission
-        document.getElementById('postForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            submitForm();
+        // Character counters
+        function updateCharacterCount(element, maxLength) {
+            const count = element.value.length;
+            const counter = element.nextElementSibling;
+            if (counter && counter.classList.contains('char-counter')) {
+                counter.textContent = `${count}/${maxLength} characters`;
+                if (count > maxLength) {
+                    counter.classList.add('text-red-600');
+                } else {
+                    counter.classList.remove('text-red-600');
+                }
+            }
+        }
+
+        // Initialize character counters
+        document.getElementById('postTitle').addEventListener('input', function() {
+            updateCharacterCount(this, 200);
+        });
+
+        document.getElementById('postExcerpt').addEventListener('input', function() {
+            updateCharacterCount(this, 500);
         });
     </script>
 </body>

@@ -267,6 +267,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
                             <div class="bg-white rounded-lg px-4 py-2 shadow-md">
                                 <p class="text-gray-600 text-sm"><i class="fas fa-calendar-day text-indigo-500 mr-2"></i><?php echo date('F j, Y'); ?></p>
                             </div>
+                            <div class="bg-white rounded-lg px-4 py-2 shadow-md">
+                                <p class="text-gray-600 text-sm"><i class="fas fa-clock text-green-500 mr-2"></i><?php echo date('h:i A'); ?></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Total Categories Card -->
+                    <div class="stat-card rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="feature-icon bg-indigo-100 text-indigo-600">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-gray-800 stat-number" data-target="<?php echo $stats['total_categories']; ?>">0</div>
+                                <div class="text-gray-500 text-sm">Total Categories</div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-indigo-500 h-2 rounded-full progress-bar" style="width: 0%" data-target="<?php echo min(($stats['total_categories'] / max($stats['total_categories'], 1)) * 100, 100); ?>"></div>
+                        </div>
+                    </div>
+
+                    <!-- Active Categories Card -->
+                    <div class="stat-card rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="feature-icon bg-green-100 text-green-600">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-gray-800 stat-number" data-target="<?php echo $stats['active_categories']; ?>">0</div>
+                                <div class="text-gray-500 text-sm">Active Categories</div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full progress-bar" style="width: 0%" data-target="<?php echo min(($stats['active_categories'] / max($stats['total_categories'], 1)) * 100, 100); ?>"></div>
+                        </div>
+                    </div>
+
+                    <!-- Total Posts Card -->
+                    <div class="stat-card rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="feature-icon bg-blue-100 text-blue-600">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-gray-800 stat-number" data-target="<?php echo $stats['total_posts']; ?>">0</div>
+                                <div class="text-gray-500 text-sm">Total Posts</div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full progress-bar" style="width: 0%" data-target="<?php echo min(($stats['total_posts'] / max($stats['total_posts'] + 1, 1)) * 100, 100); ?>"></div>
+                        </div>
+                    </div>
+
+                    <!-- Total Contacts Card -->
+                    <div class="stat-card rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="feature-icon bg-teal-100 text-teal-600">
+                                <i class="fas fa-address-book"></i>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-gray-800 stat-number" data-target="<?php echo $stats['total_contacts']; ?>">0</div>
+                                <div class="text-gray-500 text-sm">Total Contacts</div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-teal-500 h-2 rounded-full progress-bar" style="width: 0%" data-target="<?php echo min(($stats['total_contacts'] / max($stats['total_contacts'] + 1, 1)) * 100, 100); ?>"></div>
                         </div>
                     </div>
                 </div>
@@ -278,6 +348,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
                             <i class="fas fa-bolt text-yellow-500 mr-3 floating"></i>
                             Quick Actions
                         </h2>
+                        <span class="text-gray-500 text-sm">Get things done faster</span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <a href="create_category.php" class="quick-action-card p-6 border-l-4 border-indigo-500 group">
@@ -359,6 +430,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
                         </a>
                     </div>
                 </div>
+
+                <!-- System Status & Tips -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- System Status -->
+                    <div class="bg-white rounded-2xl p-6 shadow-xl">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-chart-line text-green-500 mr-3"></i>
+                            System Status
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-green-500 rounded-full pulse-dot mr-3"></div>
+                                    <span class="text-gray-700">Database Connection</span>
+                                </div>
+                                <span class="text-green-600 font-medium">Active</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-blue-500 rounded-full pulse-dot mr-3"></div>
+                                    <span class="text-gray-700">Application Server</span>
+                                </div>
+                                <span class="text-blue-600 font-medium">Running</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-indigo-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-indigo-500 rounded-full pulse-dot mr-3"></div>
+                                    <span class="text-gray-700">User Session</span>
+                                </div>
+                                <span class="text-indigo-600 font-medium">Valid</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-teal-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-teal-500 rounded-full pulse-dot mr-3"></div>
+                                    <span class="text-gray-700">Security</span>
+                                </div>
+                                <span class="text-teal-600 font-medium">Protected</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <
             </div>
         </div>
     </div>

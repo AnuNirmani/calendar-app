@@ -52,17 +52,6 @@ if ($contact_result) {
     $row = mysqli_fetch_assoc($contact_result);
     $stats['total_contacts'] = $row['count'];
 }
-
-// Handle category creation
-$category_message = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
-    $result = createCategory($_POST['category_name']);
-    if ($result === true) {
-        $category_message = "<p class='text-green-600 mt-2'>Category created successfully!</p>";
-    } else {
-        $category_message = "<p class='text-red-600 mt-2'>$result</p>";
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -194,9 +183,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.8);
         }
-        .progress-bar {
-            transition: width 1.5s ease-in-out;
-        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -271,11 +257,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
                     </div>
                 </div>
 
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Total Categories Card -->
+                    <div class="stat-card rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="feature-icon bg-indigo-100 text-indigo-600">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-gray-800"><?php echo $stats['total_categories']; ?></div>
+                                <div class="text-gray-500 text-sm">Total Categories</div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-indigo-500 h-2 rounded-full" style="width: <?php echo min(($stats['total_categories'] / max($stats['total_categories'], 1)) * 100, 100); ?>%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Active Categories Card -->
+                    <div class="stat-card rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="feature-icon bg-green-100 text-green-600">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-gray-800"><?php echo $stats['active_categories']; ?></div>
+                                <div class="text-gray-500 text-sm">Active Categories</div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: <?php echo min(($stats['active_categories'] / max($stats['total_categories'], 1)) * 100, 100); ?>%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Total Posts Card -->
+                    <div class="stat-card rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="feature-icon bg-blue-100 text-blue-600">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-gray-800"><?php echo $stats['total_posts']; ?></div>
+                                <div class="text-gray-500 text-sm">Total Posts</div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: <?php echo min(($stats['total_posts'] / max($stats['total_posts'] + 1, 1)) * 100, 100); ?>%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Total Contacts Card -->
+                    <div class="stat-card rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="feature-icon bg-teal-100 text-teal-600">
+                                <i class="fas fa-address-book"></i>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-gray-800"><?php echo $stats['total_contacts']; ?></div>
+                                <div class="text-gray-500 text-sm">Total Contacts</div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-teal-500 h-2 rounded-full" style="width: <?php echo min(($stats['total_contacts'] / max($stats['total_contacts'] + 1, 1)) * 100, 100); ?>%"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Quick Actions -->
                 <div class="bg-white p-8 rounded-2xl shadow-xl mb-8">
                     <div class="flex items-center justify-between mb-8">
                         <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                            <i class="fas fa-bolt text-yellow-500 mr-3 floating"></i>
+                            <i class="fas fa-bolt text-yellow-500 mr-3"></i>
                             Quick Actions
                         </h2>
                     </div>
@@ -345,72 +398,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
                             </div>
                         </a>
 
-                        <a href="list_telephone_directory.php" class="quick-action-card p-6 border-l-4 border-teal-500 group">
-                            <div class="flex items-start mb-4">
-                                <div class="feature-icon bg-teal-100 text-teal-600 mr-4">
-                                    <i class="fas fa-address-book"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-800 text-lg mb-2 group-hover:text-teal-600 transition-colors">List Telephone Directory</h3>
-                                    <p class="text-gray-600 text-sm">View and manage all contact information.</p>
-                                </div>
-                                <i class="fas fa-arrow-right text-gray-400 group-hover:text-teal-500 transform group-hover:translate-x-1 transition-all"></i>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        $(document).ready(function() {
-            // Hamburger menu toggle
-            $('#hamburgerBtn').click(function() {
-                $('.sidebar').toggleClass('hidden');
-            });
-
-            // Add hover effects to stat cards
-            $('.stat-card').hover(
-                function() {
-                    $(this).addClass('glow');
-                },
-                function() {
-                    $(this).removeClass('glow');
-                }
-            );
-
-            // Animate statistics numbers
-            function animateNumbers() {
-                $('.stat-number').each(function() {
-                    const $this = $(this);
-                    const target = parseInt($this.data('target'));
-                    let count = 0;
-                    const duration = 1500;
-                    const steps = 60;
-                    const increment = target / steps;
-                    const stepTime = duration / steps;
-                    
-                    const timer = setInterval(() => {
-                        if (count >= target) {
-                            $this.text(target);
-                            clearInterval(timer);
-                        } else {
-                            count += increment;
-                            $this.text(Math.ceil(count));
-                        }
-                    }, stepTime);
-                });
-            }
-
-            // Animate progress bars
-            function animateProgressBars() {
-                $('.progress-bar').each(function() {
-                    const $this = $(this);
-                    const targetWidth = $this.data('target');
-                    $this.css('width', targetWidth + '%');
-                });
-            }
-
-            // Initialize animations when page loads
-            setTimeout(() => {
+                       

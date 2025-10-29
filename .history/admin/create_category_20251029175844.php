@@ -231,6 +231,21 @@ if (isset($_SESSION['error'])) {
                         }
                     }
                     ?>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                        <div class="text-2xl font-bold text-indigo-600"><?php echo $total_categories; ?></div>
+                        <div class="text-gray-600">Total Categories</div>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                        <div class="text-2xl font-bold text-green-600"><?php echo $active_categories; ?></div>
+                        <div class="text-gray-600">Active Categories</div>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                        <div class="text-2xl font-bold text-gray-600"><?php echo $inactive_categories; ?></div>
+                        <div class="text-gray-600">Inactive Categories</div>
+                    </div>
                 </div>
             </div>
         </div>

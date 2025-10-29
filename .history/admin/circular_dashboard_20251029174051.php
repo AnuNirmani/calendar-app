@@ -267,6 +267,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
                             <div class="bg-white rounded-lg px-4 py-2 shadow-md">
                                 <p class="text-gray-600 text-sm"><i class="fas fa-calendar-day text-indigo-500 mr-2"></i><?php echo date('F j, Y'); ?></p>
                             </div>
+                            <div class="bg-white rounded-lg px-4 py-2 shadow-md">
+                                <p class="text-gray-600 text-sm"><i class="fas fa-clock text-green-500 mr-2"></i><?php echo date('h:i A'); ?></p>
+                            </div>
                         </div>
                     </div>
                 </div>
