@@ -280,6 +280,10 @@ if ($contact_result) {
                             <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center">
                                 <i class="fas fa-user text-white text-sm"></i>
                             </div>
+                            <div class="ml-3">
+                                <p class="text-white font-medium text-sm">Admin User</p>
+                                <p class="text-blue-200 text-xs">Online</p>
+                            </div>
                         </div>
                         <div class="pulse-dot w-3 h-3 bg-green-400 rounded-full"></div>
                     </div>
