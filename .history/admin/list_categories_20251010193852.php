@@ -14,38 +14,21 @@ if (!isset($_SESSION['user_id'])) {
 $successMessage = "";
 $errorMessage = "";
 
-// Handle logout
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header("Location: login.php");
-    exit();
-}
-
 // Handle category deletion
 if (isset($_GET['delete'])) {
     $category_id = intval($_GET['delete']);
-    
-    // Use prepared statement to prevent SQL injection
-    $stmt = $conn->prepare("SELECT * FROM categories WHERE id = ?");
-    $stmt->bind_param("i", $category_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result && $result->num_rows > 0) {
-        $delete_stmt = $conn->prepare("DELETE FROM categories WHERE id = ?");
-        $delete_stmt->bind_param("i", $category_id);
-        
-        if ($delete_stmt->execute()) {
+    $sql = "SELECT * FROM categories WHERE id = $category_id";
+    $result = mysqli_query($conn, $sql);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $sql = "DELETE FROM categories WHERE id = $category_id";
+        if (mysqli_query($conn, $sql)) {
             $_SESSION['success'] = "Category deleted successfully!";
         } else {
-            $_SESSION['error'] = "Failed to delete category: " . $conn->error;
+            $_SESSION['error'] = "Failed to delete category: " . mysqli_error($conn);
         }
-        $delete_stmt->close();
     } else {
         $_SESSION['error'] = "Category not found.";
     }
-    $stmt->close();
-    
     header("Location: list_categories.php");
     exit();
 }
@@ -60,14 +43,11 @@ if (isset($_SESSION['error'])) {
     unset($_SESSION['error']);
 }
 
-// Fetch categories with error handling
-$categories = [];
+// Fetch categories
 $sql = "SELECT * FROM categories ORDER BY created_at DESC";
 $result = mysqli_query($conn, $sql);
-
-if ($result === false) {
-    $errorMessage = "Database error: " . mysqli_error($conn) . "<br>Please make sure the 'categories' table exists in your database.";
-} else {
+$categories = [];
+if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
         $categories[] = $row;
     }
@@ -155,26 +135,22 @@ if ($result === false) {
         </div>
 
         <!-- Main Content -->
-        <div class="main-content flex-1 p-8 overflow-y-auto">
+        <div class="main-content flex-1 p-8">
             <div class="max-w-4xl mx-auto">
                 <h1 class="text-3xl font-bold text-gray-800 mb-6">List of Categories</h1>
 
                 <?php if ($successMessage): ?>
-                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded">
-                        <?php echo htmlspecialchars($successMessage); ?>
-                    </div>
+                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded"><?php echo htmlspecialchars($successMessage); ?></div>
                 <?php endif; ?>
 
                 <?php if ($errorMessage): ?>
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
-                        <?php echo $errorMessage; ?>
-                    </div>
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded"><?php echo $errorMessage; ?></div>
                 <?php endif; ?>
 
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">All Categories</h2>
                     <?php if (empty($categories)): ?>
-                        <p class="text-gray-600 flex items-center justify-center py-8">
+                        <p class="text-gray-600 flex items-center justify-center">
                             <span class="text-2xl mr-2">📁</span> No categories found.
                         </p>
                     <?php else: ?>
@@ -190,7 +166,7 @@ if ($result === false) {
                                 </thead>
                                 <tbody>
                                     <?php foreach ($categories as $category): ?>
-                                        <tr class="border-b hover:bg-gray-50">
+                                        <tr>
                                             <td class="p-3"><?php echo htmlspecialchars($category['name']); ?></td>
                                             <td class="p-3">
                                                 <span class="px-2 py-1 rounded-full text-xs font-semibold <?php echo $category['status'] == 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'; ?>">
@@ -199,8 +175,8 @@ if ($result === false) {
                                             </td>
                                             <td class="p-3"><?php echo date('M d, Y', strtotime($category['created_at'])); ?></td>
                                             <td class="p-3 flex space-x-2">
-                                                <a href="edit_category.php?id=<?php echo $category['id']; ?>" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition">Edit</a>
-                                                <a href="?delete=<?php echo $category['id']; ?>" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition" onclick="return confirm('Are you sure you want to delete this category?')">Delete</a>
+                                                <a href="edit_category.php?id=<?php echo $category['id']; ?>" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">Edit</a>
+                                                <a href="?delete=<?php echo $category['id']; ?>" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700" onclick="return confirm('Are you sure you want to delete this category?')">Delete</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
