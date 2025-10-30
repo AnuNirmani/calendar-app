@@ -127,37 +127,15 @@ if (isset($_SESSION['error'])) {
     unset($_SESSION['error']);
 }
 
-// Pagination configuration
-$records_per_page = 10;
-
-// Get current page
-$current_page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-if ($current_page < 1) $current_page = 1;
-
-// Calculate offset
-$offset = ($current_page - 1) * $records_per_page;
-
-// Build count query for total records
-$count_sql = "SELECT COUNT(*) as total FROM categories";
-$count_result = mysqli_query($conn, $count_sql);
-$total_records = mysqli_fetch_assoc($count_result)['total'];
-$total_pages = ceil($total_records / $records_per_page);
-
-// Ensure current page is within valid range
-if ($current_page > $total_pages && $total_pages > 0) {
-    $current_page = $total_pages;
-}
-
-// Fetch categories with post count and pagination
+// Fetch categories with post count
+$categories = [];
 $sql = "SELECT c.*, COUNT(p.id) as post_count 
         FROM categories c 
         LEFT JOIN posts p ON c.id = p.category_id 
         GROUP BY c.id 
-        ORDER BY c.created_at DESC
-        LIMIT $offset, $records_per_page";
+        ORDER BY c.created_at DESC";
 $result = mysqli_query($conn, $sql);
 
-$categories = [];
 if ($result === false) {
     $errorMessage = "Database error: " . mysqli_error($conn) . "<br>Please make sure the 'categories' table exists in your database.";
 } else {
@@ -166,18 +144,18 @@ if ($result === false) {
     }
 }
 
-// Get category statistics (for all categories, not just current page)
-$stats_sql = "SELECT 
-                COUNT(*) as total_categories,
-                SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active_categories,
-                SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive_categories
-              FROM categories";
-$stats_result = mysqli_query($conn, $stats_sql);
-$stats = mysqli_fetch_assoc($stats_result);
+// Get category statistics
+$total_categories = count($categories);
+$active_categories = 0;
+$inactive_categories = 0;
 
-$total_categories = $stats['total_categories'];
-$active_categories = $stats['active_categories'];
-$inactive_categories = $stats['inactive_categories'];
+foreach ($categories as $category) {
+    if ($category['status'] == 'active') {
+        $active_categories++;
+    } else {
+        $inactive_categories++;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -234,38 +212,6 @@ $inactive_categories = $stats['inactive_categories'];
         }
         .table-row:hover {
             background-color: #f9fafb;
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-            gap: 8px;
-        }
-        .pagination a, .pagination span {
-            padding: 6px 12px;
-            border: 1px solid #ddd;
-            text-decoration: none;
-            color: #333;
-            border-radius: 4px;
-            transition: all 0.3s;
-            font-size: 0.875rem;
-        }
-        .pagination a:hover {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-        }
-        .pagination .current {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-        }
-        .pagination .disabled {
-            color: #9ca3af;
-            pointer-events: none;
-            background-color: #f3f4f6;
-            border-color: #d1d5db;
         }
     </style>
 </head>
@@ -377,11 +323,7 @@ $inactive_categories = $stats['inactive_categories'];
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-semibold text-gray-800">All Categories</h2>
                         <div class="text-sm text-gray-600">
-                            <?php if ($total_records > 0): ?>
-                                Showing <?php echo ($offset + 1); ?> to <?php echo min($offset + $records_per_page, $total_records); ?> of <?php echo $total_records; ?> categor<?php echo $total_records == 1 ? 'y' : 'ies'; ?>
-                            <?php else: ?>
-                                No categories found
-                            <?php endif; ?>
+                            Showing <?php echo $total_categories; ?> categor<?php echo $total_categories == 1 ? 'y' : 'ies'; ?>
                         </div>
                     </div>
                     
@@ -401,7 +343,6 @@ $inactive_categories = $stats['inactive_categories'];
                                     <tr class="bg-gray-200">
                                         <th class="p-4 border border-gray-300 font-semibold">ID</th>
                                         <th class="p-4 border border-gray-300 font-semibold">Category Name</th>
-                                        <th class="p-4 border border-gray-300 font-semibold">Posts</th>
                                         <th class="p-4 border border-gray-300 font-semibold">Status</th>
                                         <th class="p-4 border border-gray-300 font-semibold">Created Date</th>
                                         <th class="p-4 border border-gray-300 font-semibold text-center">Actions</th>
@@ -416,11 +357,6 @@ $inactive_categories = $stats['inactive_categories'];
                                                     <i class="fas fa-folder text-indigo-500 mr-3"></i>
                                                     <?php echo htmlspecialchars($category['name']); ?>
                                                 </div>
-                                            </td>
-                                            <td class="p-4 border border-gray-300 text-center">
-                                                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-indigo-100 bg-indigo-600 rounded-full">
-                                                    <?php echo $category['post_count']; ?>
-                                                </span>
                                             </td>
                                             <td class="p-4 border border-gray-300">
                                                 <div class="flex items-center space-x-2">
@@ -462,100 +398,37 @@ $inactive_categories = $stats['inactive_categories'];
                                 </tbody>
                             </table>
                         </div>
-
-                        <!-- Pagination -->
-                        <?php if ($total_pages > 1): ?>
-                            <div class="pagination mt-6">
-                                <!-- First page -->
-                                <?php if ($current_page > 1): ?>
-                                    <a href="?page=1" class="pagination-link">
-                                        <i class="fas fa-angle-double-left mr-1"></i> First
-                                    </a>
-                                <?php else: ?>
-                                    <span class="disabled">
-                                        <i class="fas fa-angle-double-left mr-1"></i> First
-                                    </span>
-                                <?php endif; ?>
-
-                                <!-- Previous page -->
-                                <?php if ($current_page > 1): ?>
-                                    <a href="?page=<?php echo $current_page - 1; ?>" class="pagination-link">
-                                        <i class="fas fa-angle-left mr-1"></i> Previous
-                                    </a>
-                                <?php else: ?>
-                                    <span class="disabled">
-                                        <i class="fas fa-angle-left mr-1"></i> Previous
-                                    </span>
-                                <?php endif; ?>
-
-                                <!-- Page numbers -->
-                                <?php
-                                $start_page = max(1, $current_page - 2);
-                                $end_page = min($total_pages, $current_page + 2);
-                                
-                                for ($i = $start_page; $i <= $end_page; $i++):
-                                ?>
-                                    <?php if ($i == $current_page): ?>
-                                        <span class="current"><?php echo $i; ?></span>
-                                    <?php else: ?>
-                                        <a href="?page=<?php echo $i; ?>" class="pagination-link"><?php echo $i; ?></a>
-                                    <?php endif; ?>
-                                <?php endfor; ?>
-
-                                <!-- Next page -->
-                                <?php if ($current_page < $total_pages): ?>
-                                    <a href="?page=<?php echo $current_page + 1; ?>" class="pagination-link">
-                                        Next <i class="fas fa-angle-right ml-1"></i>
-                                    </a>
-                                <?php else: ?>
-                                    <span class="disabled">
-                                        Next <i class="fas fa-angle-right ml-1"></i>
-                                    </span>
-                                <?php endif; ?>
-
-                                <!-- Last page -->
-                                <?php if ($current_page < $total_pages): ?>
-                                    <a href="?page=<?php echo $total_pages; ?>" class="pagination-link">
-                                        Last <i class="fas fa-angle-double-right ml-1"></i>
-                                    </a>
-                                <?php else: ?>
-                                    <span class="disabled">
-                                        Last <i class="fas fa-angle-double-right ml-1"></i>
-                                    </span>
-                                <?php endif; ?>
-                            </div>
-                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="deleteModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
-            <div class="p-6">
-                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
-                    <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 text-center mb-2">Delete Category</h3>
-                <p class="text-gray-600 text-center mb-4" id="deleteMessage"></p>
-                <div id="warningMessage" class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 hidden">
-                    <div class="flex">
-                        <i class="fas fa-exclamation-circle text-yellow-400 mr-2 mt-0.5"></i>
-                        <p class="text-sm text-yellow-700" id="warningText"></p>
-                    </div>
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
-                        <i class="fas fa-times mr-1"></i> Cancel
-                    </button>
-                    <button onclick="proceedDelete()" id="confirmDeleteBtn" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                        <i class="fas fa-trash mr-1"></i> Delete
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    // Handle post deletion
+if (isset($_GET['delete'])) {
+    $post_id = intval($_GET['delete']);
+    $sql = "SELECT featured_image FROM posts WHERE id = $post_id";
+    $result = mysqli_query($conn, $sql);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $post = mysqli_fetch_assoc($result);
+        if ($post['featured_image']) {
+            $image_path = '../Uploads/posts/' . $post['featured_image'];
+            if (file_exists($image_path)) {
+                unlink($image_path);
+            }
+        }
+        $sql = "DELETE FROM posts WHERE id = $post_id";
+        if (mysqli_query($conn, $sql)) {
+            $_SESSION['success'] = "Post deleted successfully!";
+        } else {
+            $_SESSION['error'] = "Failed to delete post: " . mysqli_error($conn);
+        }
+    } else {
+        $_SESSION['error'] = "Post not found.";
+    }
+    header("Location: list_posts.php");
+    exit();
+}
 
     <script>
         let deleteUrl = '';
@@ -624,13 +497,13 @@ $inactive_categories = $stats['inactive_categories'];
                         setTimeout(() => {
                             row.remove();
                             
+                            // Update statistics
+                            updateStatistics();
+                            
                             // Check if table is empty
                             const tbody = document.querySelector('tbody');
                             if (tbody && tbody.children.length === 0) {
                                 location.reload();
-                            } else {
-                                // Update statistics and pagination info
-                                updatePageInfo();
                             }
                         }, 300);
                     }
@@ -648,16 +521,20 @@ $inactive_categories = $stats['inactive_categories'];
                 });
         }
 
-        function updatePageInfo() {
+        function updateStatistics() {
+            // Decrease total categories
+            const totalElement = document.querySelector('.border-indigo-500 h3');
+            if (totalElement) {
+                const currentTotal = parseInt(totalElement.textContent);
+                totalElement.textContent = currentTotal - 1;
+            }
+            
             // Update the "Showing X categories" text
             const showingText = document.querySelector('.text-sm.text-gray-600');
             if (showingText) {
                 const tbody = document.querySelector('tbody');
                 const count = tbody ? tbody.children.length : 0;
-                // We need to reload to get accurate count since we don't know the total after deletion
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+                showingText.textContent = 'Showing ' + count + ' categor' + (count === 1 ? 'y' : 'ies');
             }
         }
 

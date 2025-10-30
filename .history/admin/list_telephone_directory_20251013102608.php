@@ -18,57 +18,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
     $stmt->close();
 }
 
-// Pagination configuration
-$records_per_page = 10;
-
-// Get current page
-$current_page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-if ($current_page < 1) $current_page = 1;
-
-// Calculate offset
-$offset = ($current_page - 1) * $records_per_page;
-
 // Initialize search query
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-
-// Build base query for counting total records
-$count_sql = "SELECT COUNT(DISTINCT td.id) as total 
-              FROM Telephone_Directory td 
-              LEFT JOIN Department d ON td.department_id = d.id";
-
-// Build base query for fetching data
 $sql = "SELECT DISTINCT td.id, td.name, td.phone_number, d.name AS department_name 
         FROM Telephone_Directory td 
         LEFT JOIN Department d ON td.department_id = d.id";
 
-// Add search conditions if provided
 if (!empty($search)) {
-    $search_clean = $conn->real_escape_string($search);
-    $where_condition = " WHERE td.name LIKE '%$search_clean%' 
-                         OR td.phone_number LIKE '%$search_clean%' 
-                         OR d.name LIKE '%$search_clean%'";
-    
-    $count_sql .= $where_condition;
-    $sql .= $where_condition;
+    $search = $conn->real_escape_string($search);
+    $sql .= " WHERE td.name LIKE '%$search%' 
+              OR td.phone_number LIKE '%$search%' 
+              OR d.name LIKE '%$search%'";
 }
 
-// Get total records
-$count_result = $conn->query($count_sql);
-if (!$count_result) {
-    die("Count query failed: " . $conn->error);
-}
-$total_records = $count_result->fetch_assoc()['total'];
-$total_pages = ceil($total_records / $records_per_page);
-
-// Ensure current page is within valid range
-if ($current_page > $total_pages && $total_pages > 0) {
-    $current_page = $total_pages;
-}
-
-// Add pagination to main query
-$sql .= " ORDER BY td.id LIMIT $offset, $records_per_page";
-
-// Execute main query
 $result = $conn->query($sql);
 if (!$result) {
     die("Query failed: " . $conn->error);
@@ -128,34 +90,6 @@ if (!$result) {
         .add-entry-btn {
             @apply py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700;
         }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-            gap: 10px;
-        }
-        .pagination a, .pagination span {
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            text-decoration: none;
-            color: #333;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-        .pagination a:hover {
-            background-color: #e9ecef;
-        }
-        .pagination .current {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-        .pagination .disabled {
-            color: #6c757d;
-            pointer-events: none;
-            background-color: #f8f9fa;
-        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -207,37 +141,17 @@ if (!$result) {
         <div class="main-content flex-1 p-8">
             <div class="max-w-4xl mx-auto">
                 <h2 class="text-3xl font-bold text-gray-800 mb-6">List of Telephone directories</h2>
-                
                 <?php if (isset($success)): ?>
                     <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-6"><?php echo $success; ?></div>
                 <?php endif; ?>
                 <?php if (isset($error)): ?>
                     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6"><?php echo $error; ?></div>
                 <?php endif; ?>
-                
                 <div class="flex justify-between mb-3">
                     <form method="GET" action="" class="flex w-full max-w-md">
                         <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search by name, phone, or department" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
                         <button type="submit" class="ml-2 py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Search</button>
-                        <?php if (!empty($search)): ?>
-                            <a href="list_telephone_directory.php" class="ml-2 py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Clear</a>
-                        <?php endif; ?>
                     </form>
-                </div>
-
-                <!-- Results Summary -->
-                <div class="mb-4 text-sm text-gray-600">
-                    <?php if ($total_records > 0): ?>
-                        Showing <?php echo ($offset + 1); ?> to <?php echo min($offset + $records_per_page, $total_records); ?> of <?php echo $total_records; ?> entries
-                        <?php if (!empty($search)): ?>
-                            for "<strong><?php echo htmlspecialchars($search); ?></strong>"
-                        <?php endif; ?>
-                    <?php else: ?>
-                        No entries found
-                        <?php if (!empty($search)): ?>
-                            for "<strong><?php echo htmlspecialchars($search); ?></strong>"
-                        <?php endif; ?>
-                    <?php endif; ?>
                 </div>
 
                 <?php if ($result->num_rows > 0): ?>
@@ -271,61 +185,8 @@ if (!$result) {
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- Pagination -->
-                    <?php if ($total_pages > 1): ?>
-                        <div class="pagination">
-                            <!-- First page -->
-                            <?php if ($current_page > 1): ?>
-                                <a href="?page=1<?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>">First</a>
-                            <?php else: ?>
-                                <span class="disabled">First</span>
-                            <?php endif; ?>
-
-                            <!-- Previous page -->
-                            <?php if ($current_page > 1): ?>
-                                <a href="?page=<?php echo $current_page - 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>">Previous</a>
-                            <?php else: ?>
-                                <span class="disabled">Previous</span>
-                            <?php endif; ?>
-
-                            <!-- Page numbers -->
-                            <?php
-                            $start_page = max(1, $current_page - 2);
-                            $end_page = min($total_pages, $current_page + 2);
-                            
-                            for ($i = $start_page; $i <= $end_page; $i++):
-                            ?>
-                                <?php if ($i == $current_page): ?>
-                                    <span class="current"><?php echo $i; ?></span>
-                                <?php else: ?>
-                                    <a href="?page=<?php echo $i; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>"><?php echo $i; ?></a>
-                                <?php endif; ?>
-                            <?php endfor; ?>
-
-                            <!-- Next page -->
-                            <?php if ($current_page < $total_pages): ?>
-                                <a href="?page=<?php echo $current_page + 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>">Next</a>
-                            <?php else: ?>
-                                <span class="disabled">Next</span>
-                            <?php endif; ?>
-
-                            <!-- Last page -->
-                            <?php if ($current_page < $total_pages): ?>
-                                <a href="?page=<?php echo $total_pages; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>">Last</a>
-                            <?php else: ?>
-                                <span class="disabled">Last</span>
-                            <?php endif; ?>
-                        </div>
-                    <?php endif; ?>
-
                 <?php else: ?>
-                    <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-6">
-                        No entries found in the telephone directory.
-                        <?php if (!empty($search)): ?>
-                            <a href="list_telephone_directory.php" class="ml-2 text-blue-800 underline">View all entries</a>
-                        <?php endif; ?>
-                    </div>
+                    <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-6">No entries found in the telephone directory.</div>
                 <?php endif; ?>
             </div>
         </div>
