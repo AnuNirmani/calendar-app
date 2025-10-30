@@ -1,5 +1,5 @@
 <?php
-include '../db.php';
+include dirname(__DIR__) . '/../db.php';
 
 $success = '';
 $error = '';
@@ -68,7 +68,7 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Telephone Directory</title>
-    <link rel="icon" href="../images/logo.jpg" type="image/png">
+    <link rel="icon" href="../../images/logo.jpg" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .sidebar {

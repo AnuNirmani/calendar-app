@@ -1,5 +1,5 @@
 <?php
-include '../db.php';
+include dirname(__DIR__) . '/../db.php';
 
 session_start();
 if (!isset($_SESSION['user_id'])) {

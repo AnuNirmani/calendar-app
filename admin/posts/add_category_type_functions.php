@@ -1,5 +1,5 @@
 <?php
-require_once '../db.php';
+require_once dirname(__DIR__) . '/../db.php';
 
 function getCategories() {
     global $conn;
