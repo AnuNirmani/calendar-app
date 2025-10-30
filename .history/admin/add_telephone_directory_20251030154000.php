@@ -27,18 +27,12 @@ if (isset($_GET['logout'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = trim($_POST['name']);
     $phone_number = trim($_POST['phone_number']);
-    $email = trim($_POST['email']);
-    $extension = trim($_POST['extension']);
     $department_id = $_POST['department_id'];
 
     if (empty($name) || empty($phone_number) || empty($department_id)) {
-        $error = "Name, Phone Number and Department fields are required.";
+        $error = "All fields are required.";
     } elseif (!preg_match("/^[0-9]{10}$/", $phone_number)) {
         $error = "Please enter a valid 10-digit phone number.";
-    } elseif (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Please enter a valid email address.";
-    } elseif (!empty($extension) && !preg_match("/^[0-9]{1,6}$/", $extension)) {
-        $error = "Extension must be numeric and up to 6 digits.";
     } else {
         // Check if department_id exists
         $stmt_check = $conn->prepare("SELECT id FROM Department WHERE id = ?");
@@ -49,8 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = "The selected department does not exist.";
         } else {
             // Insert telephone directory entry
-            $stmt = $conn->prepare("INSERT INTO Telephone_Directory (name, phone_number, email, extension, department_id) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssi", $name, $phone_number, $email, $extension, $department_id);
+            $stmt = $conn->prepare("INSERT INTO Telephone_Directory (name, phone_number, department_id) VALUES (?, ?, ?)");
+            $stmt->bind_param("ssi", $name, $phone_number, $department_id);
             
             if ($stmt->execute()) {
                 $_SESSION['success'] = "Telephone entry added successfully!";
@@ -190,8 +184,7 @@ if ($departments === false) {
                                        id="name" 
                                        name="name" 
                                        placeholder="Enter full name"
-                                       required
-                                       value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>">
+                                       required>
                             </div>
                             
                             <div class="mb-4">
@@ -203,33 +196,8 @@ if ($departments === false) {
                                        placeholder="Enter 10-digit phone number"
                                        required 
                                        pattern="[0-9]{10}"
-                                       maxlength="10"
-                                       value="<?php echo isset($_POST['phone_number']) ? htmlspecialchars($_POST['phone_number']) : ''; ?>">
+                                       maxlength="10">
                                 <p class="text-xs text-gray-500 mt-1">Format: 10 digits only (e.g., 0771234567)</p>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                                <input type="email" 
-                                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" 
-                                       id="email" 
-                                       name="email" 
-                                       placeholder="Enter email address"
-                                       value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
-                                <p class="text-xs text-gray-500 mt-1">Optional field</p>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="extension" class="block text-sm font-medium text-gray-700 mb-2">Extension</label>
-                                <input type="text" 
-                                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" 
-                                       id="extension" 
-                                       name="extension" 
-                                       placeholder="Enter extension number"
-                                       pattern="[0-9]{1,6}"
-                                       maxlength="6"
-                                       value="<?php echo isset($_POST['extension']) ? htmlspecialchars($_POST['extension']) : ''; ?>">
-                                <p class="text-xs text-gray-500 mt-1">Optional field - up to 6 digits</p>
                             </div>
                             
                             <div class="mb-6">
@@ -243,9 +211,8 @@ if ($departments === false) {
                                     // Reset pointer to beginning
                                     $departments->data_seek(0);
                                     while ($row = $department_list->fetch_assoc()): 
-                                        $selected = (isset($_POST['department_id']) && $_POST['department_id'] == $row['id']) ? 'selected' : '';
                                     ?>
-                                        <option value="<?php echo $row['id']; ?>" <?php echo $selected; ?>>
+                                        <option value="<?php echo $row['id']; ?>">
                                             <?php echo htmlspecialchars($row['name']); ?>
                                         </option>
                                     <?php endwhile; ?>

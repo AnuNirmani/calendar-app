@@ -249,6 +249,9 @@ if ($result->num_rows > 0) {
                             <a href="list_telephone_directory.php" class="ml-2 py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Clear</a>
                         <?php endif; ?>
                     </form>
+                    <a href="add_telephone_directory.php" class="py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 h-fit">
+                        Add New Entry
+                    </a>
                 </div>
 
                 <!-- Results Summary -->
@@ -316,7 +319,7 @@ if ($result->num_rows > 0) {
                                             <td class="p-3"><?php echo htmlspecialchars($entry['department_name'] ?: 'N/A'); ?></td>
                                             <td class="p-3">
                                                 <div class="flex space-x-2">
-                                                    <a href="edit_telephone_directory.php?id=<?php echo $entry['id']; ?>" class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition">
+                                                    <a href="edit_telephone_directory.php?id=<?php echo $entry['id']; ?>" class="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition">
                                                         Edit
                                                     </a>
                                                     <form method="POST" action="" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this entry?');">

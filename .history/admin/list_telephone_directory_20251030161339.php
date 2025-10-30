@@ -249,6 +249,9 @@ if ($result->num_rows > 0) {
                             <a href="list_telephone_directory.php" class="ml-2 py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Clear</a>
                         <?php endif; ?>
                     </form>
+                    <a href="add_telephone_directory.php" class="py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 h-fit">
+                        Add New Entry
+                    </a>
                 </div>
 
                 <!-- Results Summary -->
@@ -316,7 +319,7 @@ if ($result->num_rows > 0) {
                                             <td class="p-3"><?php echo htmlspecialchars($entry['department_name'] ?: 'N/A'); ?></td>
                                             <td class="p-3">
                                                 <div class="flex space-x-2">
-                                                    <a href="edit_telephone_directory.php?id=<?php echo $entry['id']; ?>" class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition">
+                                                    <a href="edit_telephone_directory.php?id=<?php echo $entry['id']; ?>" class="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition">
                                                         Edit
                                                     </a>
                                                     <form method="POST" action="" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this entry?');">
@@ -366,33 +369,4 @@ if ($result->num_rows > 0) {
 
                                 <!-- Next page -->
                                 <?php if ($current_page < $total_pages): ?>
-                                    <a href="?page=<?php echo $current_page + 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>" class="pagination-link">Next</a>
-                                <?php else: ?>
-                                    <span class="disabled">Next</span>
-                                <?php endif; ?>
-
-                                <!-- Last page -->
-                                <?php if ($current_page < $total_pages): ?>
-                                    <a href="?page=<?php echo $total_pages; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>" class="pagination-link">Last</a>
-                                <?php else: ?>
-                                    <span class="disabled">Last</span>
-                                <?php endif; ?>
-                            </div>
-                        <?php endif; ?>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Auto-hide success/error messages after 5 seconds
-        $(document).ready(function() {
-            setTimeout(function() {
-                $('.bg-green-100, .bg-red-100').fadeOut('slow');
-            }, 5000);
-        });
-    </script>
-</body>
-</html>
-<?php $conn->close(); ?>
+                                    <a href="?page=<?php echo $current_page + 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?

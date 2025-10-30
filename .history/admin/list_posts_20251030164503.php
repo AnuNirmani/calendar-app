@@ -18,18 +18,46 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-// Handle delete request
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
-    $delete_id = $_POST['delete_id'];
-    $stmt = $conn->prepare("DELETE FROM Telephone_Directory WHERE id = ?");
-    $stmt->bind_param("i", $delete_id);
-    if ($stmt->execute()) {
-        $_SESSION['success'] = "Entry deleted successfully!";
+// Handle post deletion
+if (isset($_GET['delete'])) {
+    $post_id = intval($_GET['delete']);
+    $sql = "SELECT featured_image FROM posts WHERE id = $post_id";
+    $result = mysqli_query($conn, $sql);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $post = mysqli_fetch_assoc($result);
+        if ($post['featured_image']) {
+            $image_path = '../Uploads/posts/' . $post['featured_image'];
+            if (file_exists($image_path)) {
+                unlink($image_path);
+            }
+        }
+        $sql = "DELETE FROM posts WHERE id = $post_id";
+        if (mysqli_query($conn, $sql)) {
+            $_SESSION['success'] = "Post deleted successfully!";
+        } else {
+            $_SESSION['error'] = "Failed to delete post: " . mysqli_error($conn);
+        }
     } else {
-        $_SESSION['error'] = "Error deleting entry: " . $conn->error;
+        $_SESSION['error'] = "Post not found.";
     }
-    $stmt->close();
-    header("Location: list_telephone_directory.php");
+    header("Location: list_posts.php");
+    exit();
+}
+
+// Handle status update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['post_id']) && isset($_POST['status'])) {
+    $post_id = intval($_POST['post_id']);
+    $status = $_POST['status'] === 'published' ? 'published' : 'draft';
+    $sql = "UPDATE posts SET status = ? WHERE id = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "si", $status, $post_id);
+    if (mysqli_stmt_execute($stmt)) {
+        $_SESSION['success'] = "Post status updated successfully!";
+    } else {
+        $_SESSION['error'] = "Failed to update post status: " . mysqli_error($conn);
+    }
+    mysqli_stmt_close($stmt);
+    header("Location: list_posts.php");
     exit();
 }
 
@@ -56,35 +84,36 @@ $offset = ($current_page - 1) * $records_per_page;
 // Initialize search query
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-// Build base query for counting total records
-$count_sql = "SELECT COUNT(DISTINCT td.id) as total 
-              FROM Telephone_Directory td 
-              LEFT JOIN Department d ON td.department_id = d.id";
+// Build count query for total records
+$count_sql = "SELECT COUNT(*) as total FROM posts p 
+              LEFT JOIN categories c ON p.category_id = c.id";
 
 // Build base query for fetching data
-$sql = "SELECT DISTINCT td.id, td.name, td.phone_number, td.email, td.extension, d.name AS department_name 
-        FROM Telephone_Directory td 
-        LEFT JOIN Department d ON td.department_id = d.id";
+$sql = "SELECT p.*, c.name AS category_name 
+        FROM posts p 
+        LEFT JOIN categories c ON p.category_id = c.id";
 
 // Add search conditions if provided
 if (!empty($search)) {
     $search_clean = $conn->real_escape_string($search);
-    $where_condition = " WHERE td.name LIKE '%$search_clean%' 
-                         OR td.phone_number LIKE '%$search_clean%' 
-                         OR td.email LIKE '%$search_clean%' 
-                         OR td.extension LIKE '%$search_clean%' 
-                         OR d.name LIKE '%$search_clean%'";
+    $where_condition = " WHERE p.title LIKE '%$search_clean%' 
+                         OR p.author LIKE '%$search_clean%' 
+                         OR p.status LIKE '%$search_clean%' 
+                         OR c.name LIKE '%$search_clean%'";
     
     $count_sql .= $where_condition;
     $sql .= $where_condition;
 }
 
+// Complete the SQL queries
+$sql .= " ORDER BY p.created_at DESC LIMIT $offset, $records_per_page";
+
 // Get total records
-$count_result = $conn->query($count_sql);
+$count_result = mysqli_query($conn, $count_sql);
 if (!$count_result) {
-    die("Count query failed: " . $conn->error);
+    die("Count query failed: " . mysqli_error($conn));
 }
-$total_records = $count_result->fetch_assoc()['total'];
+$total_records = mysqli_fetch_assoc($count_result)['total'];
 $total_pages = ceil($total_records / $records_per_page);
 
 // Ensure current page is within valid range
@@ -92,19 +121,12 @@ if ($current_page > $total_pages && $total_pages > 0) {
     $current_page = $total_pages;
 }
 
-// Add pagination to main query
-$sql .= " ORDER BY td.id LIMIT $offset, $records_per_page";
-
-// Execute main query
-$result = $conn->query($sql);
-if (!$result) {
-    die("Query failed: " . $conn->error);
-}
-
-$entries = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $entries[] = $row;
+// Fetch posts with category names and pagination
+$result = mysqli_query($conn, $sql);
+$posts = [];
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $posts[] = $row;
     }
 }
 ?>
@@ -114,7 +136,7 @@ if ($result->num_rows > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telephone Directory</title>
+    <title>List Posts</title>
     <link rel="icon" href="../images/logo.jpg" type="image/png">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -141,6 +163,14 @@ if ($result->num_rows > 0) {
         }
         .logout-btn:hover svg {
             transform: translateX(4px);
+        }
+        td img {
+            max-width: 100px;
+            border-radius: 0.375rem;
+        }
+        .status-form button {
+            padding: 2px 8px;
+            font-size: 0.75rem;
         }
         .pagination {
             display: flex;
@@ -173,12 +203,6 @@ if ($result->num_rows > 0) {
             pointer-events: none;
             background-color: #f3f4f6;
             border-color: #d1d5db;
-        }
-        .email-cell {
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
     </style>
 </head>
@@ -229,8 +253,8 @@ if ($result->num_rows > 0) {
 
         <!-- Main Content -->
         <div class="main-content flex-1 p-8">
-            <div class="max-w-7xl mx-auto">
-                <h1 class="text-3xl font-bold text-gray-800 mb-6">List of Telephone Directories</h1>
+            <div class="max-w-6xl mx-auto">
+                <h1 class="text-3xl font-bold text-gray-800 mb-6">List of Posts</h1>
 
                 <?php if ($successMessage): ?>
                     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded"><?php echo htmlspecialchars($successMessage); ?></div>
@@ -240,13 +264,13 @@ if ($result->num_rows > 0) {
                     <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded"><?php echo $errorMessage; ?></div>
                 <?php endif; ?>
 
-                <!-- Search and Add Button -->
+                <!-- Search Bar -->
                 <div class="flex justify-between mb-3">
                     <form method="GET" action="" class="flex w-full max-w-md">
-                        <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search by name, phone, email, extension, or department" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search by title, author, " class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
                         <button type="submit" class="ml-2 py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Search</button>
                         <?php if (!empty($search)): ?>
-                            <a href="list_telephone_directory.php" class="ml-2 py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Clear</a>
+                            <a href="list_posts.php" class="ml-2 py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Clear</a>
                         <?php endif; ?>
                     </form>
                 </div>
@@ -254,12 +278,12 @@ if ($result->num_rows > 0) {
                 <!-- Results Summary -->
                 <div class="mb-4 text-sm text-gray-600 bg-white p-3 rounded-lg shadow">
                     <?php if ($total_records > 0): ?>
-                        Showing <?php echo ($offset + 1); ?> to <?php echo min($offset + $records_per_page, $total_records); ?> of <?php echo $total_records; ?> entries
+                        Showing <?php echo ($offset + 1); ?> to <?php echo min($offset + $records_per_page, $total_records); ?> of <?php echo $total_records; ?> posts
                         <?php if (!empty($search)): ?>
                             for "<strong><?php echo htmlspecialchars($search); ?></strong>"
                         <?php endif; ?>
                     <?php else: ?>
-                        No entries found
+                        No posts found
                         <?php if (!empty($search)): ?>
                             for "<strong><?php echo htmlspecialchars($search); ?></strong>"
                         <?php endif; ?>
@@ -267,14 +291,14 @@ if ($result->num_rows > 0) {
                 </div>
 
                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">All Telephone Directory Entries</h2>
-                    <?php if (empty($entries)): ?>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">All Posts</h2>
+                    <?php if (empty($posts)): ?>
                         <p class="text-gray-600 flex items-center justify-center py-8">
-                            <span class="text-2xl mr-2">📞</span> No entries found in the telephone directory.
+                            <span class="text-2xl mr-2">📄</span> No posts found.
                         </p>
                         <?php if (!empty($search)): ?>
                             <div class="text-center">
-                                <a href="list_telephone_directory.php" class="text-blue-600 hover:text-blue-800 underline">View all entries</a>
+                                <a href="list_posts.php" class="text-blue-600 hover:text-blue-800 underline">View all posts</a>
                             </div>
                         <?php endif; ?>
                     <?php else: ?>
@@ -282,49 +306,43 @@ if ($result->num_rows > 0) {
                             <table class="w-full text-left table-auto">
                                 <thead>
                                     <tr class="bg-gray-200">
-                                        <th class="p-3 font-semibold">ID</th>
-                                        <th class="p-3 font-semibold">Name</th>
-                                        <th class="p-3 font-semibold">Phone Number</th>
-                                        <th class="p-3 font-semibold">Email</th>
-                                        <th class="p-3 font-semibold">Extension</th>
-                                        <th class="p-3 font-semibold">Department</th>
+                                        <th class="p-3 font-semibold">Title</th>
+                                        <th class="p-3 font-semibold">Category</th>
+                                        <th class="p-3 font-semibold">Author</th>
+                                        <th class="p-3 font-semibold">Image</th>
+                                        <th class="p-3 font-semibold">Status</th>
+                                        <th class="p-3 font-semibold">Date</th>
                                         <th class="p-3 font-semibold">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($entries as $entry): ?>
+                                    <?php foreach ($posts as $post): ?>
                                         <tr class="border-b border-gray-200 hover:bg-gray-50">
-                                            <td class="p-3"><?php echo $entry['id']; ?></td>
-                                            <td class="p-3 font-medium"><?php echo htmlspecialchars($entry['name']); ?></td>
-                                            <td class="p-3"><?php echo htmlspecialchars($entry['phone_number']); ?></td>
-                                            <td class="p-3 email-cell">
-                                                <?php if (!empty($entry['email'])): ?>
-                                                    <a href="mailto:<?php echo htmlspecialchars($entry['email']); ?>" class="text-blue-600 hover:text-blue-800">
-                                                        <?php echo htmlspecialchars($entry['email']); ?>
-                                                    </a>
+                                            <td class="p-3"><?php echo htmlspecialchars($post['title']); ?></td>
+                                            <td class="p-3"><?php echo htmlspecialchars($post['category_name'] ?: 'Uncategorized'); ?></td>
+                                            <td class="p-3"><?php echo htmlspecialchars($post['author']); ?></td>
+                                            <td class="p-3">
+                                                <?php if ($post['featured_image']): ?>
+                                                    <img src="../Uploads/posts/<?php echo htmlspecialchars($post['featured_image']); ?>" alt="Featured Image" class="max-w-20 max-h-20 object-cover">
                                                 <?php else: ?>
-                                                    <span class="text-gray-400">N/A</span>
+                                                    <span class="text-gray-500 text-sm">No Image</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="p-3">
-                                                <?php if (!empty($entry['extension'])): ?>
-                                                    <?php echo htmlspecialchars($entry['extension']); ?>
-                                                <?php else: ?>
-                                                    <span class="text-gray-400">N/A</span>
-                                                <?php endif; ?>
+                                                <form method="post" action="" class="status-form inline-flex items-center">
+                                                    <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                                                    <input type="checkbox" name="status" value="published" <?php echo $post['status'] == 'published' ? 'checked' : ''; ?> class="h-4 w-4 text-green-600 rounded focus:ring-green-500">
+                                                    <button type="submit" class="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition">Update</button>
+                                                </form>
+                                                <span class="ml-2 text-xs font-semibold px-2 py-1 rounded <?php echo $post['status'] == 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'; ?>">
+                                                    <?php echo htmlspecialchars(ucfirst($post['status'])); ?>
+                                                </span>
                                             </td>
-                                            <td class="p-3"><?php echo htmlspecialchars($entry['department_name'] ?: 'N/A'); ?></td>
+                                            <td class="p-3 text-sm"><?php echo date('M d, Y', strtotime($post['publish_date'])); ?></td>
                                             <td class="p-3">
                                                 <div class="flex space-x-2">
-                                                    <a href="edit_telephone_directory.php?id=<?php echo $entry['id']; ?>" class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition">
-                                                        Edit
-                                                    </a>
-                                                    <form method="POST" action="" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this entry?');">
-                                                        <input type="hidden" name="delete_id" value="<?php echo $entry['id']; ?>">
-                                                        <button type="submit" class="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-700 transition">
-                                                            Delete
-                                                        </button>
-                                                    </form>
+                                                    <a href="edit_post.php?id=<?php echo $post['id']; ?>" class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition">Edit</a>
+                                                    <a href="?delete=<?php echo $post['id']; ?>" class="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-700 transition" onclick="return confirm('Are you sure you want to delete this post?')">Delete</a>
                                                 </div>
                                             </td>
                                         </tr>

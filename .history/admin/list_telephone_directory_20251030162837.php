@@ -316,7 +316,7 @@ if ($result->num_rows > 0) {
                                             <td class="p-3"><?php echo htmlspecialchars($entry['department_name'] ?: 'N/A'); ?></td>
                                             <td class="p-3">
                                                 <div class="flex space-x-2">
-                                                    <a href="edit_telephone_directory.php?id=<?php echo $entry['id']; ?>" class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition">
+                                                    <a href="edit_telephone_directory.php?id=<?php echo $entry['id']; ?>" class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-blue-600 transition">
                                                         Edit
                                                     </a>
                                                     <form method="POST" action="" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this entry?');">

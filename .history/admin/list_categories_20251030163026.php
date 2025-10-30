@@ -18,18 +18,80 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-// Handle delete request
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
-    $delete_id = $_POST['delete_id'];
-    $stmt = $conn->prepare("DELETE FROM Telephone_Directory WHERE id = ?");
-    $stmt->bind_param("i", $delete_id);
-    if ($stmt->execute()) {
-        $_SESSION['success'] = "Entry deleted successfully!";
+// Handle category deletion
+if (isset($_GET['delete'])) {
+    $category_id = intval($_GET['delete']);
+    
+    // Use prepared statement to prevent SQL injection
+    $stmt = $conn->prepare("SELECT * FROM categories WHERE id = ?");
+    $stmt->bind_param("i", $category_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result && $result->num_rows > 0) {
+        $category = $result->fetch_assoc();
+        $category_name = $category['name'];
+        
+        // Check if there are posts associated with this category
+        $check_stmt = $conn->prepare("SELECT COUNT(*) as post_count FROM posts WHERE category_id = ?");
+        $check_stmt->bind_param("i", $category_id);
+        $check_stmt->execute();
+        $check_result = $check_stmt->get_result();
+        $post_data = $check_result->fetch_assoc();
+        $post_count = $post_data['post_count'];
+        $check_stmt->close();
+        
+        if ($post_count > 0) {
+            $_SESSION['error'] = "Cannot delete category '$category_name' because it has $post_count post(s) associated with it. Please delete or reassign the posts first.";
+        } else {
+            // No posts associated, safe to delete
+            $delete_stmt = $conn->prepare("DELETE FROM categories WHERE id = ?");
+            $delete_stmt->bind_param("i", $category_id);
+            
+            if ($delete_stmt->execute()) {
+                $_SESSION['success'] = "Category '$category_name' deleted successfully!";
+            } else {
+                $_SESSION['error'] = "Failed to delete category: " . $conn->error;
+            }
+            $delete_stmt->close();
+        }
     } else {
-        $_SESSION['error'] = "Error deleting entry: " . $conn->error;
+        $_SESSION['error'] = "Category not found.";
     }
     $stmt->close();
-    header("Location: list_telephone_directory.php");
+    
+    header("Location: list_categories.php");
+    exit();
+}
+
+// Handle status toggle
+if (isset($_GET['toggle_status'])) {
+    $category_id = intval($_GET['toggle_status']);
+    
+    $stmt = $conn->prepare("SELECT id, name, status FROM categories WHERE id = ?");
+    $stmt->bind_param("i", $category_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result && $result->num_rows > 0) {
+        $category = $result->fetch_assoc();
+        $new_status = $category['status'] == 'active' ? 'inactive' : 'active';
+        
+        $update_stmt = $conn->prepare("UPDATE categories SET status = ? WHERE id = ?");
+        $update_stmt->bind_param("si", $new_status, $category_id);
+        
+        if ($update_stmt->execute()) {
+            $_SESSION['success'] = "Category '{$category['name']}' status changed to $new_status!";
+        } else {
+            $_SESSION['error'] = "Failed to update category status: " . $conn->error;
+        }
+        $update_stmt->close();
+    } else {
+        $_SESSION['error'] = "Category not found.";
+    }
+    $stmt->close();
+    
+    header("Location: list_categories.php");
     exit();
 }
 
@@ -53,38 +115,10 @@ if ($current_page < 1) $current_page = 1;
 // Calculate offset
 $offset = ($current_page - 1) * $records_per_page;
 
-// Initialize search query
-$search = isset($_GET['search']) ? trim($_GET['search']) : '';
-
-// Build base query for counting total records
-$count_sql = "SELECT COUNT(DISTINCT td.id) as total 
-              FROM Telephone_Directory td 
-              LEFT JOIN Department d ON td.department_id = d.id";
-
-// Build base query for fetching data
-$sql = "SELECT DISTINCT td.id, td.name, td.phone_number, td.email, td.extension, d.name AS department_name 
-        FROM Telephone_Directory td 
-        LEFT JOIN Department d ON td.department_id = d.id";
-
-// Add search conditions if provided
-if (!empty($search)) {
-    $search_clean = $conn->real_escape_string($search);
-    $where_condition = " WHERE td.name LIKE '%$search_clean%' 
-                         OR td.phone_number LIKE '%$search_clean%' 
-                         OR td.email LIKE '%$search_clean%' 
-                         OR td.extension LIKE '%$search_clean%' 
-                         OR d.name LIKE '%$search_clean%'";
-    
-    $count_sql .= $where_condition;
-    $sql .= $where_condition;
-}
-
-// Get total records
-$count_result = $conn->query($count_sql);
-if (!$count_result) {
-    die("Count query failed: " . $conn->error);
-}
-$total_records = $count_result->fetch_assoc()['total'];
+// Build count query for total records
+$count_sql = "SELECT COUNT(*) as total FROM categories";
+$count_result = mysqli_query($conn, $count_sql);
+$total_records = mysqli_fetch_assoc($count_result)['total'];
 $total_pages = ceil($total_records / $records_per_page);
 
 // Ensure current page is within valid range
@@ -92,19 +126,21 @@ if ($current_page > $total_pages && $total_pages > 0) {
     $current_page = $total_pages;
 }
 
-// Add pagination to main query
-$sql .= " ORDER BY td.id LIMIT $offset, $records_per_page";
+// Fetch categories with post count and pagination
+$sql = "SELECT c.*, COUNT(p.id) as post_count 
+        FROM categories c 
+        LEFT JOIN posts p ON c.id = p.category_id 
+        GROUP BY c.id 
+        ORDER BY c.created_at DESC
+        LIMIT $offset, $records_per_page";
+$result = mysqli_query($conn, $sql);
 
-// Execute main query
-$result = $conn->query($sql);
-if (!$result) {
-    die("Query failed: " . $conn->error);
-}
-
-$entries = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $entries[] = $row;
+$categories = [];
+if ($result === false) {
+    $errorMessage = "Database error: " . mysqli_error($conn) . "<br>Please make sure the 'categories' table exists in your database.";
+} else {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $categories[] = $row;
     }
 }
 ?>
@@ -114,7 +150,7 @@ if ($result->num_rows > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telephone Directory</title>
+    <title>List Categories</title>
     <link rel="icon" href="../images/logo.jpg" type="image/png">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -141,6 +177,23 @@ if ($result->num_rows > 0) {
         }
         .logout-btn:hover svg {
             transform: translateX(4px);
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        .status-active {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .status-inactive {
+            background-color: #fef2f2;
+            color: #dc2626;
         }
         .pagination {
             display: flex;
@@ -173,12 +226,6 @@ if ($result->num_rows > 0) {
             pointer-events: none;
             background-color: #f3f4f6;
             border-color: #d1d5db;
-        }
-        .email-cell {
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
     </style>
 </head>
@@ -229,8 +276,8 @@ if ($result->num_rows > 0) {
 
         <!-- Main Content -->
         <div class="main-content flex-1 p-8">
-            <div class="max-w-7xl mx-auto">
-                <h1 class="text-3xl font-bold text-gray-800 mb-6">List of Telephone Directories</h1>
+            <div class="max-w-6xl mx-auto">
+                <h1 class="text-3xl font-bold text-gray-800 mb-6">List of Categories</h1>
 
                 <?php if ($successMessage): ?>
                     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded"><?php echo htmlspecialchars($successMessage); ?></div>
@@ -246,7 +293,7 @@ if ($result->num_rows > 0) {
                         <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search by name, phone, email, extension, or department" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
                         <button type="submit" class="ml-2 py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Search</button>
                         <?php if (!empty($search)): ?>
-                            <a href="list_telephone_directory.php" class="ml-2 py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Clear</a>
+                            <a href="list_ca.php" class="ml-2 py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Clear</a>
                         <?php endif; ?>
                     </form>
                 </div>
@@ -254,77 +301,65 @@ if ($result->num_rows > 0) {
                 <!-- Results Summary -->
                 <div class="mb-4 text-sm text-gray-600 bg-white p-3 rounded-lg shadow">
                     <?php if ($total_records > 0): ?>
-                        Showing <?php echo ($offset + 1); ?> to <?php echo min($offset + $records_per_page, $total_records); ?> of <?php echo $total_records; ?> entries
-                        <?php if (!empty($search)): ?>
-                            for "<strong><?php echo htmlspecialchars($search); ?></strong>"
-                        <?php endif; ?>
+                        Showing <?php echo ($offset + 1); ?> to <?php echo min($offset + $records_per_page, $total_records); ?> of <?php echo $total_records; ?> categories
                     <?php else: ?>
-                        No entries found
-                        <?php if (!empty($search)): ?>
-                            for "<strong><?php echo htmlspecialchars($search); ?></strong>"
-                        <?php endif; ?>
+                        No categories found
                     <?php endif; ?>
                 </div>
 
                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">All Telephone Directory Entries</h2>
-                    <?php if (empty($entries)): ?>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">All Categories</h2>
+                    <?php if (empty($categories)): ?>
                         <p class="text-gray-600 flex items-center justify-center py-8">
-                            <span class="text-2xl mr-2">📞</span> No entries found in the telephone directory.
+                            <span class="text-2xl mr-2">📁</span> No categories found.
                         </p>
-                        <?php if (!empty($search)): ?>
-                            <div class="text-center">
-                                <a href="list_telephone_directory.php" class="text-blue-600 hover:text-blue-800 underline">View all entries</a>
-                            </div>
-                        <?php endif; ?>
                     <?php else: ?>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left table-auto">
                                 <thead>
                                     <tr class="bg-gray-200">
                                         <th class="p-3 font-semibold">ID</th>
-                                        <th class="p-3 font-semibold">Name</th>
-                                        <th class="p-3 font-semibold">Phone Number</th>
-                                        <th class="p-3 font-semibold">Email</th>
-                                        <th class="p-3 font-semibold">Extension</th>
-                                        <th class="p-3 font-semibold">Department</th>
+                                        <th class="p-3 font-semibold">Category Name</th>
+                                        <th class="p-3 font-semibold">Posts</th>
+                                        <th class="p-3 font-semibold">Status</th>
+                                        <th class="p-3 font-semibold">Created Date</th>
                                         <th class="p-3 font-semibold">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($entries as $entry): ?>
+                                    <?php foreach ($categories as $category): ?>
                                         <tr class="border-b border-gray-200 hover:bg-gray-50">
-                                            <td class="p-3"><?php echo $entry['id']; ?></td>
-                                            <td class="p-3 font-medium"><?php echo htmlspecialchars($entry['name']); ?></td>
-                                            <td class="p-3"><?php echo htmlspecialchars($entry['phone_number']); ?></td>
-                                            <td class="p-3 email-cell">
-                                                <?php if (!empty($entry['email'])): ?>
-                                                    <a href="mailto:<?php echo htmlspecialchars($entry['email']); ?>" class="text-blue-600 hover:text-blue-800">
-                                                        <?php echo htmlspecialchars($entry['email']); ?>
-                                                    </a>
-                                                <?php else: ?>
-                                                    <span class="text-gray-400">N/A</span>
-                                                <?php endif; ?>
+                                            <td class="p-3">#<?php echo htmlspecialchars($category['id']); ?></td>
+                                            <td class="p-3 font-medium"><?php echo htmlspecialchars($category['name']); ?></td>
+                                            <td class="p-3 text-center">
+                                                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-indigo-100 bg-indigo-600 rounded-full">
+                                                    <?php echo $category['post_count']; ?>
+                                                </span>
                                             </td>
                                             <td class="p-3">
-                                                <?php if (!empty($entry['extension'])): ?>
-                                                    <?php echo htmlspecialchars($entry['extension']); ?>
-                                                <?php else: ?>
-                                                    <span class="text-gray-400">N/A</span>
-                                                <?php endif; ?>
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="status-badge <?php echo $category['status'] == 'active' ? 'status-active' : 'status-inactive'; ?>">
+                                                        <?php echo htmlspecialchars(ucfirst($category['status'])); ?>
+                                                    </span>
+                                                    <a href="?toggle_status=<?php echo $category['id']; ?>" 
+                                                       class="text-gray-500 hover:text-indigo-600 transition-colors text-sm"
+                                                       onclick="return confirm('Are you sure you want to change the status of this category?')">
+                                                        Toggle
+                                                    </a>
+                                                </div>
                                             </td>
-                                            <td class="p-3"><?php echo htmlspecialchars($entry['department_name'] ?: 'N/A'); ?></td>
+                                            <td class="p-3 text-sm"><?php echo date('M d, Y', strtotime($category['created_at'])); ?></td>
                                             <td class="p-3">
                                                 <div class="flex space-x-2">
-                                                    <a href="edit_telephone_directory.php?id=<?php echo $entry['id']; ?>" class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition">
+                                                    <a href="edit_category.php?id=<?php echo $category['id']; ?>" 
+                                                       class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition">
                                                         Edit
                                                     </a>
-                                                    <form method="POST" action="" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this entry?');">
-                                                        <input type="hidden" name="delete_id" value="<?php echo $entry['id']; ?>">
-                                                        <button type="submit" class="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-700 transition">
-                                                            Delete
-                                                        </button>
-                                                    </form>
+                                                    <a href="?delete=<?php echo $category['id']; ?>" 
+                                                       class="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-700 transition <?php echo $category['post_count'] > 0 ? 'opacity-50 cursor-not-allowed' : ''; ?>"
+                                                       onclick="<?php echo $category['post_count'] > 0 ? 'alert(\'Cannot delete category with posts associated.\'); return false;' : 'return confirm(\'Are you sure you want to delete this category?\')'; ?>">
+                                                        Delete
+                                                    </a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -338,14 +373,14 @@ if ($result->num_rows > 0) {
                             <div class="pagination mt-6">
                                 <!-- First page -->
                                 <?php if ($current_page > 1): ?>
-                                    <a href="?page=1<?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>" class="pagination-link">First</a>
+                                    <a href="?page=1" class="pagination-link">First</a>
                                 <?php else: ?>
                                     <span class="disabled">First</span>
                                 <?php endif; ?>
 
                                 <!-- Previous page -->
                                 <?php if ($current_page > 1): ?>
-                                    <a href="?page=<?php echo $current_page - 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>" class="pagination-link">Previous</a>
+                                    <a href="?page=<?php echo $current_page - 1; ?>" class="pagination-link">Previous</a>
                                 <?php else: ?>
                                     <span class="disabled">Previous</span>
                                 <?php endif; ?>
@@ -360,20 +395,20 @@ if ($result->num_rows > 0) {
                                     <?php if ($i == $current_page): ?>
                                         <span class="current"><?php echo $i; ?></span>
                                     <?php else: ?>
-                                        <a href="?page=<?php echo $i; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>" class="pagination-link"><?php echo $i; ?></a>
+                                        <a href="?page=<?php echo $i; ?>" class="pagination-link"><?php echo $i; ?></a>
                                     <?php endif; ?>
                                 <?php endfor; ?>
 
                                 <!-- Next page -->
                                 <?php if ($current_page < $total_pages): ?>
-                                    <a href="?page=<?php echo $current_page + 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>" class="pagination-link">Next</a>
+                                    <a href="?page=<?php echo $current_page + 1; ?>" class="pagination-link">Next</a>
                                 <?php else: ?>
                                     <span class="disabled">Next</span>
                                 <?php endif; ?>
 
                                 <!-- Last page -->
                                 <?php if ($current_page < $total_pages): ?>
-                                    <a href="?page=<?php echo $total_pages; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>" class="pagination-link">Last</a>
+                                    <a href="?page=<?php echo $total_pages; ?>" class="pagination-link">Last</a>
                                 <?php else: ?>
                                     <span class="disabled">Last</span>
                                 <?php endif; ?>
