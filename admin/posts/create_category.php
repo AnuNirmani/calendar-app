@@ -78,7 +78,7 @@ if (isset($_SESSION['error'])) {
         <?php 
         // For sidebar path adjustments - we're in admin/posts/, sidebar links are relative to admin/
         $base_path = '../';
-        include dirname(__DIR__) . '/includes/sidebar.php'; 
+        include dirname(__DIR__) . '/includes/slidebar2.php'; 
         ?>
             <div class="max-w-2xl mx-auto">
                 <h1 class="text-3xl font-bold text-gray-800 mb-6">Create New Category</h1>
@@ -165,15 +165,6 @@ if (isset($_SESSION['error'])) {
                     ?>
                 </div>
             </div>
-        </div>
-        <!-- End Content Area from sidebar.php -->
-    </main>
-    </div>
-
-    <!-- Mobile menu toggle button -->
-    <button id="menu-toggle" class="lg:hidden fixed bottom-6 right-6 bg-blue-900 text-white p-4 rounded-full shadow-lg z-50">
-        <i class="fas fa-bars text-xl"></i>
-    </button>
 
     <script>
         // Fix sidebar paths since we're in posts/ subdirectory
@@ -221,5 +212,5 @@ if (isset($_SESSION['error'])) {
             if (errorMsg) errorMsg.style.display = 'none';
         }, 5000);
     </script>
-</body>
-</html>
+
+    <?php include dirname(__DIR__) . '/includes/footer.php'; ?>
