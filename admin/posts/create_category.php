@@ -1,21 +1,9 @@
 <?php
 include dirname(__DIR__) . '/../db.php';
+include dirname(__DIR__) . '/../auth.php';
 
-// Start session for messages and authentication
-session_start();
-
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../../login.php");
-    exit();
-}
-
-// Handle logout
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header("Location: ../../login.php");
-    exit();
-}
+// Check authentication
+checkAuth();
 
 $successMessage = "";
 $errorMessage = "";
@@ -77,77 +65,21 @@ if (isset($_SESSION['error'])) {
     <link rel="icon" href="../../images/logo.jpg" type="image/png">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .sidebar {
-            transition: all 0.3s ease;
-        }
-        .sidebar:hover {
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-        }
-        .btn-nav {
-            transition: all 0.2s ease;
-        }
-        .btn-nav:hover {
-            transform: translateX(5px);
-        }
         .main-content {
             min-height: calc(100vh - 64px);
-        }
-        .logout-btn svg {
-            transition: transform 0.2s ease;
-        }
-        .logout-btn:hover svg {
-            transform: translateX(4px);
         }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
-    <div class="flex h-screen">
-        <!-- Sidebar
-        <div class="sidebar w-64 bg-white shadow-lg p-6 flex flex-col justify-between">
-            <div>
-                <div class="mb-8">
-                    <img src="../images/logo.jpg" alt="Logo" class="w-16 mx-auto">
-                    <h2 class="text-xl font-bold text-center text-gray-800 mt-2">Category Management</h2>
-                </div>
-                <nav class="space-y-4">
-                    <a href="create_category.php" class="btn-nav block w-full text-left py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                        Create Category
-                    </a>
-                    <a href="list_categories.php" class="btn-nav block w-full text-left py-3 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
-                        List Categories
-                    </a>
-                    <a href="add_post.php" class="btn-nav block w-full text-left py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                        Add New Post
-                    </a>
-                    <a href="list_posts.php" class="btn-nav block w-full text-left py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        List Posts
-                    </a>
-                    <a href="add_telephone_directory.php" class="btn-nav block w-full text-left py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                        Add Telephone Directory
-                    </a>
-                    <a href="list_telephone_directory.php" class="btn-nav block w-full text-left py-3 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
-                        List Telephone Directory
-                    </a>
-                    <a href="dashboard.php" class="btn-nav block w-full text-left py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                        Admin Dashboard
-                    </a>
-                </nav>
-            </div>
-            <div class="mt-auto">
-                <a href="?logout=true" class="logout-btn flex items-center justify-center py-3 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700" onclick="return confirm('Are you sure you want to logout?')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    Logout
-                </a>
-            </div>
-        </div> -->
-
-        <!-- Main Content -->
-        <div class="main-content flex-1 p-8 overflow-y-auto">
+    <div class="flex min-h-screen">
+        <?php 
+        // For sidebar path adjustments - we're in admin/posts/, sidebar links are relative to admin/
+        $base_path = '../';
+        include dirname(__DIR__) . '/includes/sidebar.php'; 
+        ?>
             <div class="max-w-2xl mx-auto">
                 <h1 class="text-3xl font-bold text-gray-800 mb-6">Create New Category</h1>
 
@@ -234,9 +166,52 @@ if (isset($_SESSION['error'])) {
                 </div>
             </div>
         </div>
+        <!-- End Content Area from sidebar.php -->
+    </main>
     </div>
 
+    <!-- Mobile menu toggle button -->
+    <button id="menu-toggle" class="lg:hidden fixed bottom-6 right-6 bg-blue-900 text-white p-4 rounded-full shadow-lg z-50">
+        <i class="fas fa-bars text-xl"></i>
+    </button>
+
     <script>
+        // Fix sidebar paths since we're in posts/ subdirectory
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                const links = sidebar.querySelectorAll('a[href]');
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    // Don't modify if it's already relative to posts/ or an absolute path
+                    if (!href.startsWith('posts/') && !href.startsWith('../') && !href.startsWith('http') && !href.startsWith('/')) {
+                        // Add ../ prefix for links that need to go up to admin/ directory
+                        link.setAttribute('href', '../' + href);
+                    } else if (href.startsWith('posts/')) {
+                        // Remove posts/ prefix since we're already in posts/
+                        link.setAttribute('href', href.replace('posts/', ''));
+                    }
+                });
+            }
+        });
+
+        // Mobile sidebar toggle
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menu-toggle');
+        const closeSidebar = document.getElementById('close-sidebar');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+        }
+
+        if (closeSidebar) {
+            closeSidebar.addEventListener('click', () => {
+                sidebar.classList.add('-translate-x-full');
+            });
+        }
+
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             const successMsg = document.querySelector('.bg-green-100');
