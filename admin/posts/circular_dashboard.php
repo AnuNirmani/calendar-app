@@ -201,7 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
 </head>
 <body class="bg-gray-50 font-sans">
     <div class="flex h-screen">
-        <!-- Sidebar (Unchanged) -->
+        <!-- Sidebar (Unchanged)
         <div class="sidebar w-64 bg-white shadow-lg p-6 flex flex-col justify-between">
             <div>
                 <div class="mb-8">
@@ -242,7 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
                     Logout
                 </a>
             </div>
-        </div>
+        </div> -->
 
         <!-- Main Content -->
         <div class="main-content flex-1 p-4 md:p-8 md:ml-[250px] gradient-bg overflow-y-auto">

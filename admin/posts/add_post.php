@@ -249,7 +249,7 @@ $categories = getActiveCategories();
 </head>
 <body class="bg-gray-100 font-sans">
     <div class="flex h-screen">
-        <!-- Sidebar -->
+        <!-- Sidebar
         <div class="sidebar w-64 bg-white shadow-lg p-6 flex flex-col justify-between">
             <div>
                 <div class="mb-8">
@@ -290,7 +290,7 @@ $categories = getActiveCategories();
                     Logout
                 </a>
             </div>
-        </div>
+        </div> -->
 
         <!-- Main Content -->
         <div class="main-content flex-1 p-8">

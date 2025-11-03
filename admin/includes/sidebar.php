@@ -34,11 +34,6 @@
                         <i class="fas fa-plus-circle w-6 text-center mr-3"></i> Add Special Dates
                     </a>
                 </li>
-                <li>
-                    <a href="circulars.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
-                        <i class="fas fa-newspaper w-6 text-center mr-3"></i> Circulars
-                    </a>
-                </li>
                 <?php if (isSuperAdmin()): ?>
                     <li>
                         <a href="manage_users.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
@@ -50,6 +45,38 @@
                             <i class="fas fa-user-plus w-6 text-center mr-3"></i> Add User
                         </a>
                     </li>
+
+                    <li>
+                        <a href="posts/create_category.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                            <i class="fas fa-folder-plus w-6 text-center mr-3"></i> Create Category
+                        </a>
+                    </li>
+                    <li>
+                        <a href="posts/list_categories.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                            <i class="fas fa-list w-6 text-center mr-3"></i> List Categories
+                        </a>
+                    </li>
+                    <li>
+                        <a href="posts/add_post.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                            <i class="fas fa-folder-plus w-6 text-center mr-3"></i> Add New Post
+                        </a>
+                    </li>
+                    <li>
+                        <a href="posts/list_posts.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                            <i class="fas fa-list w-6 text-center mr-3"></i> List Posts
+                        </a>
+                    </li>
+                    <li>
+                        <a href="posts/add_telephone_directory.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                            <i class="fas fa-folder-plus w-6 text-center mr-3"></i> Add Telephone Directory
+                        </a>
+                    </li>
+                    <li>
+                        <a href="posts/list_telephone_directory.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                            <i class="fas fa-list w-6 text-center mr-3"></i> List Telephone Directory
+                        </a>
+                    </li>
+
                 <?php endif; ?>
                 <li>
                     <a href="../index.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
