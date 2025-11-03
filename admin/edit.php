@@ -142,10 +142,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </a> -->
     </div>
 
-    <div class="footer-divider"></div>
-    <footer class="footer">
-        © <?= date('Y'); ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
-        © All rights reserved, 2008 - Wijeya Newspapers Ltd.
-    </footer>
-</body>
-</html>
+<div class="footer-divider"></div>
+<?php include 'includes/footer.php'; ?>

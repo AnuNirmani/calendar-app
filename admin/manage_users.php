@@ -200,11 +200,11 @@ ORDER BY u.created_at DESC
         </a>
     </div>
 
-    <div class="footer-divider"></div>
+    <!-- <div class="footer-divider"></div>
     <footer class="footer" style="margin-top: 0; text-align: center;">
         &copy; <?= date('Y') ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
         © All rights reserved, 2008 - Wijeya Newspapers Ltd.
-    </footer>
+    </footer> -->
 
     <script>
         // Auto-hide success/error messages
@@ -212,5 +212,6 @@ ORDER BY u.created_at DESC
             document.querySelectorAll('div[style*="border-left"]').forEach(el => el.style.display = 'none');
         }, 2000);
     </script>
-</body>
-</html>
+
+<div class="footer-divider"></div>
+<?php include 'includes/footer.php'; ?>

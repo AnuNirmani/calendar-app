@@ -258,11 +258,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
         </a>
     </div>
 
-    <div class="footer-divider"></div>
-    <footer class="footer" style="margin-top: 0; text-align: center;">
+    <!-- <div class="footer-divider"></div>
+     <footer class="footer" style="margin-top: 0; text-align: center;">
         &copy; <?= date('Y') ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
         © All rights reserved, 2008 - Wijeya Newspapers Ltd.
-    </footer>
+    </footer> --> 
 
     <script>
         $(document).ready(function() {
@@ -377,6 +377,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
             });
         });
     </script>
-</body>
-</html>
+
+<div class="footer-divider"></div>
+<?php include 'includes/footer.php'; ?>
 

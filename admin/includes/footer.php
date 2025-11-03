@@ -1,9 +1,9 @@
             <!-- Footer -->
             <div class="mt-10 pt-6 border-t border-gray-300">
-                <footer class="text-center text-gray-800 text-xs lg:text-sm bg-gray-50 p-4 rounded-lg">
-                    &copy; <?php echo date('Y'); ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br class="hidden sm:block">
-                    <span class="block sm:inline mt-1 sm:mt-0">© All rights reserved, 2008 - Wijeya Newspapers Ltd.</span>
-                </footer>
+                <footer class="footer" style=" text-align: center;">
+            &copy; <?php echo date('Y'); ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
+            © All rights reserved, 2008 - Wijeya Newspapers Ltd.
+        </footer>
             </div>
             
             </div><!-- End Content Area -->
