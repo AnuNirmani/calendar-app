@@ -151,7 +151,7 @@ $result = $stmt->get_result();
     ?>
 
     <div class="flex-1 p-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">✨ Admin Panel - Special Dates</h1>
+        <h1 class="text-3xl font-bold text-gray-800 mb-6"><center>✨ Admin Panel - Special Dates</center></h1>
 
         <!-- <a href="dashboard.php" 
            class="inline-block bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2 rounded-full font-semibold text-sm hover:from-indigo-600 hover:to-purple-700 transition">
@@ -165,37 +165,39 @@ $result = $stmt->get_result();
         <?php endif; ?>
 
         <!-- Filters -->
-        <div class="flex flex-wrap gap-4 items-center my-6">
-            <form method="GET" class="flex gap-2">
-                <input type="text" name="search" placeholder="Search by description..." 
-                       value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
-                       class="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                <button type="submit" class="bg-sky-500 text-white px-4 py-2 rounded-md font-semibold">🔎 Search</button>
-            </form>
+        <div class="w-full my-6">
+            <div class="flex flex-wrap gap-4 items-center justify-between">
+                <form method="GET" class="flex gap-2 flex-1 min-w-fit">
+                    <input type="text" name="search" placeholder="Search by description..." 
+                           value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
+                           class="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none flex-1">
+                    <button type="submit" class="bg-sky-500 text-white px-4 py-2 rounded-md font-semibold">🔎 Search</button>
+                </form>
 
-            <form method="GET" class="flex gap-2">
-                <select name="year" class="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500">
-                    <option value="">Select Year</option>
-                    <?php
-                    $currentYear = date('Y');
-                    for ($y = $currentYear - 5; $y <= $currentYear + 5; $y++): ?>
-                        <option value="<?= $y ?>" <?= isset($_GET['year']) && $_GET['year'] == $y ? 'selected' : '' ?>><?= $y ?></option>
-                    <?php endfor; ?>
-                </select>
+                <form method="GET" class="flex gap-2 flex-1 min-w-fit">
+                    <select name="year" class="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 flex-1">
+                        <option value="">Select Year</option>
+                        <?php
+                        $currentYear = date('Y');
+                        for ($y = $currentYear - 5; $y <= $currentYear + 5; $y++): ?>
+                            <option value="<?= $y ?>" <?= isset($_GET['year']) && $_GET['year'] == $y ? 'selected' : '' ?>><?= $y ?></option>
+                        <?php endfor; ?>
+                    </select>
 
-                <select name="type" class="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500">
-                    <option value="">All Types</option>
-                    <?php
-                    $typeRes = $conn->query("SELECT id, type FROM special_types");
-                    while ($row = $typeRes->fetch_assoc()): ?>
-                        <option value="<?= $row['id'] ?>" <?= isset($_GET['type']) && $_GET['type'] == $row['id'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($row['type']) ?>
-                        </option>
-                    <?php endwhile; ?>
-                </select>
+                    <select name="type" class="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 flex-1">
+                        <option value="">All Types</option>
+                        <?php
+                        $typeRes = $conn->query("SELECT id, type FROM special_types");
+                        while ($row = $typeRes->fetch_assoc()): ?>
+                            <option value="<?= $row['id'] ?>" <?= isset($_GET['type']) && $_GET['type'] == $row['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($row['type']) ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
 
-                <button type="submit" class="bg-sky-500 text-white px-4 py-2 rounded-md font-semibold">🎯 Filter</button>
-            </form>
+                    <button type="submit" class="bg-sky-500 text-white px-4 py-2 rounded-md font-semibold">🎯 Filter</button>
+                </form>
+            </div>
         </div>
 
         <!-- Table -->

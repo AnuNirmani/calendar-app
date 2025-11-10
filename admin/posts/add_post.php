@@ -1,6 +1,6 @@
 <?php
 include dirname(__DIR__) . '/../db.php';
-session_start();
+include dirname(__DIR__) . '/../auth.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -248,52 +248,16 @@ $categories = getActiveCategories();
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
+    <!-- Mobile menu button -->
+    <button id="mobile-menu-btn" class="lg:hidden fixed top-4 left-4 z-50 bg-blue-900 text-white p-3 rounded-lg shadow-lg">
+        <i class="fas fa-bars text-xl"></i>
+    </button>
+
     <div class="flex h-screen">
-        <!-- Sidebar
-        <div class="sidebar w-64 bg-white shadow-lg p-6 flex flex-col justify-between">
-            <div>
-                <div class="mb-8">
-                    <img src="../images/logo.jpg" alt="Logo" class="w-16 mx-auto">
-                    <h2 class="text-xl font-bold text-center text-gray-800 mt-2">Category Management</h2>
-                </div>
-                <nav class="space-y-4">
-                    <a href="create_category.php" class="btn-nav block w-full text-left py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                        Create Category
-                    </a>
-                    <a href="list_categories.php" class="btn-nav block w-full text-left py-3 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
-                        List Categories
-                    </a>
-                    <a href="add_post.php" class="btn-nav block w-full text-left py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                        Add New Post
-                    </a>
-                    <a href="list_posts.php" class="btn-nav block w-full text-left py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        List Posts
-                    </a>
-                    <a href="add_telephone_directory.php" class="btn-nav block w-full text-left py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                        Add Telephone Directory
-                    </a>
-                    <a href="list_telephone_directory.php" class="btn-nav block w-full text-left py-3 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
-                        List Telephone Directory
-                    </a>
-                    <a href="dashboard.php" class="btn-nav block w-full text-left py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                        Admin Dashboard
-                    </a>
-                </nav>
-            </div>
-            <div class="mt-auto">
-                <a href="?logout=true" class="logout-btn flex items-center justify-center py-3 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700" onclick="return confirm('Are you sure you want to logout?')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    Logout
-                </a>
-            </div>
-        </div> -->
+        <?php include '../includes/slidebar2.php'; ?>
 
         <!-- Main Content -->
-        <div class="main-content flex-1 p-8">
+        <div class="main-content flex-1 p-8 overflow-y-auto">
             <div class="max-w-4xl mx-auto">
                 <h1 class="text-3xl font-bold text-gray-800 mb-6">Create New Post</h1>
 
@@ -619,6 +583,24 @@ $categories = getActiveCategories();
         document.getElementById('postForm').addEventListener('submit', function(e) {
             e.preventDefault();
             submitForm();
+        });
+
+        // Mobile menu toggle
+        $(document).ready(function() {
+            $('#mobile-menu-btn').click(function() {
+                $('#sidebar').toggleClass('-translate-x-full');
+            });
+
+            $('#close-sidebar').click(function() {
+                $('#sidebar').addClass('-translate-x-full');
+            });
+
+            // Close sidebar when clicking outside on mobile
+            $(document).click(function(event) {
+                if (!$(event.target).closest('#sidebar, #mobile-menu-btn').length) {
+                    $('#sidebar').addClass('-translate-x-full');
+                }
+            });
         });
     </script>
 </body>
