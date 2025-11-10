@@ -80,6 +80,9 @@ if (isset($_SESSION['error'])) {
         $base_path = '../';
         include dirname(__DIR__) . '/includes/slidebar2.php'; 
         ?>
+
+        <!-- Main Content -->
+        <div class="main-content flex-1 p-8 overflow-y-auto">
             <div class="max-w-2xl mx-auto">
                 <h1 class="text-3xl font-bold text-gray-800 mb-6">Create New Category</h1>
 
@@ -165,6 +168,10 @@ if (isset($_SESSION['error'])) {
                     ?>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <?php include '../includes/footer.php'; ?>
 
     <script>
         // Fix sidebar paths since we're in posts/ subdirectory
@@ -212,5 +219,6 @@ if (isset($_SESSION['error'])) {
             if (errorMsg) errorMsg.style.display = 'none';
         }, 5000);
     </script>
-
-    <?php include dirname(__DIR__) . '/includes/footer.php'; ?>
+</body>
+</html>
+<?php $conn->close(); ?>

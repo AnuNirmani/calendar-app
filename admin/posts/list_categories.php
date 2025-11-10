@@ -249,6 +249,19 @@ if ($result === false) {
             background-color: #f3f4f6;
             border-color: #d1d5db;
         }
+        .footer-divider {
+            border-top: 2px solid #e5e7eb;
+            margin-top: 40px;
+            margin-bottom: 0;
+        }
+        footer.footer {
+            background-color: #f9fafb;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -257,7 +270,7 @@ if ($result === false) {
         <i class="fas fa-bars text-xl"></i>
     </button>
 
-    <div class="flex h-screen">
+    <div class="flex min-h-screen">
         <?php include '../includes/slidebar2.php'; ?>
 
         <!-- Main Content -->
@@ -416,6 +429,8 @@ if ($result === false) {
             </div>
         </div>
     </div>
+
+    <?php include '../includes/footer.php'; ?>
 
     <script>
         // Auto-hide success/error messages after 5 seconds
