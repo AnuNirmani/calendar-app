@@ -83,7 +83,7 @@ if (isSuperAdmin()) {
 
             <div class="m-5 bg-blue-800 bg-opacity-50 p-4 rounded-xl text-center">
                 <div class="text-lg font-semibold mb-1">👤 <?= htmlspecialchars($_SESSION['username']) ?></div>
-                <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold mt-2 <?= isSuperAdmin() ? 'bg-gradient-to-r from-pink-500 to-red-500' : 'bg-gradient-to-r from-cyan-500 to-blue-500' ?>">
+                <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold mt-2 <?= isSuperAdmin() ?>">
                     <?= isSuperAdmin() ? '👑 Super Admin' : '🔰 Admin' ?>
                 </span>
             </div>
@@ -102,11 +102,6 @@ if (isSuperAdmin()) {
                 <li>
                     <a href="add.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
                         <i class="fas fa-plus-circle w-6 text-center mr-3"></i> Add Special Dates
-                    </a>
-                </li>
-                <li>
-                    <a href="circulars.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
-                        <i class="fas fa-newspaper w-6 text-center mr-3"></i> Circulars
                     </a>
                 </li>
                 <?php if (isSuperAdmin()): ?>
@@ -217,11 +212,13 @@ if (isSuperAdmin()) {
 
             <!-- Footer -->
             <div class="mt-10 pt-6 border-t border-gray-300">
-                <footer class="text-center text-gray-800 text-xs lg:text-sm bg-gray-50 p-4 rounded-lg">
-                    &copy; <?php echo date('Y'); ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br class="hidden sm:block">
-                    <span class="block sm:inline mt-1 sm:mt-0">© All rights reserved, 2008 - Wijeya Newspapers Ltd.</span>
-                </footer>
-            </div>
+                <div class="footer-divider"></div>
+    <footer class="footer" style="margin-top: 0; text-align: center;">
+        &copy; <?= date('Y') ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
+        © All rights reserved, 2008 - Wijeya Newspapers Ltd.
+    </footer>
+
+    </div>
             
             </div><!-- End Content Area -->
         </main>
