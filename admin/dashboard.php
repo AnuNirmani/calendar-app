@@ -122,7 +122,7 @@ if (isSuperAdmin()) {
                     </li>
                 <?php endif; ?>
                 <li>
-                    <a href="../index.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                    <a href="../index.php" target="_blank" rel="noopener noreferrer" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
                         <i class="fas fa-calendar w-6 text-center mr-3"></i> View Calendar
                     </a>
                 </li>
@@ -208,10 +208,10 @@ if (isSuperAdmin()) {
 
                     <?php endif; ?>
 
-                    <a href="../index.php" class="flex flex-col items-center justify-center p-6 lg:p-8 bg-gradient-to-br from-orange-500 to-orange-700 text-white rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[140px] text-center">
-                        <i class="fas fa-calendar text-4xl lg:text-5xl mb-3"></i>
-                        <span class="text-sm lg:text-base font-semibold uppercase tracking-wide">View Calendar</span>
-                    </a>
+                    <a href="../index.php" target="_blank" rel="noopener noreferrer" class="flex flex-col items-center justify-center p-6 lg:p-8 bg-gradient-to-br from-orange-500 to-orange-700 text-white rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[140px] text-center">
+                            <i class="fas fa-calendar text-4xl lg:text-5xl mb-3"></i>
+                            <span class="text-sm lg:text-base font-semibold uppercase tracking-wide">View Calendar</span>
+                        </a>
                 </div>
             </div>
 
