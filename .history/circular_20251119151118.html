@@ -1,65 +1,3 @@
-<?php
-include 'db.php';
-
-// Pagination configuration
-$records_per_page = 9; // 3x3 grid
-
-// Get current page
-$current_page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-if ($current_page < 1) $current_page = 1;
-
-// Calculate offset
-$offset = ($current_page - 1) * $records_per_page;
-
-// Initialize search and date filters
-$search = isset($_GET['search']) ? trim($_GET['search']) : '';
-$filter_date = isset($_GET['date']) ? trim($_GET['date']) : '';
-
-// Build count query for total records
-$count_sql = "SELECT COUNT(*) as total FROM posts WHERE status = 'published'";
-
-// Build base query for fetching data
-$sql = "SELECT id, featured_image, publish_date, title, content FROM posts WHERE status = 'published'";
-
-// Add search conditions if provided
-if (!empty($search)) {
-    $search_clean = $conn->real_escape_string($search);
-    $sql .= " AND (title LIKE '%$search_clean%' OR content LIKE '%$search_clean%')";
-    $count_sql .= " AND (title LIKE '%$search_clean%' OR content LIKE '%$search_clean%')";
-}
-
-// Add date filter if provided
-if (!empty($filter_date)) {
-    $date_clean = $conn->real_escape_string($filter_date);
-    $sql .= " AND DATE(publish_date) = '$date_clean'";
-    $count_sql .= " AND DATE(publish_date) = '$date_clean'";
-}
-
-// Complete the SQL queries
-$sql .= " ORDER BY publish_date DESC LIMIT $offset, $records_per_page";
-
-// Get total records
-$count_result = mysqli_query($conn, $count_sql);
-if (!$count_result) {
-    die("Count query failed: " . mysqli_error($conn));
-}
-$total_records = mysqli_fetch_assoc($count_result)['total'];
-$total_pages = ceil($total_records / $records_per_page);
-
-// Ensure current page is within valid range
-if ($current_page > $total_pages && $total_pages > 0) {
-    $current_page = $total_pages;
-}
-
-// Fetch posts
-$result = mysqli_query($conn, $sql);
-$posts = [];
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $posts[] = $row;
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +11,7 @@ if ($result) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="icon" href="images/logo.jpg" type="image/png">
+    <link rel="icon" href="../images/logo.jpg" type="image/png">
     <style>
         :root {
             --wijeya-primary: #87CEEB; /* Sky Blue */
@@ -270,36 +208,53 @@ if ($result) {
         </div>
         
         <!-- Search and Date Filter Section -->
-        <form method="GET" action="" class="row mb-4">
+        <div class="row mb-4">
             <div class="col-md-8">
                 <label class="form-label">Search</label>
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" class="form-control search-input" placeholder="Search by circular title or content...">
+                    <input type="text" class="form-control search-input" placeholder="Search by circular title, content, or number...">
                 </div>
             </div>
             <div class="col-md-4">
                 <label class="form-label">Date</label>
-                <input type="date" name="date" value="<?php echo htmlspecialchars($filter_date); ?>" class="form-control">
+                <input type="date" class="form-control" placeholder="mm/dd/yyyy">
             </div>
-            <div class="col-md-12 mt-3">
-                <button type="submit" class="btn btn-wijeya"><i class="fas fa-search me-2"></i>Search</button>
-                <?php if (!empty($search) || !empty($filter_date)): ?>
-                    <a href="circular.php" class="btn btn-secondary"><i class="fas fa-times me-2"></i>Clear Filters</a>
-                <?php endif; ?>
-            </div>
-        </form>
+        </div>
         
         <!-- Circulations List - 3x3 Grid -->
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <?php
-            if (!empty($posts)) {
-                foreach ($posts as $row) {
+            // Database connection
+            $servername = "localhost";
+            $username = "your_username"; // Replace with your database username
+            $password = "your_password"; // Replace with your database password
+            $dbname = "calendar_app";
+            
+            // Create connection
+            $conn = new mysqli($servername, $username, $password, $dbname);
+            
+            // Check connection
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+            
+            // SQL query to fetch circulars
+            $sql = "SELECT featured_image, publish_date, title, content FROM posts ORDER BY publish_date DESC";
+            $result = $conn->query($sql);
+            
+            // Check if there are results
+            if ($result->num_rows > 0) {
+                // Output data of each row
+                while($row = $result->fetch_assoc()) {
                     // Format the date
                     $formatted_date = date("F j, Y", strtotime($row["publish_date"]));
                     
                     // Truncate content for description
                     $description = substr(strip_tags($row["content"]), 0, 120) . "...";
+                    
+                    // Generate a unique ID for the circular
+                    $circular_id = "circular_" . $row["id"];
                     
                     echo '
                     <div class="col">
@@ -314,64 +269,32 @@ if ($result) {
                                 <p class="circular-description">
                                     ' . htmlspecialchars($description) . '
                                 </p>
-                                <a href="circular_detail.php?id=' . $row["id"] . '" class="btn btn-wijeya">View Details</a>
+                                <a href="circular_detail.php?id=' . $circular_id . '" class="btn btn-wijeya">View Details</a>
                             </div>
                         </div>
                     </div>';
                 }
             } else {
-                echo '<div class="col-12"><p class="text-center">No circulars found.</p></div>';
+                echo '<div class="col-12"><p>No circulars found.</p></div>';
             }
+            
+            // Close connection
+            $conn->close();
             ?>
         </div>
        
         <!-- Pagination -->
         <nav aria-label="Page navigation" class="mt-4">
             <ul class="pagination justify-content-center">
-                <?php if ($current_page > 1): ?>
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1<?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo !empty($filter_date) ? '&date=' . urlencode($filter_date) : ''; ?>">First</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page=<?php echo $current_page - 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo !empty($filter_date) ? '&date=' . urlencode($filter_date) : ''; ?>">Previous</a>
-                    </li>
-                <?php else: ?>
-                    <li class="page-item disabled">
-                        <span class="page-link">First</span>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link">Previous</span>
-                    </li>
-                <?php endif; ?>
-                
-                <?php
-                $start_page = max(1, $current_page - 2);
-                $end_page = min($total_pages, $current_page + 2);
-                
-                for ($i = $start_page; $i <= $end_page; $i++):
-                ?>
-                    <?php if ($i == $current_page): ?>
-                        <li class="page-item active"><span class="page-link"><?php echo $i; ?></span></li>
-                    <?php else: ?>
-                        <li class="page-item"><a class="page-link" href="?page=<?php echo $i; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo !empty($filter_date) ? '&date=' . urlencode($filter_date) : ''; ?>"><?php echo $i; ?></a></li>
-                    <?php endif; ?>
-                <?php endfor; ?>
-                
-                <?php if ($current_page < $total_pages): ?>
-                    <li class="page-item">
-                        <a class="page-link" href="?page=<?php echo $current_page + 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo !empty($filter_date) ? '&date=' . urlencode($filter_date) : ''; ?>">Next</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page=<?php echo $total_pages; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo !empty($filter_date) ? '&date=' . urlencode($filter_date) : ''; ?>">Last</a>
-                    </li>
-                <?php else: ?>
-                    <li class="page-item disabled">
-                        <span class="page-link">Next</span>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link">Last</span>
-                    </li>
-                <?php endif; ?>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
             </ul>
         </nav>
     </div>

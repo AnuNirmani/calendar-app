@@ -18,7 +18,7 @@ $filter_date = isset($_GET['date']) ? trim($_GET['date']) : '';
 // Build count query for total records
 $count_sql = "SELECT COUNT(*) as total FROM posts WHERE status = 'published'";
 
-// Build base query for fetching data
+// Build base query for fetching data - check if featured_image column exists
 $sql = "SELECT id, featured_image, publish_date, title, content FROM posts WHERE status = 'published'";
 
 // Add search conditions if provided
@@ -38,13 +38,21 @@ if (!empty($filter_date)) {
 // Complete the SQL queries
 $sql .= " ORDER BY publish_date DESC LIMIT $offset, $records_per_page";
 
+// Initialize total_pages to avoid undefined variable errors
+$total_pages = 1;
+$total_records = 0;
+
 // Get total records
-$count_result = mysqli_query($conn, $count_sql);
+$count_result = $conn->query($count_sql);
 if (!$count_result) {
-    die("Count query failed: " . mysqli_error($conn));
+    echo "Count query failed: " . $conn->error;
+    $total_records = 0;
+} else {
+    $count_row = $count_result->fetch_assoc();
+    $total_records = $count_row['total'];
 }
-$total_records = mysqli_fetch_assoc($count_result)['total'];
-$total_pages = ceil($total_records / $records_per_page);
+
+$total_pages = $total_records > 0 ? ceil($total_records / $records_per_page) : 1;
 
 // Ensure current page is within valid range
 if ($current_page > $total_pages && $total_pages > 0) {
@@ -52,10 +60,12 @@ if ($current_page > $total_pages && $total_pages > 0) {
 }
 
 // Fetch posts
-$result = mysqli_query($conn, $sql);
 $posts = [];
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
+$result = $conn->query($sql);
+if (!$result) {
+    echo "Query failed: " . $conn->error;
+} else {
+    while ($row = $result->fetch_assoc()) {
         $posts[] = $row;
     }
 }
@@ -301,10 +311,13 @@ if ($result) {
                     // Truncate content for description
                     $description = substr(strip_tags($row["content"]), 0, 120) . "...";
                     
+                    // Use featured image or fallback to placeholder
+                    $image_path = !empty($row["featured_image"]) ? $row["featured_image"] : 'images/placeholder.jpg';
+                    
                     echo '
                     <div class="col">
                         <div class="card h-100 circulation-card enhanced-card">
-                            <img src="' . htmlspecialchars($row["featured_image"]) . '" alt="' . htmlspecialchars($row["title"]) . '" class="circular-image">
+                            <img src="' . htmlspecialchars($image_path) . '" alt="' . htmlspecialchars($row["title"]) . '" class="circular-image">
                             <div class="card-content">
                                 <div class="circular-date">
                                     <i class="fas fa-calendar-alt me-2"></i>

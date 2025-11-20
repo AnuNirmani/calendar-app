@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <center> 
+        <img src="images/logo.jpg" style="width: 250px;"> 
+    </center>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wijeya Newspapers - Internal Communications</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="../images/logo.jpg" type="image/png">
+    <style>
+        :root {
+            --wijeya-primary: #87CEEB; /* Sky Blue */
+            --wijeya-dark: #4682B4; /* Steel Blue */
+            --wijeya-light: #E6F2F8; /* Light Sky Blue */
+        }
+        body {
+            font-family: 'Georgia', serif;
+        }
+        .navbar {
+            background-color: var(--wijeya-primary) !important;
+            border-bottom: 3px solid var(--wijeya-dark);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #fff !important;
+        }
+        .navbar-dark .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .circulation-card {
+            transition: transform 0.3s;
+            border-left: 4px solid transparent;
+            height: 100%;
+        }
+        .circulation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .unread {
+            border-left: 4px solid var(--wijeya-primary);
+        }
+        .btn-wijeya {
+            background-color: var(--wijeya-primary);
+            color: white;
+            border: none;
+        }
+        .btn-wijeya:hover {
+            background-color: var(--wijeya-dark);
+            color: white;
+        }
+        .badge-wijeya {
+            background-color: var(--wijeya-dark);
+        }
+        footer {
+            background-color: var(--wijeya-dark);
+            color: white;
+            padding: 2rem 0;
+        }
+        footer a {
+            color: #ddd;
+            text-decoration: none;
+        }
+        footer a:hover {
+            color: white;
+        }
+        .page-item.active .page-link {
+            background-color: var(--wijeya-primary);
+            border-color: var(--wijeya-primary);
+        }
+        .page-link {
+            color: var(--wijeya-primary);
+        }
+        .footer-heading {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: white;
+            font-weight: 600;
+        }
+        .footer-logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .footer-divider {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin: 1.5rem 0;
+        }
+        .footer-contact {
+            line-height: 1.8;
+        }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+        .circular-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--wijeya-primary);
+            margin-bottom: 1rem;
+        }
+        .btn-outline-wijeya {
+            color: var(--wijeya-primary);
+            border-color: var(--wijeya-primary);
+        }
+        .btn-outline-wijeya:hover {
+            color: white;
+            background-color: var(--wijeya-primary);
+        }
+        .search-container {
+            position: relative;
+        }
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            pointer-events: none;
+        }
+        .search-input {
+            padding-left: 45px;
+        }
+        .search-input:focus {
+            border-color: var(--wijeya-primary);
+            box-shadow: 0 0 0 0.2rem rgba(135, 206, 235, 0.25);
+        }
+        
+        /* Enhanced card styling for Circular 1 */
+        .enhanced-card {
+            overflow: hidden;
+        }
+        .enhanced-card .card-body {
+            padding: 0;
+            display: block;
+        }
+        .circular-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 1.25rem;
+            text-align: left;
+        }
+        .circular-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--wijeya-primary);
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+        .circular-description {
+            color: #666;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+        .circular-date {
+            font-size: 0.75rem;
+            color: #999;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        .enhanced-card .btn-wijeya {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Category Filter Styles */
+        .category-filter {
+            margin-bottom: 20px;
+        }
+        .category-badge {
+            cursor: pointer;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .category-badge.active {
+            background-color: var(--wijeya-dark);
+        }
+        
+        /* Loading spinner */
+        .spinner-border {
+            color: var(--wijeya-primary);
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                WIJEYA NEWSPAPERS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.php"><i class="fas fa-home me-1"></i> Home</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h2>Circulars</h2>
+            </div>
+        </div>
+        
+        <!-- Category Filter Section -->
+        <div class="category-filter">
+            <label class="form-label">Filter by Category</label>
+            <div id="categoryContainer">
+                <span class="badge bg-secondary category-badge active" data-category="all">All Categories</span>
+                <!-- Categories will be dynamically loaded here -->
+            </div>
+        </div>
+        
+        <!-- Search and Date Filter Section -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <label class="form-label">Search</label>
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="form-control search-input" id="searchInput" placeholder="Search by circular title, content, or number...">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-control" id="dateFilter" placeholder="mm/dd/yyyy">
+            </div>
+        </div>
+        
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="text-center d-none">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading circulars...</p>
+        </div>
+        
+        <!-- Circulations List - 3x3 Grid -->
+        <div id="circularsContainer" class="row row-cols-1 row-cols-md-3 g-4">
+            <!-- Circulars will be dynamically loaded here -->
+        </div>
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state d-none">
+            <i class="fas fa-inbox fa-3x mb-3"></i>
+            <h4>No circulars found</h4>
+            <p>Try adjusting your search or filter criteria</p>
+        </div>
+       
+        <!-- Pagination -->
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center" id="paginationContainer">
+                <!-- Pagination will be dynamically loaded here -->
+            </ul>
+        </nav>
+    </div>
+    
+    <footer class="copyright-footer">
+        <div class="container">
+            <p>© Copyright WNL. All Rights Reserved</p>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Mock database data - In a real application, this would come from your backend API
+        const mockCategories = [
+            { id: 1, name: "Editorial", color: "#87CEEB" },
+            { id: 2, name: "HR", color: "#4682B4" },
+            { id: 3, name: "Technology", color: "#5F9EA0" },
+            { id: 4, name: "Safety", color: "#6495ED" },
+            { id: 5, name: "Training", color: "#00BFFF" },
+            { id: 6, name: "Finance", color: "#1E90FF" },
+            { id: 7, name: "Operations", color: "#4169E1" },
+            { id: 8, name: "Communication", color: "#0000CD" },
+            { id: 9, name: "Performance", color: "#000080" }
+        ];
+
+        const mockCirculars = [
+            {
+                id: 1,
+                title: "New Editorial Guidelines & Quality Standards",
+                description: "Updated editorial standards for all publications including new content guidelines, fact-checking procedures, and quality assurance processes.",
+                date: "2025-01-15",
+                image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=180&fit=crop&crop=center",
+                categoryId: 1,
+                isUnread: true
+            },
+            {
+                id: 2,
+                title: "HR Policy Updates & Employee Benefits",
+                description: "Important updates to human resources policies, employee benefits package, and new workplace guidelines for all staff members.",
+                date: "2025-01-10",
+                image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=180&fit=crop&crop=center",
+                categoryId: 2,
+                isUnread: false
+            },
+            {
+                id: 3,
+                title: "Digital Transformation Initiative",
+                description: "Launch of new digital publishing platforms and online content management systems to modernize our newspaper operations.",
+                date: "2025-01-08",
+                image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=180&fit=crop&crop=center",
+                categoryId: 3,
+                isUnread: false
+            },
+            {
+                id: 4,
+                title: "Updated Safety Protocols & Health Guidelines",
+                description: "New workplace safety measures, health and safety protocols, and emergency procedures for all Wijeya Newspapers locations.",
+                date: "2025-01-05",
+                image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=180&fit=crop&crop=center",
+                categoryId: 4,
+                isUnread: false
+            },
+            {
+                id: 5,
+                title: "Professional Development Training Program",
+                description: "New mandatory training sessions for journalists, editors, and support staff to enhance skills and maintain professional standards.",
+                date: "2025-01-03",
+                image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=180&fit=crop&crop=center",
+                categoryId: 5,
+                isUnread: true
+            },
+            {
+                id: 6,
+                title: "Annual Budget Planning & Resource Allocation",
+                description: "Budget guidelines for 2025, departmental allocations, and expense reporting procedures for all divisions within the organization.",
+                date: "2024-12-28",
+                image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=180&fit=crop&crop=center",
+                categoryId: 6,
+                isUnread: false
+            },
+            {
+                id: 7,
+                title: "Equipment Upgrade & Maintenance Schedule",
+                description: "Scheduled upgrades for printing equipment, computer systems, and office technology. Maintenance windows and operational changes.",
+                date: "2024-12-25",
+                image: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=400&h=180&fit=crop&crop=center",
+                categoryId: 7,
+                isUnread: false
+            },
+            {
+                id: 8,
+                title: "Internal Communication & Reporting Structure",
+                description: "New internal communication protocols, reporting hierarchy updates, and inter-departmental coordination guidelines.",
+                date: "2024-12-22",
+                image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=180&fit=crop&crop=center",
+                categoryId: 8,
+                isUnread: false
+            },
+            {
+                id: 9,
+                title: "Annual Performance Review Process",
+                description: "Guidelines for annual performance evaluations, career development discussions, and goal setting for the upcoming year.",
+                date: "2024-12-20",
+                image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&h=180&fit=crop&crop=center",
+                categoryId: 9,
+                isUnread: false
+            }
+        ];
+
+        // State variables
+        let currentPage = 1;
+        const itemsPerPage = 9;
+        let selectedCategory = 'all';
+        let searchQuery = '';
+        let selectedDate = '';
+
+        // DOM elements
+        const categoryContainer = document.getElementById('categoryContainer');
+        const circularsContainer = document.getElementById('circularsContainer');
+        const paginationContainer = document.getElementById('paginationContainer');
+        const searchInput = document.getElementById('searchInput');
+        const dateFilter = document.getElementById('dateFilter');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const emptyState = document.getElementById('emptyState');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategories();
+            loadCirculars();
+            setupEventListeners();
+        });
+
+        // Load categories from the database
+        function loadCategories() {
+            // In a real application, this would be an API call to your backend
+            // For now, we're using mock data
+            mockCategories.forEach(category => {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-secondary category-badge';
+                badge.textContent = category.name;
+                badge.dataset.category = category.id;
+                badge.style.backgroundColor = category.color;
+                categoryContainer.appendChild(badge);
+            });
+        }
+
+        // Load circulars with filtering and pagination
+        function loadCirculars() {
+            // Show loading spinner
+            loadingSpinner.classList.remove('d-none');
+            circularsContainer.innerHTML = '';
+            emptyState.classList.add('d-none');
+
+            // Simulate API delay
+            setTimeout(() => {
+                // Filter circulars based on selected category, search query, and date
+                let filteredCirculars = mockCirculars.filter(circular => {
+                    // Category filter
+                    const categoryMatch = selectedCategory === 'all' || circular.categoryId == selectedCategory;
+                    
+                    // Search filter
+                    const searchMatch = searchQuery === '' || 
+                        circular.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        circular.description.toLowerCase().includes(searchQuery.toLowerCase());
+                    
+                    // Date filter
+                    const dateMatch = selectedDate === '' || circular.date === selectedDate;
+                    
+                    return categoryMatch && searchMatch && dateMatch;
+                });
+
+                // Calculate pagination
+                const totalPages = Math.ceil(filteredCirculars.length / itemsPerPage);
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const paginatedCirculars = filteredCirculars.slice(startIndex, startIndex + itemsPerPage);
+
+                // Hide loading spinner
+                loadingSpinner.classList.add('d-none');
+
+                // Display circulars or empty state
+                if (paginatedCirculars.length === 0) {
+                    emptyState.classList.remove('d-none');
+                } else {
+                    renderCirculars(paginatedCirculars);
+                }
+
+                // Render pagination
+                renderPagination(totalPages);
+            }, 500); // Simulate network delay
+        }
+
+        // Render circulars to the DOM
+        function renderCirculars(circulars) {
+            circularsContainer.innerHTML = '';
+            
+            circulars.forEach(circular => {
+                const category = mockCategories.find(cat => cat.id === circular.categoryId);
+                const formattedDate = formatDate(circular.date);
+                
+                const col = document.createElement('div');
+                col.className = 'col';
+                
+                col.innerHTML = `
+                    <div class="card h-100 circulation-card ${circular.isUnread ? 'unread' : ''} enhanced-card">
+                        <img src="${circular.image}" alt="${circular.title}" class="circular-image">
+                        <div class="card-content">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="circular-date">
+                                    <i class="fas fa-calendar-alt me-2"></i>
+                                    ${formattedDate}
+                                </div>
+                                <span class="badge" style="background-color: ${category.color}">${category.name}</span>
+                            </div>
+                            <h6 class="circular-title">${circular.title}</h6>
+                            <p class="circular-description">
+                                ${circular.description}
+                            </p>
+                            <a href="circular${circular.id}.html" class="btn btn-wijeya">View Details</a>
+                        </div>
+                    </div>
+                `;
+                
+                circularsContainer.appendChild(col);
+            });
+        }
+
+        // Render pagination controls
+        function renderPagination(totalPages) {
+            paginationContainer.innerHTML = '';
+            
+            // Previous button
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a>`;
+            paginationContainer.appendChild(prevLi);
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const pageLi = document.createElement('li');
+                pageLi.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                pageLi.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+                paginationContainer.appendChild(pageLi);
+            }
+            
+            // Next button
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            nextLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage + 1}">Next</a>`;
+            paginationContainer.appendChild(nextLi);
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Category filter
+            categoryContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('category-badge')) {
+                    // Remove active class from all badges
+                    document.querySelectorAll('.category-badge').forEach(badge => {
+                        badge.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked badge
+                    e.target.classList.add('active');
+                    
+                    // Update selected category
+                    selectedCategory = e.target.dataset.category;
+                    
+                    // Reset to first page and reload circulars
+                    currentPage = 1;
+                    loadCirculars();
+                }
+            });
+            
+            // Search input
+            searchInput.addEventListener('input', function() {
+                searchQuery = this.value;
+                currentPage = 1;
+                loadCirculars();
+            });
+            
+            // Date filter
+            dateFilter.addEventListener('change', function() {
+                selectedDate = this.value;
+                currentPage = 1;
+                loadCirculars();
+            });
+            
+            // Pagination
+            paginationContainer.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (e.target.classList.contains('page-link')) {
+                    const page = parseInt(e.target.dataset.page);
+                    if (page && page !== currentPage) {
+                        currentPage = page;
+                        loadCirculars();
+                    }
+                }
+            });
+        }
+
+        // Helper function to format date
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('en-US', options);
+        }
+    </script>
+</body>
+</html>

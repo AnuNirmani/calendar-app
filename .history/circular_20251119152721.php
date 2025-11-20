@@ -18,7 +18,7 @@ $filter_date = isset($_GET['date']) ? trim($_GET['date']) : '';
 // Build count query for total records
 $count_sql = "SELECT COUNT(*) as total FROM posts WHERE status = 'published'";
 
-// Build base query for fetching data
+// Build base query for fetching data - check if featured_image column exists
 $sql = "SELECT id, featured_image, publish_date, title, content FROM posts WHERE status = 'published'";
 
 // Add search conditions if provided
@@ -38,12 +38,17 @@ if (!empty($filter_date)) {
 // Complete the SQL queries
 $sql .= " ORDER BY publish_date DESC LIMIT $offset, $records_per_page";
 
+// Initialize total_pages to avoid undefined variable errors
+$total_pages = 1;
+$total_records = 0;
+
 // Get total records
-$count_result = mysqli_query($conn, $count_sql);
+$count_result = $conn->query($count_sql);
 if (!$count_result) {
-    die("Count query failed: " . mysqli_error($conn));
+    die("Count query failed: " . $conn->error);
 }
-$total_records = mysqli_fetch_assoc($count_result)['total'];
+$count_row = $count_result->fetch_assoc();
+$total_records = $count_row['total'];
 $total_pages = ceil($total_records / $records_per_page);
 
 // Ensure current page is within valid range
@@ -52,10 +57,10 @@ if ($current_page > $total_pages && $total_pages > 0) {
 }
 
 // Fetch posts
-$result = mysqli_query($conn, $sql);
+$result = $conn->query($sql);
 $posts = [];
 if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
+    while ($row = $result->fetch_assoc()) {
         $posts[] = $row;
     }
 }

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <center> 
+        <img src="images/logo.jpg" style="width: 250px;"> 
+    </center>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wijeya Newspapers - Internal Communications</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link rel="icon" href="../images/logo.jpg" type="image/png">
+      <style>
+        :root {
+            --wijeya-primary: #87CEEB; /* Sky Blue */
+            --wijeya-dark: #4682B4; /* Steel Blue */
+            --wijeya-light: #E6F2F8; /* Light Sky Blue */
+        }
+        body {
+            font-family: 'Georgia', serif;
+        }
+        .navbar {
+            background-color: var(--wijeya-primary) !important;
+            border-bottom: 3px solid var(--wijeya-dark);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #fff !important;
+        }
+        .navbar-dark .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .circulation-card {
+            transition: transform 0.3s;
+            border-left: 4px solid transparent;
+            height: 100%;
+        }
+        .circulation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .unread {
+            border-left: 4px solid var(--wijeya-primary);
+        }
+        .btn-wijeya {
+            background-color: var(--wijeya-primary);
+            color: white;
+            border: none;
+        }
+        .btn-wijeya:hover {
+            background-color: var(--wijeya-dark);
+            color: white;
+        }
+        .badge-wijeya {
+            background-color: var(--wijeya-dark);
+        }
+        footer {
+            background-color: var(--wijeya-dark);
+            color: white;
+            padding: 2rem 0;
+        }
+        footer a {
+            color: #ddd;
+            text-decoration: none;
+        }
+        footer a:hover {
+            color: white;
+        }
+        .page-item.active .page-link {
+            background-color: var(--wijeya-primary);
+            border-color: var(--wijeya-primary);
+        }
+        .page-link {
+            color: var(--wijeya-primary);
+        }
+        .footer-heading {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: white;
+            font-weight: 600;
+        }
+        .footer-logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .footer-divider {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin: 1.5rem 0;
+        }
+        .footer-contact {
+            line-height: 1.8;
+        }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+        .circular-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--wijeya-primary);
+            margin-bottom: 1rem;
+        }
+        .btn-outline-wijeya {
+            color: var(--wijeya-primary);
+            border-color: var(--wijeya-primary);
+        }
+        .btn-outline-wijeya:hover {
+            color: white;
+            background-color: var(--wijeya-primary);
+        }
+        .search-container {
+            position: relative;
+        }
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            pointer-events: none;
+        }
+        .search-input {
+            padding-left: 45px;
+        }
+        .search-input:focus {
+            border-color: var(--wijeya-primary);
+            box-shadow: 0 0 0 0.2rem rgba(135, 206, 235, 0.25);
+        }
+        
+        /* Enhanced card styling for Circular 1 */
+        .enhanced-card {
+            overflow: hidden;
+        }
+        .enhanced-card .card-body {
+            padding: 0;
+            display: block;
+        }
+        .circular-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 1.25rem;
+            text-align: left;
+        }
+        .circular-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--wijeya-primary);
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+        .circular-description {
+            color: #666;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+        .circular-date {
+            font-size: 0.75rem;
+            color: #999;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        .enhanced-card .btn-wijeya {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                WIJEYA NEWSPAPERS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.php"><i class="fas fa-home me-1"></i> Home</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h2>Circulars</h2>
+            </div>
+        </div>
+        
+        <!-- Search and Date Filter Section -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <label class="form-label">Search</label>
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="form-control search-input" placeholder="Search by circular title, content, or number...">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-control" placeholder="mm/dd/yyyy">
+            </div>
+        </div>
+        
+        <!-- Circulations List - 3x3 Grid -->
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <!-- Enhanced Card 1 -->
+            <div class="col">
+                <div class="card h-100 circulation-card unread enhanced-card">
+                    <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=180&fit=crop&crop=center" alt="Editorial Guidelines" class="circular-image">
+                    <div class="card-content">
+                        <div class="circular-date">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            January 15, 2025
+                        </div>
+                        <h6 class="circular-title">New Editorial Guidelines & Quality Standards</h6>
+                        <p class="circular-description">
+                            Updated editorial standards for all publications including new content guidelines, fact-checking procedures, and quality assurance processes.
+                        </p>
+                        <a href="circular1.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Card 2 -->
+            <div class="col">
+                <div class="card h-100 circulation-card enhanced-card">
+                    <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=180&fit=crop&crop=center" alt="HR Policy Update" class="circular-image">
+                    <div class="card-content">
+                        <div class="circular-date">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            January 10, 2025
+                        </div>
+                        <h6 class="circular-title">HR Policy Updates & Employee Benefits</h6>
+                        <p class="circular-description">
+                            Important updates to human resources policies, employee benefits package, and new workplace guidelines for all staff members.
+                        </p>
+                        <a href="circular2.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Card 3 -->
+            <div class="col">
+                <div class="card h-100 circulation-card enhanced-card">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=180&fit=crop&crop=center" alt="Digital Transformation" class="circular-image">
+                    <div class="card-content">
+                        <div class="circular-date">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            January 8, 2025
+                        </div>
+                        <h6 class="circular-title">Digital Transformation Initiative</h6>
+                        <p class="circular-description">
+                            Launch of new digital publishing platforms and online content management systems to modernize our newspaper operations.
+                        </p>
+                        <a href="circular3.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Card 4 -->
+            <div class="col">
+                <div class="card h-100 circulation-card enhanced-card">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=180&fit=crop&crop=center" alt="Safety Protocols" class="circular-image">
+                    <div class="card-content">
+                        <div class="circular-date">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            January 5, 2025
+                        </div>
+                        <h6 class="circular-title">Updated Safety Protocols & Health Guidelines</h6>
+                        <p class="circular-description">
+                            New workplace safety measures, health and safety protocols, and emergency procedures for all Wijeya Newspapers locations.
+                        </p>
+                        <a href="circular4.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Card 5 -->
+            <div class="col">
+                <div class="card h-100 circulation-card unread enhanced-card">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=180&fit=crop&crop=center" alt="Training Program" class="circular-image">
+                    <div class="card-content">
+                        <div class="circular-date">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            January 3, 2025
+                        </div>
+                        <h6 class="circular-title">Professional Development Training Program</h6>
+                        <p class="circular-description">
+                            New mandatory training sessions for journalists, editors, and support staff to enhance skills and maintain professional standards.
+                        </p>
+                        <a href="circular5.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Card 6 -->
+            <div class="col">
+                <div class="card h-100 circulation-card enhanced-card">
+                    <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=180&fit=crop&crop=center" alt="Budget Planning" class="circular-image">
+                    <div class="card-content">
+                        <div class="circular-date">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            December 28, 2024
+                        </div>
+                        <h6 class="circular-title">Annual Budget Planning & Resource Allocation</h6>
+                        <p class="circular-description">
+                            Budget guidelines for 2025, departmental allocations, and expense reporting procedures for all divisions within the organization.
+                        </p>
+                        <a href="circular6.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Card 7 -->
+            <div class="col">
+                <div class="card h-100 circulation-card enhanced-card">
+                    <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=400&h=180&fit=crop&crop=center" alt="Equipment Upgrade" class="circular-image">
+                    <div class="card-content">
+                        <div class="circular-date">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            December 25, 2024
+                        </div>
+                        <h6 class="circular-title">Equipment Upgrade & Maintenance Schedule</h6>
+                        <p class="circular-description">
+                            Scheduled upgrades for printing equipment, computer systems, and office technology. Maintenance windows and operational changes.
+                        </p>
+                        <a href="circular7.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Card 8 -->
+            <div class="col">
+                <div class="card h-100 circulation-card enhanced-card">
+                    <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=180&fit=crop&crop=center" alt="Communication Policy" class="circular-image">
+                    <div class="card-content">
+                        <div class="circular-date">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            December 22, 2024
+                        </div>
+                        <h6 class="circular-title">Internal Communication & Reporting Structure</h6>
+                        <p class="circular-description">
+                            New internal communication protocols, reporting hierarchy updates, and inter-departmental coordination guidelines.
+                        </p>
+                        <a href="circular8.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Card 9 -->
+            <div class="col">
+                <div class="card h-100 circulation-card enhanced-card">
+                    <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&h=180&fit=crop&crop=center" alt="Performance Review" class="circular-image">
+                    <div class="card-content">
+                        <div class="circular-date">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            December 20, 2024
+                        </div>
+                        <h6 class="circular-title">Annual Performance Review Process</h6>
+                        <p class="circular-description">
+                            Guidelines for annual performance evaluations, career development discussions, and goal setting for the upcoming year.
+                        </p>
+                        <a href="circular9.html" class="btn btn-wijeya">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+        <!-- Pagination -->
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+        <footer class="copyright-footer">
+            <div class="container">
+            <p>© Copyright WNL. All Rights Reserved</p>
+            </div>
+        </footer>
+    
+       <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -39,11 +39,12 @@ if (!empty($filter_date)) {
 $sql .= " ORDER BY publish_date DESC LIMIT $offset, $records_per_page";
 
 // Get total records
-$count_result = mysqli_query($conn, $count_sql);
+$count_result = $conn->query($count_sql);
 if (!$count_result) {
-    die("Count query failed: " . mysqli_error($conn));
+    die("Count query failed: " . $conn->error);
 }
-$total_records = mysqli_fetch_assoc($count_result)['total'];
+$count_row = $count_result->fetch_assoc();
+$total_records = $count_row['total'];
 $total_pages = ceil($total_records / $records_per_page);
 
 // Ensure current page is within valid range
@@ -52,10 +53,10 @@ if ($current_page > $total_pages && $total_pages > 0) {
 }
 
 // Fetch posts
-$result = mysqli_query($conn, $sql);
+$result = $conn->query($sql);
 $posts = [];
 if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
+    while ($row = $result->fetch_assoc()) {
         $posts[] = $row;
     }
 }
