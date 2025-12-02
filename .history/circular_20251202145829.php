@@ -1262,11 +1262,26 @@ if (!empty($phone_search)) {
     <footer class="main-footer">
         <div class="footer-wave"></div>
         <div class="container">
-            <div class="footer-content">  
+            <div class="footer-content">
+                <div class="footer-grid">
+                    <div class="footer-section">
+                        <div class="footer-logo">WIJEYA</div>
+                        <p class="footer-description">
+                            Leading media organization in Sri Lanka, delivering trusted news and information 
+                            since 1970. Committed to journalistic excellence and integrity.
+                       
+                </div>
+                
                 <div class="footer-bottom">
                     <div class="copyright">
                         <i class="far fa-copyright me-1"></i>
                         <?php echo date('Y'); ?> Wijeya Newspapers Ltd. All Rights Reserved.
+                    </div>
+                    <div class="footer-legal">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Cookie Policy</a>
+                        <a href="#">Accessibility</a>
                     </div>
                 </div>
             </div>

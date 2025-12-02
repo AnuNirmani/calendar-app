@@ -964,6 +964,7 @@ if (!empty($phone_search)) {
     <!-- Main Content -->
     <main class="main-container">
         <div class="content-wrapper">
+            
             <div class="tab-content">
                 <!-- Circulars Tab Content -->
                 <div id="circulars-tab-content" class="tab-pane-content <?php echo $current_tab == 'circulars' ? 'active' : 'd-none'; ?>">
@@ -1262,11 +1263,127 @@ if (!empty($phone_search)) {
     <footer class="main-footer">
         <div class="footer-wave"></div>
         <div class="container">
-            <div class="footer-content">  
+            <div class="footer-content">
+                <div class="footer-grid">
+                    <div class="footer-section">
+                        <div class="footer-logo">WIJEYA</div>
+                        <p class="footer-description">
+                            Leading media organization in Sri Lanka, delivering trusted news and information 
+                            since 1970. Committed to journalistic excellence and integrity.
+                        </p>
+                        <div class="social-links">
+                            <a href="#" class="social-link" title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-link" title="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link" title="LinkedIn">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="#" class="social-link" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link" title="YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-section">
+                        <h4 class="footer-heading">Quick Links</h4>
+                        <ul class="footer-links">
+                            <li>
+                                <a href="index.php">
+                                    <i class="fas fa-home"></i>
+                                    <span>Home</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="circular.php?tab=circulars">
+                                    <i class="fas fa-newspaper"></i>
+                                    <span>Circulars</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="circular.php?tab=directory">
+                                    <i class="fas fa-address-book"></i>
+                                    <span>Telephone Directory</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="fas fa-building"></i>
+                                    <span>About Us</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="fas fa-headset"></i>
+                                    <span>Support</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-section">
+                        <h4 class="footer-heading">Contact Info</h4>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <strong>Head Office</strong>
+                                    <p>No. 10, Hunupitiya Lake Road,<br>Colombo 02, Sri Lanka</p>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <strong>Phone</strong>
+                                    <p>+94 112 345 678</p>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <strong>Email</strong>
+                                    <p>info@wijeya.lk</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-section">
+                        <h4 class="footer-heading">Newsletters</h4>
+                        <p class="footer-description">
+                            Subscribe to get updates on latest circulars and announcements.
+                        </p>
+                        <div class="input-group mb-3">
+                            <input type="email" class="form-control" placeholder="Your email address">
+                            <button class="btn btn-primary" type="button">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">We respect your privacy. Unsubscribe at any time.</small>
+                    </div>
+                </div>
+                
                 <div class="footer-bottom">
                     <div class="copyright">
                         <i class="far fa-copyright me-1"></i>
                         <?php echo date('Y'); ?> Wijeya Newspapers Ltd. All Rights Reserved.
+                    </div>
+                    <div class="footer-legal">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Cookie Policy</a>
+                        <a href="#">Accessibility</a>
                     </div>
                 </div>
             </div>

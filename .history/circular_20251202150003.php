@@ -1268,6 +1268,12 @@ if (!empty($phone_search)) {
                         <i class="far fa-copyright me-1"></i>
                         <?php echo date('Y'); ?> Wijeya Newspapers Ltd. All Rights Reserved.
                     </div>
+                    <div class="footer-legal">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Cookie Policy</a>
+                        <a href="#">Accessibility</a>
+                    </div>
                 </div>
             </div>
         </div>

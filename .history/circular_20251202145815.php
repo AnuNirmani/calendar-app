@@ -1262,11 +1262,61 @@ if (!empty($phone_search)) {
     <footer class="main-footer">
         <div class="footer-wave"></div>
         <div class="container">
-            <div class="footer-content">  
+            <div class="footer-content">
+                <div class="footer-grid">
+                    <div class="footer-section">
+                        <div class="footer-logo">WIJEYA</div>
+                        <p class="footer-description">
+                            Leading media organization in Sri Lanka, delivering trusted news and information 
+                            since 1970. Committed to journalistic excellence and integrity.
+                        </p>
+                        <div class="social-links">
+                            <a href="#" class="social-link" title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-link" title="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link" title="LinkedIn">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="#" class="social-link" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link" title="YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-section">
+                        <h4 class="footer-heading">Quick Links</h4>
+                        <ul class="footer-links">
+                            <li>
+                                <a href="index.php">
+                                    <i class="fas fa-home"></i>
+                                    <span>Home</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="circular.php?tab=circulars">
+                                    <i class="fas fa-newspaper"></i>
+                                    <span>Circulars</span>
+                                </a>
+                            
+                    
+                </div>
+                
                 <div class="footer-bottom">
                     <div class="copyright">
                         <i class="far fa-copyright me-1"></i>
                         <?php echo date('Y'); ?> Wijeya Newspapers Ltd. All Rights Reserved.
+                    </div>
+                    <div class="footer-legal">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Cookie Policy</a>
+                        <a href="#">Accessibility</a>
                     </div>
                 </div>
             </div>

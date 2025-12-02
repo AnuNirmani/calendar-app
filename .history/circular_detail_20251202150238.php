@@ -9,44 +9,6 @@ if (!$circular_id) {
     exit;
 }
 
-// Function to get correct image path
-function getImagePath($image_name) {
-    if (empty($image_name) || $image_name == 'NULL') {
-        return 'images/logo.jpg';
-    }
-    
-    // If it's already a full URL, return as is
-    if (filter_var($image_name, FILTER_VALIDATE_URL)) {
-        return $image_name;
-    }
-    
-    // Check different possible locations
-    $possible_paths = [
-        $image_name, // Original path
-        'images/' . $image_name,
-        'images/circulars/' . $image_name,
-        'uploads/' . $image_name,
-        '../images/' . $image_name,
-        'images/posts/' . $image_name,
-        'assets/images/' . $image_name,
-        'img/' . $image_name,
-        'media/' . $image_name
-    ];
-    
-    foreach ($possible_paths as $path) {
-        // Check if file exists
-        if (file_exists($path)) {
-            return $path;
-        }
-        // Check relative to current directory
-        if (file_exists(__DIR__ . '/' . $path)) {
-            return $path;
-        }
-    }
-    
-    return 'images/logo.jpg'; // Default fallback
-}
-
 // Fetch the circular details from the posts table
 $sql = "SELECT id, title, content, featured_image, publish_date FROM posts WHERE id = ? AND status = 'published'";
 $stmt = $conn->prepare($sql);
@@ -66,9 +28,6 @@ if ($result->num_rows === 0) {
 
 $circular = $result->fetch_assoc();
 $stmt->close();
-
-// Get correct image path
-$circular['featured_image'] = getImagePath($circular['featured_image']);
 
 // Format dates
 $formatted_date = date("F j, Y", strtotime($circular['publish_date']));
@@ -91,10 +50,6 @@ $stmt_next->execute();
 $next_result = $stmt_next->get_result();
 $next_circular = $next_result->fetch_assoc();
 $stmt_next->close();
-
-// Debug info (comment out in production)
-// echo "<!-- Debug: Image path = " . htmlspecialchars($circular['featured_image']) . " -->";
-// echo "<!-- Debug: File exists = " . (file_exists($circular['featured_image']) ? 'Yes' : 'No') . " -->";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -109,7 +64,7 @@ $stmt_next->close();
     <meta property="og:description" content="<?php echo htmlspecialchars(substr(strip_tags($circular['content']), 0, 160)); ?>">
     <meta property="og:type" content="article">
     <meta property="og:url" content="<?php echo "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>">
-    <?php if (!empty($circular['featured_image']) && $circular['featured_image'] != 'images/logo.jpg'): ?>
+    <?php if (!empty($circular['featured_image'])): ?>
     <meta property="og:image" content="<?php echo htmlspecialchars($circular['featured_image']); ?>">
     <?php endif; ?>
     <meta property="article:published_time" content="<?php echo $datetime_iso; ?>">
@@ -421,7 +376,6 @@ $stmt_next->close();
             transform: translateY(-25px);
             box-shadow: var(--shadow-heavy);
             z-index: 3;
-            background: var(--light-blue);
         }
         
         .featured-image {
@@ -429,7 +383,6 @@ $stmt_next->close();
             height: 100%;
             object-fit: cover;
             transition: transform 0.8s ease;
-            background: linear-gradient(135deg, var(--light-blue) 0%, #f0f8ff 100%);
         }
         
         .featured-image-container:hover .featured-image {
@@ -450,37 +403,6 @@ $stmt_next->close();
         
         .featured-image-container:hover .image-overlay {
             transform: translateY(-10px);
-        }
-        
-        /* Image Fallback Styling */
-        .image-fallback {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-            background: linear-gradient(135deg, var(--light-blue) 0%, #f0f8ff 100%);
-        }
-        
-        .image-fallback-icon {
-            font-size: 5rem;
-            color: var(--accent-blue);
-            margin-bottom: 1.5rem;
-        }
-        
-        .image-fallback-text {
-            color: var(--dark-blue);
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-        
-        .image-fallback-subtext {
-            color: #666;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
         }
         
         /* Circular Body */
@@ -538,7 +460,6 @@ $stmt_next->close();
             margin-top: 3rem;
             padding-top: 2.5rem;
             border-top: 2px solid #eef2f7;
-            flex-wrap: wrap;
         }
         
         .btn-primary {
@@ -553,7 +474,6 @@ $stmt_next->close();
             display: inline-flex;
             align-items: center;
             gap: 0.75rem;
-            text-decoration: none;
         }
         
         .btn-primary:hover {
@@ -573,7 +493,6 @@ $stmt_next->close();
             display: inline-flex;
             align-items: center;
             gap: 0.75rem;
-            text-decoration: none;
         }
         
         .btn-outline-primary:hover {
@@ -1083,36 +1002,26 @@ $stmt_next->close();
             </div>
 
             <!-- Featured Image -->
+            <?php if (!empty($circular['featured_image'])): ?>
             <div class="featured-image-container">
-                <?php 
-                $image_src = htmlspecialchars($circular['featured_image']);
-                $image_alt = htmlspecialchars($circular['title']);
-                $is_logo = ($circular['featured_image'] == 'images/logo.jpg');
-                
-                if (!$is_logo && file_exists($circular['featured_image'])): 
-                ?>
-                    <img src="<?php echo $image_src; ?>" 
-                         alt="<?php echo $image_alt; ?>" 
-                         class="featured-image"
-                         onerror="this.onerror=null; this.src='images/logo.jpg'; this.classList.add('image-error');">
-                    <div class="image-overlay">
-                        <h4><?php echo htmlspecialchars($circular['title']); ?></h4>
-                        <p class="mb-0">Published on <?php echo $formatted_date; ?></p>
-                    </div>
-                <?php else: ?>
-                    <div class="image-fallback">
-                        <i class="fas fa-image image-fallback-icon"></i>
-                        <div class="image-fallback-text">Circular Image</div>
-                        <div class="image-fallback-subtext">
-                            <?php if ($is_logo): ?>
-                                Using company logo as featured image
-                            <?php else: ?>
-                                No featured image available
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
+                <img src="<?php echo htmlspecialchars($circular['featured_image']); ?>" 
+                     alt="<?php echo htmlspecialchars($circular['title']); ?>" 
+                     class="featured-image"
+                     onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\"d-flex align-items-center justify-content-center h-100 bg-light\"><div class=\"text-center p-4\"><i class=\"fas fa-image fa-4x text-muted mb-3\"></i><h4>Circular Image</h4><p class=\"text-muted mb-0\">No featured image available</p></div></div>'">
+                <div class="image-overlay">
+                    <h4><?php echo htmlspecialchars($circular['title']); ?></h4>
+                    <p class="mb-0">Published on <?php echo $formatted_date; ?></p>
+                </div>
             </div>
+            <?php else: ?>
+            <div class="featured-image-container bg-light d-flex align-items-center justify-content-center">
+                <div class="text-center p-4">
+                    <i class="fas fa-image fa-5x text-muted mb-3"></i>
+                    <h4>Circular Image</h4>
+                    <p class="text-muted mb-0">No featured image available</p>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <!-- Circular Body -->
             <div class="circular-body">
@@ -1189,10 +1098,18 @@ $stmt_next->close();
         <div class="footer-wave"></div>
         <div class="container">
             <div class="footer-content">
+                <div class="footer-grid">
+                    
                 <div class="footer-bottom">
                     <div class="copyright">
                         <i class="far fa-copyright me-1"></i>
                         <?php echo date('Y'); ?> Wijeya Newspapers Ltd. All Rights Reserved.
+                    </div>
+                    <div class="footer-legal">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Cookie Policy</a>
+                        <a href="#">Accessibility</a>
                     </div>
                 </div>
             </div>
@@ -1410,17 +1327,6 @@ $stmt_next->close();
                 
                 element.addEventListener('mouseleave', function() {
                     this.style.transform = 'translateY(0)';
-                });
-            });
-            
-            // Debug image loading
-            document.querySelectorAll('img').forEach(img => {
-                img.addEventListener('error', function() {
-                    console.log('Image failed to load:', this.src);
-                    if (!this.classList.contains('image-error')) {
-                        this.src = 'images/logo.jpg';
-                        this.classList.add('image-error');
-                    }
                 });
             });
         });
