@@ -1079,6 +1079,7 @@ $stmt_next->close();
             </div>
 
             <!-- Featured Image -->
+            <!-- Featured Image -->
 <div class="featured-image-container">
     <?php 
     $image_src = htmlspecialchars($circular['featured_image']);

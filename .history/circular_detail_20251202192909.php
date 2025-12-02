@@ -1079,64 +1079,7 @@ $stmt_next->close();
             </div>
 
             <!-- Featured Image -->
-<div class="featured-image-container">
-    <?php 
-    $image_src = htmlspecialchars($circular['featured_image']);
-    $image_alt = htmlspecialchars($circular['title']);
-    $is_logo = ($circular['featured_image'] == 'images/logo.jpg');
-    
-    // Debug output (remove in production)
-    // echo "<!-- Debug: Image path = $image_src -->";
-    // echo "<!-- Debug: Is logo = " . ($is_logo ? 'Yes' : 'No') . " -->";
-    // echo "<!-- Debug: File exists = " . (file_exists($circular['featured_image']) ? 'Yes' : 'No') . " -->";
-    
-    // Try to find the image in multiple locations
-    $found_image = false;
-    $actual_image_path = '';
-    
-    if (!empty($circular['featured_image']) && $circular['featured_image'] != 'images/logo.jpg') {
-        $possible_paths = [
-            $circular['featured_image'],
-            'images/' . basename($circular['featured_image']),
-            'images/circulars/' . basename($circular['featured_image']),
-            'uploads/' . basename($circular['featured_image']),
-            '../images/' . basename($circular['featured_image']),
-            'images/posts/' . basename($circular['featured_image'])
-        ];
-        
-        foreach ($possible_paths as $path) {
-            if (file_exists($path)) {
-                $found_image = true;
-                $actual_image_path = $path;
-                break;
-            }
-        }
-    }
-    
-    if ($found_image && !$is_logo): 
-    ?>
-        <img src="<?php echo htmlspecialchars($actual_image_path); ?>" 
-             alt="<?php echo $image_alt; ?>" 
-             class="featured-image"
-             onerror="this.onerror=null; this.src='images/logo.jpg'; this.classList.add('image-error');">
-        <div class="image-overlay">
-            <h4><?php echo htmlspecialchars($circular['title']); ?></h4>
-            <p class="mb-0">Published on <?php echo $formatted_date; ?></p>
-        </div>
-    <?php else: ?>
-        <div class="image-fallback">
-            <i class="fas fa-image image-fallback-icon"></i>
-            <div class="image-fallback-text">Circular Image</div>
-            <div class="image-fallback-subtext">
-                <?php if ($is_logo): ?>
-                    Using company logo as featured image
-                <?php else: ?>
-                    No featured image available
-                <?php endif; ?>
-            </div>
-        </div>
-    <?php endif; ?>
-</div>
+            
 
             <!-- Circular Body -->
             <div class="circular-body">
