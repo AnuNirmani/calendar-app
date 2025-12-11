@@ -1,4 +1,4 @@
-<?php
+this is add_telephone_directory.php code - <?php
 include dirname(__DIR__) . '/../db.php';
 include dirname(__DIR__) . '/../auth.php';
 
@@ -21,13 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $extension = trim($_POST['extension']);
     $department_id = $_POST['department_id'];
 
-    // If phone_number is empty, set it to empty string instead of NULL
-    $phone_number = empty($phone_number) ? '' : $phone_number;
-    
-    if (empty($name) || empty($department_id)) {
-        $error = "Name and Department fields are required.";
-    } elseif (!empty($phone_number) && !preg_match("/^[0-9]{10}$/", $phone_number)) {
-        $error = "Please enter a valid 10-digit phone number or leave it empty.";
+    if (empty($name) || empty($phone_number) || empty($department_id)) {
+        $error = "Name, Phone Number and Department fields are required.";
+    } elseif (!preg_match("/^[0-9]{10}$/", $phone_number)) {
+        $error = "Please enter a valid 10-digit phone number.";
     } elseif (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Please enter a valid email address.";
     } elseif (!empty($extension) && !preg_match("/^[0-9]{1,6}$/", $extension)) {
@@ -135,16 +132,17 @@ if ($departments === false) {
                             </div>
                             
                             <div class="mb-4">
-                                <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
                                 <input type="text" 
                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" 
                                        id="phone_number" 
                                        name="phone_number" 
-                                       placeholder="Enter 10-digit phone number (optional)"
+                                       placeholder="Enter 10-digit phone number"
+                                       required 
                                        pattern="[0-9]{10}"
                                        maxlength="10"
                                        value="<?php echo isset($_POST['phone_number']) ? htmlspecialchars($_POST['phone_number']) : ''; ?>">
-                                <p class="text-xs text-gray-500 mt-1">Optional field - Format: 10 digits only (e.g., 0771234567). Leave empty if no phone number.</p>
+                                <p class="text-xs text-gray-500 mt-1">Format: 10 digits only (e.g., 0771234567)</p>
                             </div>
                             
                             <div class="mb-4">
@@ -217,4 +215,4 @@ if ($departments === false) {
     <?php include '../includes/footer.php'; ?>
 </body>
 </html>
-<?php $conn->close(); ?>
+<?php $conn->close(); ?> , I want to add these department to select department part; Chairman & Chairman's Staff, Board of Directors, Executive Directors, Administration 1, Administration 2, HRD, Ada/ Go/ Tharanaya, Daily Lankadeepa, Daily Mirror, Daily FT, Deshaya, Hi Magazine, LW Magazine, Pariganaka/ EasyGuide, Sirikatha, Sunday Lankadeepa, Sunday Times, Tamil Mirror, Tamil Vijey, Wijeya/ Bilindu/ Braille, Advertising Department, Circulation Department, Brands & Promotions, DIGITAL MEDIA, Account Department, Credit Control, Internal Audit Department, Design Department, Desktop Publishing (Typesetting), Despatch, Electrical, Hokandara Factory, Information System Department, Library, Maintenance Department, Photo Copy, Press, Production, Security Department, Stores, Transport Department, LHPP, RS Printek (Pvt) Ltd, Sarathi Ltd, Wijeya Graphics, Wijeya Networks (Pvt) Ltd, Other Useful Numbers

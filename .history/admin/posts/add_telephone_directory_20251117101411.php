@@ -21,13 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $extension = trim($_POST['extension']);
     $department_id = $_POST['department_id'];
 
-    // If phone_number is empty, set it to empty string instead of NULL
-    $phone_number = empty($phone_number) ? '' : $phone_number;
-    
-    if (empty($name) || empty($department_id)) {
-        $error = "Name and Department fields are required.";
-    } elseif (!empty($phone_number) && !preg_match("/^[0-9]{10}$/", $phone_number)) {
-        $error = "Please enter a valid 10-digit phone number or leave it empty.";
+    if (empty($name) || empty($phone_number) || empty($department_id)) {
+        $error = "Name, Phone Number and Department fields are required.";
+    } elseif (!preg_match("/^[0-9]{10}$/", $phone_number)) {
+        $error = "Please enter a valid 10-digit phone number.";
     } elseif (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Please enter a valid email address.";
     } elseif (!empty($extension) && !preg_match("/^[0-9]{1,6}$/", $extension)) {
@@ -135,16 +132,17 @@ if ($departments === false) {
                             </div>
                             
                             <div class="mb-4">
-                                <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
                                 <input type="text" 
                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" 
                                        id="phone_number" 
                                        name="phone_number" 
-                                       placeholder="Enter 10-digit phone number (optional)"
+                                       placeholder="Enter 10-digit phone number"
+                                       required 
                                        pattern="[0-9]{10}"
                                        maxlength="10"
                                        value="<?php echo isset($_POST['phone_number']) ? htmlspecialchars($_POST['phone_number']) : ''; ?>">
-                                <p class="text-xs text-gray-500 mt-1">Optional field - Format: 10 digits only (e.g., 0771234567). Leave empty if no phone number.</p>
+                                <p class="text-xs text-gray-500 mt-1">Format: 10 digits only (e.g., 0771234567)</p>
                             </div>
                             
                             <div class="mb-4">

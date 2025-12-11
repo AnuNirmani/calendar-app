@@ -876,7 +876,7 @@ if ($phone_result) {
             box-shadow: var(--shadow-heavy);
         }
         
-        /* Enhanced Telephone Directory Styles - ROW FORMAT */
+        /* Enhanced Telephone Directory Styles */
         .directory-filters {
             background: white;
             border-radius: 15px;
@@ -893,27 +893,39 @@ if ($phone_result) {
             border-left: 4px solid var(--primary-blue);
         }
         
-        /* Department Group */
+        /* Enhanced Department Group */
         .department-group {
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             background: white;
-            border-radius: 12px;
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-light);
             border: 1px solid #eef2f7;
+            transition: all 0.3s ease;
+        }
+        
+        .department-group:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
         }
         
         .department-header {
             background: var(--gradient-primary);
             color: white;
-            padding: 1.25rem 1.5rem;
+            padding: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .department-header:hover {
+            background: var(--gradient-secondary);
         }
         
         .department-name {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -922,124 +934,123 @@ if ($phone_result) {
         
         .department-count {
             background: rgba(255, 255, 255, 0.2);
-            padding: 0.3rem 0.8rem;
+            padding: 0.35rem 1rem;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 600;
         }
         
-        /* Contact Table Styles */
-        .contact-table {
-            width: 100%;
-            border-collapse: collapse;
+        /* Enhanced Contact Cards */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+            padding: 1.5rem;
         }
         
-        .contact-table thead {
-            background: #f8fafc;
+        .contact-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #eef2f7;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
-        .contact-table th {
-            padding: 1rem 1.5rem;
-            text-align: left;
-            font-weight: 600;
-            color: var(--dark-blue);
-            border-bottom: 2px solid #e2e8f0;
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 86, 179, 0.15);
+            border-color: var(--accent-blue);
         }
         
-        .contact-table tbody tr {
-            border-bottom: 1px solid #f1f5f9;
-            transition: all 0.2s ease;
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--gradient-primary);
         }
         
-        .contact-table tbody tr:hover {
-            background: #f8fafc;
-            transform: translateX(2px);
-        }
-        
-        .contact-table td {
-            padding: 1rem 1.5rem;
-            vertical-align: middle;
-        }
-        
-        .contact-row {
-            border-bottom: 1px solid #f1f5f9;
-            padding: 1rem 0;
-        }
-        
-        .contact-row:last-child {
-            border-bottom: none;
-        }
-        
-        /* Contact Details in Row Format */
-        .contact-row {
+        .contact-header {
             display: flex;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #f1f5f9;
-            transition: all 0.2s ease;
-        }
-        
-        .contact-row:hover {
-            background: #f8fafc;
-        }
-        
-        .contact-row:last-child {
-            border-bottom: none;
-        }
-        
-        .contact-info-col {
-            flex: 1;
-            min-width: 250px;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
         }
         
         .contact-name {
-            font-weight: 600;
+            font-size: 1.25rem;
+            font-weight: 700;
             color: var(--dark-blue);
-            font-size: 1.05rem;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
         }
         
         .contact-extension {
-            color: #64748b;
-            font-size: 0.85rem;
-            display: flex;
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
             align-items: center;
             gap: 0.4rem;
         }
         
-        .contact-details-col {
-            flex: 2;
-            display: flex;
-            gap: 2rem;
-        }
-        
-        .contact-detail {
+        .contact-details {
             display: flex;
             flex-direction: column;
-            min-width: 180px;
+            gap: 0.75rem;
+        }
+        
+        .contact-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #eee;
+        }
+        
+        .contact-detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-blue);
+            font-size: 1rem;
+        }
+        
+        .detail-content {
+            flex: 1;
         }
         
         .detail-label {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.25rem;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.15rem;
         }
         
         .detail-value {
-            font-size: 0.95rem;
-            color: #334155;
+            font-size: 1rem;
             font-weight: 500;
+            color: #333;
         }
         
         .detail-value a {
             color: var(--primary-blue);
             text-decoration: none;
-            transition: color 0.2s ease;
+            transition: color 0.3s ease;
         }
         
         .detail-value a:hover {
@@ -1047,80 +1058,91 @@ if ($phone_result) {
             text-decoration: underline;
         }
         
-        .contact-actions-col {
-            flex: 0 0 auto;
+        .contact-actions {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #eee;
         }
         
         .action-btn {
-            width: 36px;
-            height: 36px;
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            background: white;
+            background: var(--light-blue);
             color: var(--primary-blue);
+            font-size: 0.9rem;
+            font-weight: 500;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 0.5rem;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
         
         .action-btn:hover {
             background: var(--primary-blue);
             color: white;
-            border-color: var(--primary-blue);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
         
-        .action-btn i {
-            font-size: 0.9rem;
+        /* Quick Contact Card */
+        .quick-contact {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-heavy);
+            padding: 1.5rem;
+            width: 300px;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.4s ease;
+            border: 1px solid var(--accent-blue);
         }
         
-        /* No Data State */
+        .quick-contact.show {
+            transform: translateX(0);
+        }
+        
+        /* Empty State */
         .empty-directory {
             text-align: center;
             padding: 4rem 2rem;
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-radius: 15px;
-            border: 2px dashed #cbd5e1;
+            border: 2px dashed #ccc;
         }
         
         .empty-icon {
             font-size: 4rem;
-            color: #cbd5e1;
+            color: #ccc;
             margin-bottom: 1.5rem;
         }
         
-        /* Responsive Design for Rows */
-        @media (max-width: 1024px) {
-            .contact-row {
-                flex-direction: column;
-                align-items: flex-start;
+        /* Print Styles for Directory */
+        @media print {
+            .main-header, .main-nav, .search-section, .footer, .scroll-top, .contact-actions {
+                display: none !important;
+            }
+            
+            .contact-grid {
+                grid-template-columns: repeat(3, 1fr);
                 gap: 1rem;
             }
             
-            .contact-info-col {
-                min-width: 100%;
-            }
-            
-            .contact-details-col {
-                flex-direction: column;
-                width: 100%;
-                gap: 1rem;
-            }
-            
-            .contact-detail {
-                min-width: 100%;
-            }
-            
-            .contact-actions-col {
-                width: 100%;
-                justify-content: flex-start;
+            .contact-card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ddd;
             }
         }
         
+        /* Responsive Design */
         @media (max-width: 768px) {
             .company-name {
                 font-size: 2rem;
@@ -1144,6 +1166,10 @@ if ($phone_result) {
                 grid-template-columns: 1fr;
             }
             
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            
             .footer-grid {
                 grid-template-columns: 1fr;
             }
@@ -1160,15 +1186,19 @@ if ($phone_result) {
             .department-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 0.5rem;
-            }
-            
-            .contact-row {
-                padding: 1rem;
-            }
-            
-            .contact-details-col {
                 gap: 0.75rem;
+            }
+            
+            .contact-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            .quick-contact {
+                width: calc(100% - 60px);
+                right: 30px;
+                left: 30px;
             }
         }
         
@@ -1210,6 +1240,43 @@ if ($phone_result) {
         
         .active-filter i:hover {
             opacity: 1;
+        }
+        
+        /* Quick Actions Bar */
+        .quick-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow-light);
+        }
+        
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .view-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            color: #666;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+        
+        .view-btn:hover:not(.active) {
+            background: #f8f9fa;
         }
     </style>
 </head>
@@ -1449,7 +1516,7 @@ if ($phone_result) {
                     <?php endif; ?>
                 </div>
 
-                <!-- Directory Tab Content - ROW FORMAT -->
+                <!-- Directory Tab Content - ENHANCED -->
                 <div id="directory-tab-content" class="tab-pane-content <?php echo $current_tab == 'directory' ? 'active' : 'd-none'; ?>">
                     <div class="search-section">
                         <h3 class="search-title">
@@ -1539,6 +1606,23 @@ if ($phone_result) {
                         </div>
                     </div>
 
+                    <!-- Quick Actions -->
+                    <div class="quick-actions mb-4">
+                        <div class="view-toggle">
+                            <button class="view-btn active" onclick="setView('grid')">
+                                <i class="fas fa-th-large"></i> Grid View
+                            </button>
+                            <button class="view-btn" onclick="setView('list')">
+                                <i class="fas fa-list"></i> List View
+                            </button>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-primary" onclick="printDirectory()">
+                                <i class="fas fa-print"></i> Print Directory
+                            </button>
+                        </div>
+                    </div>
+
                     <?php if (!empty($phone_entries)): ?>
                         <!-- Group contacts by department -->
                         <?php 
@@ -1555,115 +1639,101 @@ if ($phone_result) {
                         <div class="directory-results" id="directory-view">
                             <?php foreach ($grouped_contacts as $dept_name => $contacts): ?>
                             <div class="department-group">
-                                <div class="department-header">
+                                <div class="department-header" onclick="toggleDepartment(this)">
                                     <div class="department-name">
                                         <i class="fas fa-building"></i>
                                         <?php echo htmlspecialchars($dept_name); ?>
                                     </div>
                                     <div class="department-count">
                                         <?php echo count($contacts); ?> employee(s)
+                                        <i class="fas fa-chevron-down ms-2"></i>
                                     </div>
                                 </div>
                                 
                                 <div class="department-contacts">
-                                    <!-- Table Headers -->
-                                    <div class="contact-row" style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-                                        <div class="contact-info-col">
-                                            <div class="contact-name" style="color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                                                Employee Name
-                                            </div>
-                                        </div>
-                                        <div class="contact-details-col">
-                                            <div class="contact-detail">
-                                                <div class="detail-label" style="visibility: hidden;">Phone</div>
-                                                <div class="detail-value" style="color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                                                    Phone Number
+                                    <div class="contact-grid">
+                                        <?php foreach ($contacts as $entry): ?>
+                                        <div class="contact-card">
+                                            <div class="contact-header">
+                                                <div>
+                                                    <h5 class="contact-name">
+                                                        <?php echo htmlspecialchars($entry['name']); ?>
+                                                    </h5>
+                                                    <?php if (!empty($entry['extension'])): ?>
+                                                    <div class="contact-extension">
+                                                        <i class="fas fa-phone-volume"></i>
+                                                        Ext: <?php echo htmlspecialchars($entry['extension']); ?>
+                                                    </div>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
-                                            <div class="contact-detail">
-                                                <div class="detail-label" style="visibility: hidden;">Email</div>
-                                                <div class="detail-value" style="color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                                                    Email Address
+                                            
+                                            <div class="contact-details">
+                                                <?php if (!empty($entry['phone_number'])): ?>
+                                                <div class="contact-detail-item">
+                                                    <div class="detail-icon">
+                                                        <i class="fas fa-mobile-alt"></i>
+                                                    </div>
+                                                    <div class="detail-content">
+                                                        <div class="detail-label">Phone Number</div>
+                                                        <div class="detail-value">
+                                                            <a href="tel:<?php echo htmlspecialchars($entry['phone_number']); ?>">
+                                                                <?php echo htmlspecialchars($entry['phone_number']); ?>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <?php endif; ?>
+                                                
+                                                <?php if (!empty($entry['email'])): ?>
+                                                <div class="contact-detail-item">
+                                                    <div class="detail-icon">
+                                                        <i class="fas fa-envelope"></i>
+                                                    </div>
+                                                    <div class="detail-content">
+                                                        <div class="detail-label">Email Address</div>
+                                                        <div class="detail-value">
+                                                            <a href="mailto:<?php echo htmlspecialchars($entry['email']); ?>">
+                                                                <?php echo htmlspecialchars($entry['email']); ?>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <?php endif; ?>
+                                                
+                                                <div class="contact-detail-item">
+                                                    <div class="detail-icon">
+                                                        <i class="fas fa-id-card"></i>
+                                                    </div>
+                                                    <div class="detail-content">
+                                                        <div class="detail-label">Employee ID</div>
+                                                        <div class="detail-value">
+                                                            <?php echo htmlspecialchars($entry['id']); ?>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            
+                                            <div class="contact-actions">
+                                                <?php if (!empty($entry['phone_number'])): ?>
+                                                <button class="action-btn" onclick="callNumber('<?php echo htmlspecialchars($entry['phone_number']); ?>')">
+                                                    <i class="fas fa-phone"></i> Call
+                                                </button>
+                                                <?php endif; ?>
+                                                
+                                                <?php if (!empty($entry['email'])): ?>
+                                                <button class="action-btn" onclick="sendEmail('<?php echo htmlspecialchars($entry['email']); ?>')">
+                                                    <i class="fas fa-envelope"></i> Email
+                                                </button>
+                                                <?php endif; ?>
+                                                
+                                                <button class="action-btn" onclick="copyContactDetails(<?php echo $entry['id']; ?>)">
+                                                    <i class="fas fa-copy"></i> Copy
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="contact-actions-col">
-                                            <div style="width: 36px;"></div>
-                                        </div>
+                                        <?php endforeach; ?>
                                     </div>
-                                    
-                                    <!-- Contact Rows -->
-                                    <?php foreach ($contacts as $entry): ?>
-                                    <div class="contact-row">
-                                        <div class="contact-info-col">
-                                            <div class="contact-name">
-                                                <?php echo htmlspecialchars($entry['name']); ?>
-                                            </div>
-                                            <?php if (!empty($entry['extension'])): ?>
-                                            <div class="contact-extension">
-                                                <i class="fas fa-phone-volume"></i>
-                                                Extension: <?php echo htmlspecialchars($entry['extension']); ?>
-                                            </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        
-                                        <div class="contact-details-col">
-                                            <?php if (!empty($entry['phone_number'])): ?>
-                                            <div class="contact-detail">
-                                                <div class="detail-label">Phone Number</div>
-                                                <div class="detail-value">
-                                                    <a href="tel:<?php echo htmlspecialchars($entry['phone_number']); ?>">
-                                                        <?php echo htmlspecialchars($entry['phone_number']); ?>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <?php else: ?>
-                                            <div class="contact-detail">
-                                                <div class="detail-label">Phone Number</div>
-                                                <div class="detail-value" style="color: #94a3b8;">
-                                                    Not available
-                                                </div>
-                                            </div>
-                                            <?php endif; ?>
-                                            
-                                            <?php if (!empty($entry['email'])): ?>
-                                            <div class="contact-detail">
-                                                <div class="detail-label">Email Address</div>
-                                                <div class="detail-value">
-                                                    <a href="mailto:<?php echo htmlspecialchars($entry['email']); ?>">
-                                                        <?php echo htmlspecialchars($entry['email']); ?>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <?php else: ?>
-                                            <div class="contact-detail">
-                                                <div class="detail-label">Email Address</div>
-                                                <div class="detail-value" style="color: #94a3b8;">
-                                                    Not available
-                                                </div>
-                                            </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        
-                                        <div class="contact-actions-col">
-                                            <?php if (!empty($entry['phone_number'])): ?>
-                                            <button class="action-btn" onclick="callNumber('<?php echo htmlspecialchars($entry['phone_number']); ?>')" title="Call">
-                                                <i class="fas fa-phone"></i>
-                                            </button>
-                                            <?php endif; ?>
-                                            
-                                            <?php if (!empty($entry['email'])): ?>
-                                            <button class="action-btn" onclick="sendEmail('<?php echo htmlspecialchars($entry['email']); ?>')" title="Email">
-                                                <i class="fas fa-envelope"></i>
-                                            </button>
-                                            <?php endif; ?>
-                                            
-                                            <button class="action-btn" onclick="copyContactDetails(this)" title="Copy Details">
-                                                <i class="fas fa-copy"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <?php endforeach; ?>
                                 </div>
                             </div>
                             <?php endforeach; ?>
@@ -1708,6 +1778,19 @@ if ($phone_result) {
             </div>
         </div>
     </main>
+
+    <!-- Quick Contact Panel -->
+    <div class="quick-contact" id="quickContact">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0">Quick Contact</h6>
+            <button class="btn btn-sm btn-outline-secondary" onclick="hideQuickContact()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="quickContactContent">
+            <p class="text-muted small">Select a contact to see details here</p>
+        </div>
+    </div>
 
     <!-- Enhanced Footer -->
     <footer class="main-footer">
@@ -1805,8 +1888,8 @@ if ($phone_result) {
                 });
             }, observerOptions);
             
-            // Observe department groups
-            document.querySelectorAll('.department-group').forEach(element => {
+            // Observe cards and sections
+            document.querySelectorAll('.circular-card, .footer-section, .department-group').forEach(element => {
                 element.style.opacity = '0';
                 element.style.transform = 'translateY(20px)';
                 element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
@@ -1821,6 +1904,9 @@ if ($phone_result) {
                     if (searchInput) searchInput.focus();
                 }, 300);
             }
+            
+            // Initialize contact cards with hover effects
+            initializeContactCards();
         });
         
         // Function to clear individual filters
@@ -1828,6 +1914,47 @@ if ($phone_result) {
             const url = new URL(window.location);
             url.searchParams.delete(filterName);
             window.location.href = url.toString();
+        }
+        
+        // Toggle department sections
+        function toggleDepartment(element) {
+            const contacts = element.nextElementSibling;
+            const icon = element.querySelector('.fa-chevron-down');
+            
+            if (contacts.style.display === 'none') {
+                contacts.style.display = 'block';
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                contacts.style.display = 'none';
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+        }
+        
+        // Set view mode
+        function setView(mode) {
+            const viewBtns = document.querySelectorAll('.view-btn');
+            const directoryView = document.getElementById('directory-view');
+            const contactGrids = document.querySelectorAll('.contact-grid');
+            
+            viewBtns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (mode === 'grid') {
+                contactGrids.forEach(grid => {
+                    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(400px, 1fr))';
+                });
+            } else {
+                contactGrids.forEach(grid => {
+                    grid.style.gridTemplateColumns = '1fr';
+                });
+            }
+        }
+        
+        // Print directory
+        function printDirectory() {
+            window.print();
         }
         
         // Call phone number
@@ -1841,24 +1968,42 @@ if ($phone_result) {
         }
         
         // Copy contact details to clipboard
-        function copyContactDetails(button) {
-            const contactRow = button.closest('.contact-row');
-            const name = contactRow.querySelector('.contact-name').textContent;
-            const extensionElement = contactRow.querySelector('.contact-extension');
-            const extension = extensionElement ? extensionElement.textContent.replace('Extension:', '').trim() : '';
-            const phoneElement = contactRow.querySelector('a[href^="tel:"]');
-            const phone = phoneElement ? phoneElement.textContent : 'Not available';
-            const emailElement = contactRow.querySelector('a[href^="mailto:"]');
-            const email = emailElement ? emailElement.textContent : 'Not available';
+        function copyContactDetails(contactId) {
+            const contactCard = event.target.closest('.contact-card');
+            const name = contactCard.querySelector('.contact-name').textContent;
+            const phone = contactCard.querySelector('a[href^="tel:"]')?.textContent || 'Not available';
+            const email = contactCard.querySelector('a[href^="mailto:"]')?.textContent || 'Not available';
+            const extension = contactCard.querySelector('.contact-extension')?.textContent || '';
             
-            const contactText = `Name: ${name}
-${extension ? `Extension: ${extension}\n` : ''}
+            const contactText = `
+Name: ${name}
+${extension ? `${extension}\n` : ''}
 Phone: ${phone}
-Email: ${email}`;
+Email: ${email}
+            `.trim();
             
             navigator.clipboard.writeText(contactText).then(() => {
                 showNotification('Contact details copied to clipboard!');
             });
+        }
+        
+        // Show quick contact details
+        function showQuickContact(contactId, contactName) {
+            const quickContact = document.getElementById('quickContact');
+            const quickContent = document.getElementById('quickContactContent');
+            
+            // For now, just show basic info
+            quickContent.innerHTML = `
+                <h6>${contactName}</h6>
+                <p class="text-muted small">Details loaded...</p>
+            `;
+            
+            quickContact.classList.add('show');
+        }
+        
+        // Hide quick contact
+        function hideQuickContact() {
+            document.getElementById('quickContact').classList.remove('show');
         }
         
         // Show notification
@@ -1878,9 +2023,28 @@ Email: ${email}`;
             }, 3000);
         }
         
-        // Print directory
-        function printDirectory() {
-            window.print();
+        // Initialize contact cards with hover effects
+        function initializeContactCards() {
+            const contactCards = document.querySelectorAll('.contact-card');
+            
+            contactCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+                
+                // Add click to show quick contact
+                card.addEventListener('click', function(e) {
+                    if (!e.target.closest('.action-btn')) {
+                        const contactId = this.querySelector('.detail-value')?.textContent?.trim();
+                        const contactName = this.querySelector('.contact-name').textContent;
+                        showQuickContact(contactId, contactName);
+                    }
+                });
+            });
         }
         
         // Quick search function for directory
@@ -1890,6 +2054,23 @@ Email: ${email}`;
             url.searchParams.set('tab', 'directory');
             window.location.href = url.toString();
         }
+        
+        // Export directory to CSV
+        function exportToCSV() {
+            alert('CSV export feature would be implemented here');
+            // Implementation would gather all contact data and create CSV
+        }
+        
+        // Add department collapsing functionality
+        document.querySelectorAll('.department-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const contacts = this.nextElementSibling;
+                const icon = this.querySelector('.fa-chevron-down');
+                
+                contacts.style.display = contacts.style.display === 'none' ? 'block' : 'none';
+                icon.style.transform = contacts.style.display === 'none' ? 'rotate(0deg)' : 'rotate(180deg)';
+            });
+        });
     </script>
 </body>
 </html>

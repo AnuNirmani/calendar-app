@@ -5,6 +5,11 @@ include dirname(__DIR__) . '/../auth.php';
 // Check authentication
 checkAuth();
 
+// Start session for success messages
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 $success = '';
 $error = '';
 
@@ -21,13 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $extension = trim($_POST['extension']);
     $department_id = $_POST['department_id'];
 
-    // If phone_number is empty, set it to empty string instead of NULL
-    $phone_number = empty($phone_number) ? '' : $phone_number;
-    
-    if (empty($name) || empty($department_id)) {
-        $error = "Name and Department fields are required.";
-    } elseif (!empty($phone_number) && !preg_match("/^[0-9]{10}$/", $phone_number)) {
-        $error = "Please enter a valid 10-digit phone number or leave it empty.";
+    if (empty($name) || empty($phone_number) || empty($department_id)) {
+        $error = "Name, Phone Number and Department fields are required.";
+    } elseif (!preg_match("/^[0-9]{10}$/", $phone_number)) {
+        $error = "Please enter a valid 10-digit phone number.";
     } elseif (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Please enter a valid email address.";
     } elseif (!empty($extension) && !preg_match("/^[0-9]{1,6}$/", $extension)) {
@@ -92,6 +94,10 @@ if ($departments === false) {
         .main-content {
             min-height: calc(100vh - 64px);
         }
+        .department-select {
+            max-height: 300px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -135,16 +141,17 @@ if ($departments === false) {
                             </div>
                             
                             <div class="mb-4">
-                                <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
                                 <input type="text" 
                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" 
                                        id="phone_number" 
                                        name="phone_number" 
-                                       placeholder="Enter 10-digit phone number (optional)"
+                                       placeholder="Enter 10-digit phone number"
+                                       required 
                                        pattern="[0-9]{10}"
                                        maxlength="10"
                                        value="<?php echo isset($_POST['phone_number']) ? htmlspecialchars($_POST['phone_number']) : ''; ?>">
-                                <p class="text-xs text-gray-500 mt-1">Optional field - Format: 10 digits only (e.g., 0771234567). Leave empty if no phone number.</p>
+                                <p class="text-xs text-gray-500 mt-1">Format: 10 digits only (e.g., 0771234567)</p>
                             </div>
                             
                             <div class="mb-4">
@@ -173,7 +180,7 @@ if ($departments === false) {
                             
                             <div class="mb-6">
                                 <label for="department_id" class="block text-sm font-medium text-gray-700 mb-2">Department *</label>
-                                <select class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" 
+                                <select class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 department-select" 
                                         id="department_id" 
                                         name="department_id" 
                                         required>
@@ -193,21 +200,32 @@ if ($departments === false) {
                             
                             <div class="flex gap-4">
                                 <button type="submit" class="py-3 px-6 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold">
-                                    Add to Directory
+                                    <i class="fas fa-plus mr-2"></i>Add to Directory
                                 </button>
-                                <a href="list_telephone_directory.php" class="py-3 px-6 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition font-semibold">
-                                    View Directory
+                                <a href="list_telephone_directory.php" class="py-3 px-6 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition font-semibold flex items-center">
+                                    <i class="fas fa-list mr-2"></i>View Directory
+                                </a>
+                                <a href="setup_departments.php" class="py-3 px-6 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-semibold flex items-center">
+                                    <i class="fas fa-building mr-2"></i>Setup Departments
                                 </a>
                             </div>
                         </form>
                     </div>
                 <?php else: ?>
-                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded">
-                        <p class="font-semibold">No Departments Available</p>
-                        <p class="mt-2">Please create departments first before adding telephone directory entries.</p>
-                        <a href="create_department.php" class="mt-3 inline-block py-2 px-4 bg-yellow-600 text-white rounded hover:bg-yellow-700">
-                            Create Department
-                        </a>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded mb-6">
+                            <p class="font-semibold"><i class="fas fa-exclamation-triangle mr-2"></i>No Departments Available</p>
+                            <p class="mt-2">Please create departments first before adding telephone directory entries.</p>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <a href="create_department.php" class="py-3 px-6 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition font-semibold flex items-center">
+                                <i class="fas fa-plus-circle mr-2"></i>Create Department
+                            </a>
+                            <a href="setup_departments.php" class="py-3 px-6 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-semibold flex items-center">
+                                <i class="fas fa-database mr-2"></i>Bulk Add Departments
+                            </a>
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>
