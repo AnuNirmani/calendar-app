@@ -1826,43 +1826,6 @@ if ($phone_result) {
             url.searchParams.delete(filterName);
             window.location.href = url.toString();
         }
-        
-        // Call phone number
-        function callNumber(phoneNumber) {
-            window.location.href = `tel:${phoneNumber}`;
-        }
-        
-        // Send email
-        function sendEmail(email) {
-            window.location.href = `mailto:${email}`;
-        }
-        
-        // Copy phone number to clipboard
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(function() {
-                const btn = event.target.closest('button');
-                const originalHtml = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i>';
-                btn.style.color = '#10b981';
-                
-                setTimeout(function() {
-                    btn.innerHTML = originalHtml;
-                    btn.style.color = '';
-                }, 1500);
-            }, function(err) {
-                console.error('Failed to copy: ', err);
-                alert('Failed to copy phone number');
-            });
-        }
-        
-        // Copy contact details to clipboard
-        function copyContactDetails(button) {
-            const contactRow = button.closest('.contact-row');
-            const name = contactRow.querySelector('.contact-name').textContent;
-            const positionElement = contactRow.querySelector('.contact-position');
-            const position = positionElement ? positionElement.textContent.replace(/^\s*[^:]*:\s*/, '').trim() : '';
-            const extensionElement = contactRow.querySelector('.contact-extension');
-            const extension = extensionElement ? extensionElement.textContent.replace('Extension:', '').trim() : '';
             
             // Get all phone numbers
             const phoneItems = contactRow.querySelectorAll('.phone-number-item');

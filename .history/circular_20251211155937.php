@@ -1827,33 +1827,7 @@ if ($phone_result) {
             window.location.href = url.toString();
         }
         
-        // Call phone number
-        function callNumber(phoneNumber) {
-            window.location.href = `tel:${phoneNumber}`;
-        }
         
-        // Send email
-        function sendEmail(email) {
-            window.location.href = `mailto:${email}`;
-        }
-        
-        // Copy phone number to clipboard
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(function() {
-                const btn = event.target.closest('button');
-                const originalHtml = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i>';
-                btn.style.color = '#10b981';
-                
-                setTimeout(function() {
-                    btn.innerHTML = originalHtml;
-                    btn.style.color = '';
-                }, 1500);
-            }, function(err) {
-                console.error('Failed to copy: ', err);
-                alert('Failed to copy phone number');
-            });
-        }
         
         // Copy contact details to clipboard
         function copyContactDetails(button) {
