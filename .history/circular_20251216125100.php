@@ -1254,6 +1254,13 @@ if ($phone_result) {
                                 <div class="nav-indicator"></div>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="circular.php?tab=directory" class="nav-link <?php echo $current_tab == 'directory' ? 'active' : ''; ?>">
+                                <i class="fas fa-address-book"></i>
+                                <span>Directory</span>
+                                <div class="nav-indicator"></div>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </div>

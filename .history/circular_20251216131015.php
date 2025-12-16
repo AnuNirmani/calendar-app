@@ -1325,6 +1325,14 @@ if ($phone_result) {
                         </div>
                     </div>
 
+                    <!-- Telephone Directory Button -->
+                    <div class="mb-3">
+                        <a href="admin/posts/list_telephone_directory.php" class="btn btn-outline-primary">
+                            <i class="fas fa-address-book me-1"></i>
+                            Telephone Directory
+                        </a>
+                    </div>
+
                     <!-- Circulars Grid -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3>Latest Circulars</h3>
