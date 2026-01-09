@@ -26,8 +26,8 @@ if (isset($_GET['logout'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Category Management Dashboard</title>
     <link rel="icon" href="../../images/logo.jpg" type="image/png">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS -->
+    <script src="../../assets/js/tailwind.js"></script>
     <style>
         /* Custom styles for sidebar and main content */
         .sidebar {
