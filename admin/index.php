@@ -92,8 +92,8 @@ $result = $stmt->get_result();
     <meta charset="UTF-8">
     <title>Admin - Special Dates</title>
     <link rel="icon" href="../images/logo.jpg" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/fontawesome.min.css">
+    <script src="../assets/js/tailwind.js"></script>
     <style>
         /* Edit Button Styling */
         a.edit-button {

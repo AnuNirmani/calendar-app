@@ -167,18 +167,18 @@ $categories = getActiveCategories();
     <title>Create New Post</title>
     <link rel="icon" href="../../images/logo.jpg" type="image/png">
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS -->
+    <script src="../../assets/js/tailwind.js"></script>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/fontawesome.min.css">
 
     <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="../../assets/js/jquery.min.js"></script>
 
     <!-- Quill Editor -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <link href="../../assets/css/quill.snow.css" rel="stylesheet">
+    <script src="../../assets/js/quill.min.js"></script>
 
     <style>
         /* ✅ Single browser scrollbar (NO separate scroll container) */
