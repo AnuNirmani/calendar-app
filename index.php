@@ -92,9 +92,9 @@ function adjustBrightness($hex, $percent) {
     $g = hexdec(substr($hex, 2, 2));
     $b = hexdec(substr($hex, 4, 2));
     
-    $r = max(0, min(255, $r * $percent));
-    $g = max(0, min(255, $g * $percent));
-    $b = max(0, min(255, $b * $percent));
+    $r = (int) max(0, min(255, $r * $percent));
+    $g = (int) max(0, min(255, $g * $percent));
+    $b = (int) max(0, min(255, $b * $percent));
     
     return '#' . str_pad(dechex($r), 2, '0', STR_PAD_LEFT) . 
                  str_pad(dechex($g), 2, '0', STR_PAD_LEFT) . 

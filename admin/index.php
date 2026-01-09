@@ -153,11 +153,6 @@ $result = $stmt->get_result();
     <div class="flex-1 p-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-6"><center>✨ Admin Panel - Special Dates</center></h1>
 
-        <!-- <a href="dashboard.php" 
-           class="inline-block bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2 rounded-full font-semibold text-sm hover:from-indigo-600 hover:to-purple-700 transition">
-           <i class="fas fa-home"></i> Back to Dashboard
-        </a> -->
-
         <?php if ($accessDeniedError): ?>
             <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 my-6 rounded">
                 <strong>⚠️ Access Denied:</strong> You don't have permission to access that feature.

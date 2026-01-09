@@ -71,19 +71,6 @@ $types = $conn->query("SELECT id, type FROM special_types");
         <!-- Title -->
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">➕ Add New Special Date</h1>
 
-        <!-- Top Buttons (match your index page button style) -->
-        <div class="flex flex-wrap gap-3 justify-center mb-6">
-            <a href="dashboard.php"
-               class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2 rounded-full font-semibold text-sm hover:from-indigo-600 hover:to-purple-700 transition">
-                <i class="fas fa-home"></i> Back to Dashboard
-            </a>
-
-            <a href="index.php"
-               class="inline-flex items-center gap-2 bg-sky-500 text-white px-5 py-2 rounded-full font-semibold text-sm hover:bg-sky-600 transition">
-                ← Back to Special Dates
-            </a>
-        </div>
-
         <!-- Form Card -->
         <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6">
             <form action="save.php" method="POST" id="addSpecialDateForm" class="space-y-5">

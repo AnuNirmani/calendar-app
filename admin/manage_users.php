@@ -155,13 +155,6 @@ $result = $conn->query("
     <div class="flex-1 p-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">✨ Admin Panel - Manage Users</h1>
 
-        <div class="flex justify-center mb-6">
-            <a href="dashboard.php"
-               class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2 rounded-full font-semibold text-sm hover:from-indigo-600 hover:to-purple-700 transition">
-                <i class="fas fa-home"></i> Back to Dashboard
-            </a>
-        </div>
-
         <?php if (isset($error)): ?>
             <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 my-4 rounded">
                 <strong>⚠️ Error:</strong> <?= htmlspecialchars($error) ?>

@@ -151,7 +151,7 @@ if ($phone_result) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="icon" href="images/logo.jpg" type="image/png">
+    <link rel="icon" href="images/logo.png" type="image/png">
     <style>
         :root {
             --primary-blue: #0056b3;
