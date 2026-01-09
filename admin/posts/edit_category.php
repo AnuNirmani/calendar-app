@@ -1,21 +1,29 @@
 <?php
-require_once dirname(__DIR__) . '/../db.php';
-require_once 'categories.php';
+// admin/categories/edit_category.php  (or admin/posts/edit_category.php - adjust paths if needed)
 
-// Start session for authentication
-session_start();
+require_once dirname(__DIR__) . '/../db.php';          // -> /db.php
+require_once __DIR__ . '/categories.php';             // same folder as this file
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
+// ✅ Use your main auth system (same style as other admin pages)
+require_once dirname(__DIR__) . '/../auth.php';
+checkAuth(); // or checkAuth('super_admin') if only super admin can edit categories
+
+// Auto logout after inactivity
+$timeout = 900;
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout) {
+    session_unset();
+    session_destroy();
     header("Location: ../../login.php");
-    exit();
+    exit;
 }
+$_SESSION['LAST_ACTIVITY'] = time();
 
 $categoryId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $category = getCategoryById($categoryId);
 
 if (!$category) {
-    die("Category not found.");
+    header("Location: list_categories.php");
+    exit;
 }
 
 $errors = [];
@@ -23,185 +31,169 @@ $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $categoryName = trim($_POST['name'] ?? '');
-    $slug = trim($_POST['slug'] ?? '');
     $status = trim($_POST['status'] ?? '');
 
     if (empty($categoryName)) {
         $errors[] = "Category name is required.";
     }
-    if (empty($slug)) {
-        $errors[] = "Slug is required.";
-    }
-    if (!in_array($status, ['published', 'unpublished'])) {
+    if (!in_array($status, ['active', 'inactive'], true)) {
         $errors[] = "Invalid status selected.";
     }
 
     if (empty($errors)) {
-        $result = updateCategory($categoryId, $categoryName, $slug, $status);
+        $result = updateCategory($categoryId, $categoryName, $status);
         if ($result === true) {
-            $success = "Category updated successfully!";
+            $success = "✅ Category updated successfully!";
             $category = getCategoryById($categoryId);
+            header("refresh:2;url=list_categories.php");
         } else {
-            $errors[] = $result;
+            $errors[] = (string)$result;
         }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Edit Category</title>
-    <link rel="icon" href="../../images/logo.jpg" type="image/png">
-    <!-- Tailwind CSS -->
-    <script src="../../assets/js/tailwind.js"></script>
-    <!-- jQuery -->
-    <script src="../../assets/js/jquery.min.js"></script>
+    <link rel="icon" href="../../images/logo.jpg" type="image/png" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
     <style>
-        .sidebar {
-            transition: all 0.3s ease;
+        /* same validation style used in your other admin pages */
+        input.error, select.error {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
         }
-        .sidebar:hover {
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        input.valid, select.valid {
+            border-color: #22c55e !important;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15) !important;
         }
-        .btn-nav {
-            transition: all 0.2s ease;
-        }
-        .btn-nav:hover {
-            transform: translateX(5px);
-        }
-        .main-content {
-            min-height: calc(100vh - 64px);
-        }
-        .logout-btn svg {
-            transition: transform 0.2s ease;
-        }
-        .logout-btn:hover svg {
-            transform: translateX(4px);
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border-left: 4px solid #ef4444;
+            font-size: 13px;
         }
     </style>
-    <script>
-        $(document).ready(function() {
-            // Function to generate slug from category name
-            function generateSlug(text) {
-                return text
-                    .toLowerCase()
-                    .trim()
-                    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-                    .replace(/\s+/g, '-')         // Replace spaces with hyphens
-                    .replace(/-+/g, '-');         // Replace multiple hyphens with single hyphen
-            }
-
-            // Auto-fill slug when category name changes
-            $('#name').on('input', function() {
-                const categoryName = $(this).val();
-                const slug = generateSlug(categoryName);
-                $('#slug').val(slug);
-            });
-
-            // Initialize slug on page load
-            const initialCategoryName = $('#name').val();
-            if (initialCategoryName) {
-                $('#slug').val(generateSlug(initialCategoryName));
-            }
-        });
-    </script>
 </head>
+
 <body class="bg-gray-100 font-sans">
-    <div class="flex h-screen">
-        <!-- Sidebar
-        <div class="sidebar w-64 bg-white shadow-lg p-6 flex flex-col justify-between">
-            <div>
-                <div class="mb-8">
-                    <img src="../images/logo.jpg" alt="Logo" class="w-16 mx-auto">
-                    <h2 class="text-xl font-bold text-center text-gray-800 mt-2">Category Management</h2>
+<div class="flex min-h-screen">
+    <?php
+        // ✅ Sidebar include: from /admin/categories/ -> go up one -> /admin/includes/
+        $base_path = '../../';
+        include dirname(__DIR__) . '/includes/slidebar2.php';
+    ?>
+
+    <div class="flex-1 p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">✏️ Edit Category</h1>
+
+        <div class="flex flex-wrap gap-3 justify-center mb-6">
+            <a href="../dashboard.php"
+               class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2 rounded-full font-semibold text-sm hover:from-indigo-600 hover:to-purple-700 transition">
+                <i class="fas fa-home"></i> Back to Dashboard
+            </a>
+
+            <a href="list_categories.php"
+               class="inline-flex items-center gap-2 bg-sky-500 text-white px-5 py-2 rounded-full font-semibold text-sm hover:bg-sky-600 transition">
+                ← Back to Categories
+            </a>
+        </div>
+
+        <?php if (!empty($success)): ?>
+            <div class="max-w-xl mx-auto bg-green-100 border-l-4 border-green-500 text-green-800 p-4 my-4 rounded">
+                <strong><?= htmlspecialchars($success) ?></strong>
+                <div class="text-xs mt-1">Redirecting to Categories...</div>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($errors)): ?>
+            <div class="max-w-xl mx-auto bg-red-100 border-l-4 border-red-500 text-red-700 p-4 my-4 rounded">
+                <strong>⚠️ Please fix the following:</strong>
+                <ul class="list-disc ml-6 mt-2">
+                    <?php foreach ($errors as $err): ?>
+                        <li><?= htmlspecialchars($err) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
+        <div class="max-w-xl mx-auto bg-white rounded-lg shadow-md p-6">
+            <form method="POST" id="editCategoryForm" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">🏷️ Category Name</label>
+                    <input type="text" name="name" id="name"
+                           value="<?= htmlspecialchars($category['name'] ?? '') ?>"
+                           placeholder="Enter category name"
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                           required>
                 </div>
-                <nav class="space-y-4">
-                    <a href="create_category.php" class="btn-nav block w-full text-left py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                        Create Category
-                    </a>
-                    <a href="list_categories.php" class="btn-nav block w-full text-left py-3 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
-                        List Categories
-                    </a>
-                    <a href="add_post.php" class="btn-nav block w-full text-left py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                        Add New Post
-                    </a>
-                    <a href="list_posts.php" class="btn-nav block w-full text-left py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        List Posts
-                    </a>
-                    <a href="add_telephone_directory.php" class="btn-nav block w-full text-left py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                        Add Telephone Directory
-                    </a>
-                    <a href="list_telephone_directory.php" class="btn-nav block w-full text-left py-3 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
-                        List Telephone Directory
-                    </a>
-                    <a href="dashboard.php" class="btn-nav block w-full text-left py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                        Admin Dashboard
-                    </a>
-                </nav>
-            </div>
-            <div class="mt-auto">
-                <a href="?logout=true" class="logout-btn flex items-center justify-center py-3 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700" onclick="return confirm('Are you sure you want to logout?')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    Logout
-                </a>
-            </div>
-        </div> -->
 
-        <!-- Main Content -->
-        <div class="main-content flex-1 p-8">
-            <div class="max-w-4xl mx-auto">
-                <h1 class="text-3xl font-bold text-gray-800 mb-6">Edit Category</h1>
-
-                <?php if ($success): ?>
-                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded"><?php echo htmlspecialchars($success); ?></div>
-                <?php endif; ?>
-
-                <?php if (!empty($errors)): ?>
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
-                        <ul>
-                            <?php foreach ($errors as $error): ?>
-                                <li><?php echo htmlspecialchars($error); ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                <?php endif; ?>
-
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Edit Category Details</h2>
-                    <form method="POST" action="">
-                        <div class="mb-4">
-                            <label for="name" class="block text-gray-700 font-medium mb-2">Category Name</label>
-                            <input type="text" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" id="name" name="name" 
-                                   value="<?php echo htmlspecialchars($category['name'] ?? ''); ?>" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="slug" class="block text-gray-700 font-medium mb-2">Slug</label>
-                            <input type="text" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" id="slug" name="slug" 
-                                   value="<?php echo htmlspecialchars($category['slug'] ?? ''); ?>" required>
-                            <p class="text-sm text-gray-600 mt-1">Use lowercase letters, numbers, and hyphens only. Auto-generated from category name.</p>
-                        </div>
-                        <div class="mb-4">
-                            <label for="status" class="block text-gray-700 font-medium mb-2">Status</label>
-                            <select class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" id="status" name="status" required>
-                                <option value="published" <?php echo $category['status'] === 'published' ? 'selected' : ''; ?>>Published</option>
-                                <option value="unpublished" <?php echo $category['status'] === 'unpublished' ? 'selected' : ''; ?>>Unpublished</option>
-                            </select>
-                        </div>
-                        <div class="flex space-x-4">
-                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Update Category</button>
-                            <a href="list_categories.php" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Back to Categories</a>
-                        </div>
-                    </form>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">✅ Status</label>
+                    <select name="status" id="status"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            required>
+                        <option value="active" <?= (($category['status'] ?? '') === 'active') ? 'selected' : '' ?>>Active</option>
+                        <option value="inactive" <?= (($category['status'] ?? '') === 'inactive') ? 'selected' : '' ?>>Inactive</option>
+                    </select>
                 </div>
-            </div>
+
+                <button type="submit"
+                        class="w-full bg-sky-500 text-white px-4 py-3 rounded-md font-semibold hover:bg-sky-600 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i>
+                    Update Category
+                </button>
+            </form>
         </div>
     </div>
+</div>
+
+<?php include dirname(__DIR__) . '/includes/footer.php'; ?>
+
+<script>
+$(document).ready(function () {
+    // auto-hide messages
+    setTimeout(() => {
+        $('.bg-red-100, .bg-green-100').fadeOut();
+    }, 2000);
+
+    $("#editCategoryForm").validate({
+        rules: {
+            name: { required: true, minlength: 2, maxlength: 100 },
+            status: { required: true }
+        },
+        messages: {
+            name: {
+                required: "🏷️ Category name is required",
+                minlength: "Category name must be at least 2 characters",
+                maxlength: "Category name cannot exceed 100 characters"
+            },
+            status: "✅ Please select a status"
+        },
+        errorElement: "div",
+        errorClass: "error-message",
+        validClass: "valid",
+        errorPlacement: function(error, element) {
+            error.insertAfter(element);
+        },
+        success: function(label, element) {
+            $(element).removeClass("error").addClass("valid");
+            label.remove();
+        }
+    });
+});
+</script>
 </body>
 </html>

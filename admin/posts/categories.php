@@ -1,5 +1,5 @@
 <?php
-require_once '../db.php';
+require_once '../../db.php';
 
 function getCategories() {
     global $conn;
@@ -17,31 +17,28 @@ function getCategories() {
     return $categories;
 }
 
-function createCategory($categoryName, $slug, $status = 'published') {
+function createCategory($categoryName, $status = 'active') {
     global $conn;
     
-    // Sanitize slug
-    $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $slug)));
-    
     // Validate status
-    if (!in_array($status, ['published', 'unpublished'])) {
-        $status = 'published';
+    if (!in_array($status, ['active', 'inactive'])) {
+        $status = 'active';
     }
     
-    // Check if category or slug already exists
-    $checkSql = "SELECT id FROM categories WHERE name = ? OR slug = ?";
+    // Check if category already exists
+    $checkSql = "SELECT id FROM categories WHERE name = ?";
     $checkStmt = $conn->prepare($checkSql);
-    $checkStmt->bind_param("ss", $categoryName, $slug);
+    $checkStmt->bind_param("s", $categoryName);
     $checkStmt->execute();
     $result = $checkStmt->get_result();
     
     if ($result->num_rows > 0) {
-        return "Category name or slug already exists!";
+        return "Category name already exists!";
     }
     
-    $sql = "INSERT INTO categories (name, slug, status) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO categories (name, status) VALUES (?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $categoryName, $slug, $status);
+    $stmt->bind_param("ss", $categoryName, $status);
     
     if ($stmt->execute()) {
         return true;
@@ -50,31 +47,28 @@ function createCategory($categoryName, $slug, $status = 'published') {
     }
 }
 
-function updateCategory($categoryId, $categoryName, $slug, $status) {
+function updateCategory($categoryId, $categoryName, $status) {
     global $conn;
     
     // Validate status
-    if (!in_array($status, ['published', 'unpublished'])) {
+    if (!in_array($status, ['active', 'inactive'])) {
         return "Invalid status value.";
     }
     
-    // Sanitize slug
-    $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $slug)));
-    
-    // Check if category name or slug already exists (excluding current category)
-    $checkSql = "SELECT id FROM categories WHERE (name = ? OR slug = ?) AND id != ?";
+    // Check if category name already exists (excluding current category)
+    $checkSql = "SELECT id FROM categories WHERE name = ? AND id != ?";
     $checkStmt = $conn->prepare($checkSql);
-    $checkStmt->bind_param("ssi", $categoryName, $slug, $categoryId);
+    $checkStmt->bind_param("si", $categoryName, $categoryId);
     $checkStmt->execute();
     $result = $checkStmt->get_result();
     
     if ($result->num_rows > 0) {
-        return "Category name or slug already exists!";
+        return "Category name already exists!";
     }
     
-    $sql = "UPDATE categories SET name = ?, slug = ?, status = ? WHERE id = ?";
+    $sql = "UPDATE categories SET name = ?, status = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssi", $categoryName, $slug, $status, $categoryId);
+    $stmt->bind_param("ssi", $categoryName, $status, $categoryId);
     
     if ($stmt->execute()) {
         return true;
@@ -119,7 +113,7 @@ function toggleCategoryStatus($categoryId, $status) {
     global $conn;
     
     // Validate status
-    if (!in_array($status, ['published', 'unpublished'])) {
+    if (!in_array($status, ['active', 'inactive'])) {
         return "Invalid status value.";
     }
     
@@ -166,19 +160,19 @@ function getCategoryById($id) {
     return false;
 }
 
-function getCategoryBySlug($slug) {
-    global $conn;
+// function getCategoryBySlug($slug) {
+//     global $conn;
     
-    $sql = "SELECT * FROM categories WHERE slug = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $slug);
-    $stmt->execute();
-    $result = $stmt->get_result();
+//     $sql = "SELECT * FROM categories WHERE slug = ?";
+//     $stmt = $conn->prepare($sql);
+//     $stmt->bind_param("s", $slug);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
     
-    if ($row = $result->fetch_assoc()) {
-        return $row;
-    }
+//     if ($row = $result->fetch_assoc()) {
+//         return $row;
+//     }
     
-    return false;
-}
+//     return false;
+// }
 ?>

@@ -1,22 +1,25 @@
 <?php
-include dirname(__DIR__) . '/../db.php';
-session_start();
+// admin/posts/edit_post.php
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../../login.php");
-    exit();
-}
+// ✅ Correct paths (this file is inside: /admin/posts/)
+include dirname(__DIR__) . '/../db.php';        // -> /db.php
+include dirname(__DIR__) . '/../auth.php';      // -> /auth.php  ✅ FIXED
 
-$successMessage = "";
-$errorMessage = "";
+// ✅ Use your auth system
+checkAuth(); // or checkAuth('admin') / checkAuth('super_admin') if you want to restrict
 
-// Handle logout
-if (isset($_GET['logout'])) {
+// Auto logout after inactivity
+$timeout = 900;
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout) {
+    session_unset();
     session_destroy();
     header("Location: ../../login.php");
-    exit();
+    exit;
 }
+$_SESSION['LAST_ACTIVITY'] = time();
+
+$successMessage = "";
+$errorMessage   = "";
 
 // Check if post ID is provided
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -24,108 +27,127 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header("Location: list_posts.php");
     exit();
 }
+$post_id = (int)$_GET['id'];
 
-$post_id = intval($_GET['id']);
+// Fetch post (prepared)
+$stmt = $conn->prepare("SELECT * FROM posts WHERE id = ?");
+$stmt->bind_param("i", $post_id);
+$stmt->execute();
+$res = $stmt->get_result();
 
-// Fetch post data
-$sql = "SELECT * FROM posts WHERE id = $post_id";
-$result = mysqli_query($conn, $sql);
-if (!$result || mysqli_num_rows($result) == 0) {
+if (!$res || $res->num_rows === 0) {
     $_SESSION['error'] = "Post not found.";
     header("Location: list_posts.php");
     exit();
 }
-$post = mysqli_fetch_assoc($result);
+$post = $res->fetch_assoc();
 
 // Fetch active categories
-function getActiveCategories() {
-    global $conn;
-    $categories = [];
-    $sql = "SELECT id, name FROM categories WHERE status = 'active' ORDER BY name ASC";
-    $result = mysqli_query($conn, $sql);
-    if ($result) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $categories[] = $row;
-        }
+$categories = [];
+$catRes = $conn->query("SELECT id, name FROM categories WHERE status = 'active' ORDER BY name ASC");
+if ($catRes) {
+    while ($row = $catRes->fetch_assoc()) {
+        $categories[] = $row;
     }
-    return $categories;
 }
-
-$categories = getActiveCategories();
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $postTitle = mysqli_real_escape_string($conn, trim($_POST['postTitle']));
-    $postCategory = intval($_POST['postCategory']);
-    $postAuthor = mysqli_real_escape_string($conn, trim($_POST['postAuthor']));
-    $postExcerpt = mysqli_real_escape_string($conn, trim($_POST['postExcerpt']));
-    $postContent = mysqli_real_escape_string($conn, $_POST['postContent']);
-    $publishDate = mysqli_real_escape_string($conn, $_POST['publishDate']);
-    $status = isset($_POST['status']) ? mysqli_real_escape_string($conn, $_POST['status']) : 'published';
-    
+    $postTitle    = trim($_POST['postTitle'] ?? '');
+    $postCategory = (int)($_POST['postCategory'] ?? 0);
+    $postAuthor   = trim($_POST['postAuthor'] ?? '');
+    $postExcerpt  = trim($_POST['postExcerpt'] ?? '');
+    $postContent  = $_POST['postContent'] ?? '';
+    $publishDate  = $_POST['publishDate'] ?? '';
+    $status       = $_POST['status'] ?? 'published';
+
     $errors = [];
-    
-    if (empty($postTitle)) $errors[] = "Post title is required";
+
+    if ($postTitle === '') $errors[] = "Post title is required";
     if ($postCategory <= 0) $errors[] = "Please select a valid category";
-    if (empty($postAuthor)) $errors[] = "Author name is required";
-    if (empty($postContent)) $errors[] = "Post content is required";
-    
+    if ($postAuthor === '') $errors[] = "Author name is required";
+    if (trim(strip_tags($postContent)) === '') $errors[] = "Post content is required";
+
     // Handle file upload
-    $featuredImage = $post['featured_image'];
+    $featuredImage = $post['featured_image'] ?? null;
+
     if (isset($_FILES['featuredImage']) && $_FILES['featuredImage']['error'] === UPLOAD_ERR_OK) {
         $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
         $maxSize = 5 * 1024 * 1024;
-        $fileType = $_FILES['featuredImage']['type'];
+
+        $fileTmp  = $_FILES['featuredImage']['tmp_name'];
         $fileSize = $_FILES['featuredImage']['size'];
-        
-        if (!in_array($fileType, $allowedTypes)) {
-            $errors[] = "Invalid file type. Only JPG, PNG, WebP, and GIF are allowed";
-        }
-        if ($fileSize > $maxSize) {
-            $errors[] = "File size exceeds 5MB limit";
-        }
-        
+
+        // Safer mime detection
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $fileType = finfo_file($finfo, $fileTmp);
+        finfo_close($finfo);
+
+        if (!in_array($fileType, $allowedTypes)) $errors[] = "Invalid file type. Only JPG, PNG, WebP, and GIF are allowed";
+        if ($fileSize > $maxSize) $errors[] = "File size exceeds 5MB limit";
+
         if (empty($errors)) {
-            $uploadDir = '../Uploads/posts/';
+            // Upload dir relative to this file: /admin/Uploads/posts/
+            $uploadDir = dirname(__DIR__) . '/Uploads/posts/'; // ✅ FIXED path
             if (!file_exists($uploadDir)) mkdir($uploadDir, 0755, true);
-            $fileExtension = pathinfo($_FILES['featuredImage']['name'], PATHINFO_EXTENSION);
-            $fileName = 'post_' . time() . '_' . uniqid() . '.' . $fileExtension;
+
+            $ext = strtolower(pathinfo($_FILES['featuredImage']['name'], PATHINFO_EXTENSION));
+            $fileName = 'post_' . time() . '_' . uniqid() . '.' . $ext;
             $uploadPath = $uploadDir . $fileName;
-            
-            if (move_uploaded_file($_FILES['featuredImage']['tmp_name'], $uploadPath)) {
+
+            if (move_uploaded_file($fileTmp, $uploadPath)) {
                 // Delete old image if exists
-                if ($featuredImage && file_exists($uploadDir . $featuredImage)) {
-                    unlink($uploadDir . $featuredImage);
+                if (!empty($featuredImage)) {
+                    $oldPath = $uploadDir . $featuredImage;
+                    if (file_exists($oldPath)) unlink($oldPath);
                 }
-                $featuredImage = mysqli_real_escape_string($conn, $fileName);
+                $featuredImage = $fileName;
             } else {
                 $errors[] = "Failed to upload image";
             }
         }
     }
-    
+
     if (empty($errors)) {
-        $sql = "UPDATE posts SET 
-                title = '$postTitle', 
-                category_id = $postCategory, 
-                author = '$postAuthor', 
-                excerpt = '$postExcerpt', 
-                content = '$postContent', 
-                featured_image = " . ($featuredImage ? "'$featuredImage'" : "NULL") . ", 
-                publish_date = '$publishDate', 
-                status = '$status', 
-                updated_at = NOW() 
-                WHERE id = $post_id";
-        
-        if (mysqli_query($conn, $sql)) {
-            $_SESSION['success'] = $status === 'draft' ? "Draft updated successfully!" : "Post updated successfully!";
+        // Update with prepared statement
+        $stmt = $conn->prepare("
+            UPDATE posts SET
+                title = ?,
+                category_id = ?,
+                author = ?,
+                excerpt = ?,
+                content = ?,
+                featured_image = ?,
+                publish_date = ?,
+                status = ?,
+                updated_at = NOW()
+            WHERE id = ?
+        ");
+
+        $featuredParam = $featuredImage ? $featuredImage : null;
+
+        $stmt->bind_param(
+            "sissssssi",
+            $postTitle,
+            $postCategory,
+            $postAuthor,
+            $postExcerpt,
+            $postContent,
+            $featuredParam,
+            $publishDate,
+            $status,
+            $post_id
+        );
+
+        if ($stmt->execute()) {
+            $_SESSION['success'] = ($status === 'draft') ? "Draft updated successfully!" : "Post updated successfully!";
             header("Location: list_posts.php");
             exit();
         } else {
-            $errorMessage = "Failed to update post: " . mysqli_error($conn);
+            $errorMessage = "Failed to update post: " . htmlspecialchars($conn->error);
         }
     } else {
-        $errorMessage = implode("<br>", $errors);
+        $errorMessage = implode("<br>", array_map("htmlspecialchars", $errors));
     }
 }
 
@@ -139,7 +161,6 @@ if (isset($_SESSION['error'])) {
     unset($_SESSION['error']);
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -147,51 +168,38 @@ if (isset($_SESSION['error'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Post</title>
     <link rel="icon" href="../../images/logo.jpg" type="image/png">
-    <!-- Tailwind CSS -->
-    <script src="../../assets/js/tailwind.js"></script>
-    <!-- jQuery and jQuery Validation -->
-    <script src="../../assets/js/jquery.min.js"></script>
-    <script src="../../assets/js/jquery.validate.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
     <!-- Quill Editor -->
     <link href="../../assets/css/quill.snow.css" rel="stylesheet">
     <script src="../../assets/js/quill.min.js"></script>
+
     <style>
-        .sidebar {
-            transition: all 0.3s ease;
-        }
-        .sidebar:hover {
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-        }
-        .btn-nav {
-            transition: all 0.2s ease;
-        }
-        .btn-nav:hover {
-            transform: translateX(5px);
-        }
-        .main-content {
-            min-height: calc(100vh - 64px);
-        }
-        .logout-btn svg {
-            transition: transform 0.2s ease;
-        }
-        .logout-btn:hover svg {
-            transform: translateX(4px);
-        }
-        .error {
-            color: #dc2626;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
         input.error, textarea.error, select.error {
-            border-color: #dc2626 !important;
-            background-color: #fef2f2;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+            background: #fef2f2;
         }
         input.valid, textarea.valid, select.valid {
-            border-color: #10b981;
+            border-color: #22c55e !important;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15) !important;
         }
-        #editor-container {
-            height: 300px;
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border-left: 4px solid #ef4444;
+            font-size: 13px;
         }
+
+        #editor-container { height: 320px; }
         .ql-toolbar.ql-snow {
             border: 1px solid #d1d5db;
             border-bottom: none;
@@ -203,291 +211,316 @@ if (isset($_SESSION['error'])) {
             border-top: none;
             border-radius: 0 0 0.375rem 0.375rem;
         }
+
         .file-upload-label {
             border: 2px dashed #d1d5db;
-            border-radius: 0.375rem;
-            padding: 1.5rem;
+            border-radius: 0.5rem;
+            padding: 1.25rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            background: #f9fafb;
         }
         .file-upload-label:hover {
             border-color: #3b82f6;
             background: #eff6ff;
         }
         .file-preview {
-            margin-top: 0.5rem;
-            padding: 0.5rem;
+            margin-top: 0.75rem;
+            padding: 0.75rem;
             background: #f0fdf4;
-            border-radius: 0.375rem;
+            border-radius: 0.5rem;
             color: #166534;
             display: none;
+            font-size: 14px;
         }
         .current-image img {
-            max-width: 200px;
-            border-radius: 0.375rem;
+            max-width: 240px;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
         }
     </style>
 </head>
+
 <body class="bg-gray-100 font-sans">
-    <div class="flex h-screen">
-        <!-- Sidebar
-        <div class="sidebar w-64 bg-white shadow-lg p-6 flex flex-col justify-between">
-            <div>
-                <div class="mb-8">
-                    <img src="../images/logo.jpg" alt="Logo" class="w-16 mx-auto">
-                    <h2 class="text-xl font-bold text-center text-gray-800 mt-2">Category Management</h2>
+<div class="flex min-h-screen">
+    <?php
+        // ✅ Sidebar include (posts folder -> go up one level -> /admin/includes/)
+        $base_path = '../../';
+        include dirname(__DIR__) . '/includes/slidebar2.php'; // ✅ FIXED
+    ?>
+
+    <div class="flex-1 p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">✏️ Edit Post</h1>
+
+        <div class="flex flex-wrap gap-3 justify-center mb-6">
+            <a href="../dashboard.php"
+               class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2 rounded-full font-semibold text-sm hover:from-indigo-600 hover:to-purple-700 transition">
+                <i class="fas fa-home"></i> Back to Dashboard
+            </a>
+
+            <a href="list_posts.php"
+               class="inline-flex items-center gap-2 bg-sky-500 text-white px-5 py-2 rounded-full font-semibold text-sm hover:bg-sky-600 transition">
+                ← Back to Posts
+            </a>
+        </div>
+
+        <?php if ($successMessage): ?>
+            <div class="max-w-4xl mx-auto bg-green-100 border-l-4 border-green-500 text-green-800 p-4 mb-6 rounded">
+                <strong>✅ Success:</strong> <?= htmlspecialchars($successMessage) ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($errorMessage): ?>
+            <div class="max-w-4xl mx-auto bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+                <strong>⚠️ Error:</strong> <?= $errorMessage ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+            <form id="postForm" method="POST" action="" enctype="multipart/form-data" class="space-y-8">
+                <input type="hidden" name="status" id="postStatus" value="published">
+                <input type="hidden" name="postContent" id="postContent">
+
+                <!-- Basic Information -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">🧾 Basic Information</h2>
+
+                    <div class="mb-4">
+                        <label for="postTitle" class="block text-sm font-semibold text-gray-700 mb-2">
+                            🏷️ Post Title <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="postTitle" name="postTitle"
+                               value="<?= htmlspecialchars($post['title']) ?>"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                               placeholder="Enter an engaging title...">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="postCategory" class="block text-sm font-semibold text-gray-700 mb-2">
+                                🗂️ Category <span class="text-red-500">*</span>
+                            </label>
+                            <select id="postCategory" name="postCategory"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <option value="">Select Category</option>
+                                <?php foreach ($categories as $category): ?>
+                                    <option value="<?= (int)$category['id'] ?>" <?= ((int)$category['id'] === (int)$post['category_id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($category['name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="postAuthor" class="block text-sm font-semibold text-gray-700 mb-2">
+                                ✍️ Author <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="postAuthor" name="postAuthor"
+                                   value="<?= htmlspecialchars($post['author']) ?>"
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                                   placeholder="Author name">
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <label for="postExcerpt" class="block text-sm font-semibold text-gray-700 mb-2">📝 Excerpt</label>
+                        <textarea id="postExcerpt" name="postExcerpt" rows="3"
+                                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                                  placeholder="Write a compelling summary..."><?= htmlspecialchars($post['excerpt']) ?></textarea>
+                    </div>
                 </div>
-                <nav class="space-y-4">
-                    <a href="create_category.php" class="btn-nav block w-full text-left py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                        Create Category
-                    </a>
-                    <a href="list_categories.php" class="btn-nav block w-full text-left py-3 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
-                        List Categories
-                    </a>
-                    <a href="add_post.php" class="btn-nav block w-full text-left py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                        Add New Post
-                    </a>
-                    <a href="list_posts.php" class="btn-nav block w-full text-left py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        List Posts
-                    </a>
-                    <a href="add_telephone_directory.php" class="btn-nav block w-full text-left py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                        Add Telephone Directory
-                    </a>
-                    <a href="list_telephone_directory.php" class="btn-nav block w-full text-left py-3 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
-                        List Telephone Directory
-                    </a>
-                    <a href="dashboard.php" class="btn-nav block w-full text-left py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                        Admin Dashboard
-                    </a>
-                </nav>
-            </div>
-            <div class="mt-auto">
-                <a href="?logout=true" class="logout-btn flex items-center justify-center py-3 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700" onclick="return confirm('Are you sure you want to logout?')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    Logout
-                </a>
-            </div>
-        </div> -->
 
-        <!-- Main Content -->
-        <div class="main-content flex-1 p-8">
-            <div class="max-w-4xl mx-auto">
-                <h1 class="text-3xl font-bold text-gray-800 mb-6">Edit Post</h1>
+                <!-- Content -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">📰 Content</h2>
 
-                <?php if ($successMessage): ?>
-                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded"><?php echo htmlspecialchars($successMessage); ?></div>
-                <?php endif; ?>
-
-                <?php if ($errorMessage): ?>
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded"><?php echo $errorMessage; ?></div>
-                <?php endif; ?>
-
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <form id="postForm" method="POST" action="" enctype="multipart/form-data">
-                        <input type="hidden" name="status" id="postStatus" value="published">
-                        <input type="hidden" name="postContent" id="postContent">
-                        <div class="mb-6">
-                            <h2 class="text-xl font-semibold text-gray-800 mb-4">Basic Information</h2>
-                            <div class="mb-4">
-                                <label for="postTitle" class="block text-gray-700 font-semibold mb-2">
-                                    Post Title <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" id="postTitle" name="postTitle" value="<?php echo htmlspecialchars($post['title']); ?>" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter an engaging title...">
-                            </div>
-                            <div class="flex space-x-4 mb-4">
-                                <div class="flex-1">
-                                    <label for="postCategory" class="block text-gray-700 font-semibold mb-2">
-                                        Category <span class="text-red-500">*</span>
-                                    </label>
-                                    <select id="postCategory" name="postCategory" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                        <option value="">Select Category</option>
-                                        <?php foreach ($categories as $category): ?>
-                                            <option value="<?php echo $category['id']; ?>" <?php echo $category['id'] == $post['category_id'] ? 'selected' : ''; ?>>
-                                                <?php echo htmlspecialchars($category['name']); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="flex-1">
-                                    <label for="postAuthor" class="block text-gray-700 font-semibold mb-2">
-                                        Author <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text" id="postAuthor" name="postAuthor" value="<?php echo htmlspecialchars($post['author']); ?>" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Author name">
-                                </div>
-                            </div>
-                            <div class="mb-4">
-                                <label for="postExcerpt" class="block text-gray-700 font-semibold mb-2">Excerpt</label>
-                                <textarea id="postExcerpt" name="postExcerpt" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Write a compelling summary..."><?php echo htmlspecialchars($post['excerpt']); ?></textarea>
-                            </div>
-                        </div>
-                        <div class="mb-6">
-                            <h2 class="text-xl font-semibold text-gray-800 mb-4">Content</h2>
-                            <div class="mb-4">
-                                <label for="editor-container" class="block text-gray-700 font-semibold mb-2">
-                                    Post Content <span class="text-red-500">*</span>
-                                </label>
-                                <div id="editor-container"><?php echo $post['content']; ?></div>
-                            </div>
-                        </div>
-                        <div class="mb-6">
-                            <h2 class="text-xl font-semibold text-gray-800 mb-4">Publishing Options</h2>
-                            <div class="mb-4">
-                                <label for="publishDate" class="block text-gray-700 font-semibold mb-2">Publish Date & Time</label>
-                                <input type="datetime-local" id="publishDate" name="publishDate" value="<?php echo date('Y-m-d\TH:i', strtotime($post['publish_date'])); ?>" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div class="mb-4">
-                                <label for="featuredImage" class="block text-gray-700 font-semibold mb-2">Featured Image</label>
-                                <?php if ($post['featured_image']): ?>
-                                    <div class="current-image mb-4">
-                                        <p class="text-gray-700">Current Image:</p>
-                                        <img src="../Uploads/posts/<?php echo htmlspecialchars($post['featured_image']); ?>" alt="Current Featured Image">
-                                    </div>
-                                <?php endif; ?>
-                                <div class="file-upload">
-                                    <input type="file" id="featuredImage" name="featuredImage" accept="image/*" class="hidden">
-                                    <div class="file-upload-label">
-                                        <span>Click to upload or drag and drop<br><small>Recommended: 1200x630px (JPG, PNG, WebP) - Max 5MB</small></span>
-                                    </div>
-                                </div>
-                                <div class="file-preview" id="filePreview"></div>
-                            </div>
-                        </div>
-                        <div class="flex space-x-4 justify-center">
-                            <button type="button" class="py-3 px-6 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700" onclick="saveDraft()">Save as Draft</button>
-                            <button type="submit" class="py-3 px-6 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Update Post</button>
-                            <button type="button" class="py-3 px-6 bg-gray-500 text-white rounded-lg hover:bg-gray-600" onclick="goBack()">Back to Posts</button>
-                        </div>
-                    </form>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        ✨ Post Content <span class="text-red-500">*</span>
+                    </label>
+                    <div id="editor-container"><?= $post['content'] ?></div>
                 </div>
-            </div>
+
+                <!-- Publishing -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">📌 Publishing Options</h2>
+
+                    <div class="mb-4">
+                        <label for="publishDate" class="block text-sm font-semibold text-gray-700 mb-2">🕒 Publish Date & Time</label>
+                        <input type="datetime-local" id="publishDate" name="publishDate"
+                               value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($post['publish_date']))) ?>"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">🖼️ Featured Image</label>
+
+                        <?php if (!empty($post['featured_image'])): ?>
+                            <div class="current-image mb-4">
+                                <p class="text-sm text-gray-600 mb-2">Current Image:</p>
+                                <!-- ✅ path for browser (from /admin/posts/ to /admin/Uploads/posts/) -->
+                                <img src="../Uploads/posts/<?= htmlspecialchars($post['featured_image']) ?>" alt="Current Featured Image">
+                            </div>
+                        <?php endif; ?>
+
+                        <input type="file" id="featuredImage" name="featuredImage" accept="image/*" class="hidden">
+
+                        <div class="file-upload-label" id="fileUploadLabel">
+                            <div class="text-gray-700 font-semibold">Click to upload or drag & drop</div>
+                            <div class="text-xs text-gray-500 mt-1">Recommended: 1200x630px (JPG, PNG, WebP) • Max 5MB</div>
+                        </div>
+
+                        <div class="file-preview" id="filePreview"></div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button type="button"
+                            class="py-3 px-6 bg-yellow-600 text-white rounded-md font-semibold hover:bg-yellow-700 transition"
+                            onclick="saveDraft()">
+                        <i class="fa-solid fa-file-pen mr-2"></i> Save as Draft
+                    </button>
+
+                    <button type="submit"
+                            class="py-3 px-6 bg-sky-500 text-white rounded-md font-semibold hover:bg-sky-600 transition">
+                        <i class="fa-solid fa-floppy-disk mr-2"></i> Update Post
+                    </button>
+
+                    <button type="button"
+                            class="py-3 px-6 bg-gray-500 text-white rounded-md font-semibold hover:bg-gray-600 transition"
+                            onclick="goBack()">
+                        ← Back to Posts
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <script>
-        // Initialize Quill editor
-        var quill = new Quill('#editor-container', {
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ 'color': [] }, { 'background': [] }],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['link', 'image'],
-                    ['clean']
-                ]
-            },
-            placeholder: 'Write your post content here...',
-            theme: 'snow'
-        });
+<?php include dirname(__DIR__) . '/includes/footer.php'; ?>
 
-        $(document).ready(function() {
-            $("#postForm").validate({
-                rules: {
-                    postTitle: { required: true, minlength: 3, maxlength: 200 },
-                    postCategory: { required: true },
-                    postAuthor: { required: true, minlength: 2, maxlength: 100 },
-                    postExcerpt: { maxlength: 500 }
-                },
-                messages: {
-                    postTitle: {
-                        required: "Title is required.",
-                        minlength: "Title must be at least 3 characters.",
-                        maxlength: "Title cannot exceed 200 characters."
-                    },
-                    postCategory: { required: "Category is required." },
-                    postAuthor: {
-                        required: "Author is required.",
-                        minlength: "Author name must be at least 2 characters.",
-                        maxlength: "Author name cannot exceed 100 characters."
-                    },
-                    postExcerpt: { maxlength: "Excerpt cannot exceed 500 characters." }
-                },
-                errorElement: "label",
-                errorClass: "error",
-                validClass: "valid",
-                errorPlacement: function(error, element) {
-                    error.insertAfter(element);
-                },
-                highlight: function(element) {
-                    $(element).addClass('error').removeClass('valid');
-                },
-                unhighlight: function(element) {
-                    $(element).removeClass('error').addClass('valid');
-                },
-                submitHandler: function(form) {
-                    var content = quill.root.innerHTML;
-                    if (content === '<p><br></p>' || content.trim() === '') {
-                        alert("Post content is required.");
-                        return false;
-                    }
-                    document.getElementById('postContent').value = content;
-                    form.submit();
-                }
-            });
+<script>
+    // Quill editor
+    var quill = new Quill('#editor-container', {
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link', 'image'],
+                ['clean']
+            ]
+        },
+        placeholder: 'Write your post content here...',
+        theme: 'snow'
+    });
 
-            // Auto-hide messages
-            setTimeout(() => {
-                $('.bg-green-100, .bg-red-100').fadeOut();
-            }, 5000);
-        });
+    // Click label opens file picker
+    document.getElementById('fileUploadLabel').addEventListener('click', function () {
+        document.getElementById('featuredImage').click();
+    });
 
-        document.getElementById('featuredImage').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const preview = document.getElementById('filePreview');
-            if (file) {
-                preview.innerHTML = `Selected: <strong>${file.name}</strong> (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                preview.style.display = 'block';
-            } else {
-                preview.style.display = 'none';
-            }
-        });
+    // Preview
+    document.getElementById('featuredImage').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('filePreview');
+        if (file) {
+            preview.innerHTML = `Selected: <strong>${file.name}</strong> (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            preview.style.display = 'block';
+        } else {
+            preview.style.display = 'none';
+        }
+    });
 
-        // Drag and drop
-        const fileUploadLabel = document.querySelector('.file-upload-label');
-        ['dragover', 'dragenter'].forEach(eventName => {
-            fileUploadLabel.addEventListener(eventName, function(e) {
-                e.preventDefault();
-                this.classList.add('border-indigo-500', 'bg-blue-50');
-            });
-        });
-        ['dragleave', 'dragend'].forEach(eventName => {
-            fileUploadLabel.addEventListener(eventName, function(e) {
-                e.preventDefault();
-                this.classList.remove('border-indigo-500', 'bg-blue-50');
-            });
-        });
-        fileUploadLabel.addEventListener('drop', function(e) {
+    // Drag & drop
+    const fileUploadLabel = document.getElementById('fileUploadLabel');
+    ['dragover', 'dragenter'].forEach(eventName => {
+        fileUploadLabel.addEventListener(eventName, function(e) {
             e.preventDefault();
-            this.classList.remove('border-indigo-500', 'bg-blue-50');
-            const files = e.dataTransfer.files;
-            if (files.length > 0 && files[0].type.startsWith('image/')) {
-                const fileInput = document.getElementById('featuredImage');
-                fileInput.files = files;
-                fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+            this.classList.add('border-indigo-500');
+        });
+    });
+    ['dragleave', 'dragend'].forEach(eventName => {
+        fileUploadLabel.addEventListener(eventName, function(e) {
+            e.preventDefault();
+            this.classList.remove('border-indigo-500');
+        });
+    });
+    fileUploadLabel.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('border-indigo-500');
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+            const fileInput = document.getElementById('featuredImage');
+            fileInput.files = files;
+            fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    });
+
+    // Validation
+    $(document).ready(function() {
+        $("#postForm").validate({
+            rules: {
+                postTitle: { required: true, minlength: 3, maxlength: 200 },
+                postCategory: { required: true },
+                postAuthor: { required: true, minlength: 2, maxlength: 100 },
+                postExcerpt: { maxlength: 500 }
+            },
+            messages: {
+                postTitle: {
+                    required: "🏷️ Title is required.",
+                    minlength: "Title must be at least 3 characters.",
+                    maxlength: "Title cannot exceed 200 characters."
+                },
+                postCategory: { required: "🗂️ Category is required." },
+                postAuthor: {
+                    required: "✍️ Author is required.",
+                    minlength: "Author must be at least 2 characters.",
+                    maxlength: "Author cannot exceed 100 characters."
+                },
+                postExcerpt: { maxlength: "Excerpt cannot exceed 500 characters." }
+            },
+            errorElement: "div",
+            errorClass: "error-message",
+            validClass: "valid",
+            errorPlacement: function(error, element) {
+                error.insertAfter(element);
+            },
+            submitHandler: function(form) {
+                var content = quill.root.innerHTML;
+                if (content === '<p><br></p>' || content.trim() === '') {
+                    alert("❌ Post content is required.");
+                    return false;
+                }
+                document.getElementById('postContent').value = content;
+                form.submit();
             }
         });
 
-        function saveDraft() {
-            var content = quill.root.innerHTML;
-            if (content === '<p><br></p>' || content.trim() === '') {
-                alert("Post content is required.");
-                return false;
-            }
-            document.getElementById('postContent').value = content;
-            document.getElementById('postStatus').value = 'draft';
-            document.getElementById('postForm').submit();
-        }
+        // Auto-hide messages
+        setTimeout(() => {
+            $('.bg-green-100, .bg-red-100').fadeOut();
+        }, 5000);
+    });
 
-        function goBack() {
-            if (confirm('Are you sure you want to leave? Unsaved changes will be lost.')) {
-                window.location.href = 'list_posts.php';
-            }
+    function saveDraft() {
+        var content = quill.root.innerHTML;
+        if (content === '<p><br></p>' || content.trim() === '') {
+            alert("❌ Post content is required.");
+            return false;
         }
-    </script>
+        document.getElementById('postContent').value = content;
+        document.getElementById('postStatus').value = 'draft';
+        document.getElementById('postForm').submit();
+    }
+
+    function goBack() {
+        if (confirm('Are you sure you want to leave? Unsaved changes will be lost.')) {
+            window.location.href = 'list_posts.php';
+        }
+    }
+</script>
 </body>
 </html>
