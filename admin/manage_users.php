@@ -17,30 +17,35 @@ $_SESSION['LAST_ACTIVITY'] = time();
 // Handle status toggle
 if (isset($_GET['toggle_status'])) {
     $id = (int)$_GET['toggle_status'];
+
     if ($id == $_SESSION['user_id']) {
         $error = "You cannot deactivate your own account!";
     } else {
-        // Get current status and toggle it
         $stmt = $conn->prepare("SELECT status FROM users WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        
-        $new_status = $user['status'] == 1 ? 0 : 1;
-        
-        $stmt = $conn->prepare("UPDATE users SET status = ?, edited_by = ?, edited_at = NOW() WHERE id = ?");
-        $stmt->bind_param("iii", $new_status, $_SESSION['user_id'], $id);
-        $stmt->execute();
-        
-        $status_text = $new_status == 1 ? "activated" : "deactivated";
-        $success = "User " . $status_text . " successfully!";
+        $resultStatus = $stmt->get_result();
+        $user = $resultStatus->fetch_assoc();
+
+        if (!$user) {
+            $error = "User not found!";
+        } else {
+            $new_status = ((int)$user['status'] === 1) ? 0 : 1;
+
+            $stmt = $conn->prepare("UPDATE users SET status = ?, edited_by = ?, edited_at = NOW() WHERE id = ?");
+            $stmt->bind_param("iii", $new_status, $_SESSION['user_id'], $id);
+            $stmt->execute();
+
+            $status_text = ($new_status === 1) ? "activated" : "deactivated";
+            $success = "User " . $status_text . " successfully!";
+        }
     }
 }
 
 // Handle delete
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
+
     if ($id == $_SESSION['user_id']) {
         $error = "You cannot delete your own account!";
     } else {
@@ -53,165 +58,189 @@ if (isset($_GET['delete'])) {
 
 // Fetch users
 $result = $conn->query("
-    SELECT u.id, u.username, u.role, u.status, u.created_at,
-       creator.username as created_by_username,
-       editor.username as edited_by_username,
-       u.edited_at
-FROM users u
-LEFT JOIN users creator ON u.created_by = creator.id
-LEFT JOIN users editor ON u.edited_by = editor.id
-ORDER BY u.created_at DESC
-
+    SELECT 
+        u.id, u.username, u.role, u.status, u.created_at,
+        creator.username as created_by_username,
+        editor.username as edited_by_username,
+        u.edited_at
+    FROM users u
+    LEFT JOIN users creator ON u.created_by = creator.id
+    LEFT JOIN users editor ON u.edited_by = editor.id
+    ORDER BY u.created_at DESC
 ");
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Manage Users - Super Admin</title>
-    <link rel="stylesheet" href="../css/fonts/fonts.css">
-    <link rel="stylesheet" href="../css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../images/logo.jpg" type="image/png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-        .status-button {
-            padding: 5px 12px;
-            border: none;
-            border-radius: 20px;
-            color: white;
-            font-weight: 600;
-            text-decoration: none;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        /* Match your UI button styling */
+        a.edit-button {
+            background-color: lightblue !important;
+            color: rgb(0, 0, 0) !important;
+            padding: 8px 16px !important;
+            border-radius: 20px !important;
+            font-size: 12px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            margin: 0 5px 0 0 !important;
+            display: inline-block !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+            text-decoration: none !important;
+            border: none !important;
+            white-space: nowrap;
         }
-        
-        .status-active {
-            background: linear-gradient(135deg, #4caf50, #45a049);
-        }
-        
-        .status-active:hover {
-            background: linear-gradient(135deg, #f44336, #f44336);
-            transform: translateY(-1px);
-        }
-        
-        .status-inactive {
-            background: linear-gradient(135deg, #f44336, #e53935);
-        }
-        
-        .status-inactive:hover {
-            background: linear-gradient(135deg, #4caf50, #45a049);
-            transform: translateY(-1px);
+        a.edit-button:hover {
+            background-color: rgb(164, 107, 166) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 5px 15px rgb(159, 124, 160) !important;
         }
 
+        a.delete-button {
+            background-color: navy !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 20px !important;
+            font-size: 12px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            margin: 0 !important;
+            display: inline-block !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+            text-decoration: none !important;
+            border: none !important;
+            white-space: nowrap;
+        }
+        a.delete-button:hover {
+            background-color: red !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3) !important;
+        }
+
+        .status-button {
+            padding: 8px 14px;
+            border-radius: 999px;
+            color: white;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 12px;
+            display: inline-block;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .status-active { background: linear-gradient(135deg, #4caf50, #45a049); }
+        .status-active:hover { background: linear-gradient(135deg, #f44336, #f44336); transform: translateY(-1px); }
+
+        .status-inactive { background: linear-gradient(135deg, #f44336, #e53935); }
+        .status-inactive:hover { background: linear-gradient(135deg, #4caf50, #45a049); transform: translateY(-1px); }
     </style>
 </head>
 
-<body class="admin-page">
-    <!-- Header with Back Button and Title -->
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="font-size: 28px;">✨ Admin Panel - Manage Users</h1>
-        <a href="dashboard.php" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
-        color: white !important; 
-        padding: 10px 20px !important; 
-        border-radius: 20px !important; 
-        font-weight: 600 !important; 
-        text-transform: uppercase !important; 
-        letter-spacing: 0.5px !important; 
-        margin: 10px !important; 
-        display: inline-block !important; 
-        transition: all 0.3s ease !important;
-        font-size: 14px !important;">
-        <i class="fas fa-home"></i> Back to Dashboard
-    </a>
-    </div>
+<body class="bg-gray-100 font-sans">
+<div class="flex min-h-screen">
+    <?php
+    $base_path = '../';
+    include __DIR__ . '/includes/slidebar2.php';
+    ?>
 
-    <?php if (isset($error)): ?>
-        <div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f44336;">
-            <strong>⚠️ Error:</strong> <?= htmlspecialchars($error) ?>
+    <div class="flex-1 p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">✨ Admin Panel - Manage Users</h1>
+
+        <div class="flex justify-center mb-6">
+            <a href="dashboard.php"
+               class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2 rounded-full font-semibold text-sm hover:from-indigo-600 hover:to-purple-700 transition">
+                <i class="fas fa-home"></i> Back to Dashboard
+            </a>
         </div>
-    <?php endif; ?>
 
-    <?php if (isset($success)): ?>
-        <div style="background: #e8f5e8; color: #2e7d32; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #4caf50;">
-            <strong>✅ Success:</strong> <?= htmlspecialchars($success) ?>
-        </div>
-    <?php endif; ?>
+        <?php if (isset($error)): ?>
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 my-4 rounded">
+                <strong>⚠️ Error:</strong> <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
 
-    <!-- User Table -->
-    <div class="special-dates-table">
-        <table>
-            <thead>
-                <tr style="background: linear-gradient(90deg, #6A5ACD, #7B68EE); color: white;">
-                    <th class="col-username">👤 USERNAME</th>
-                    <th class="col-role">🏷️ ROLE</th>
-                    <th class="col-status">🔄 STATUS</th>
-                    <th class="col-created-at">📅 CREATED AT</th>
-                    <th class="col-created-by">👨‍💼 CREATED BY</th>
-                    <th class="col-edited-at">✏️ EDITED AT</th>
-                    <th class="col-edited-by">🧑 EDITED BY</th>
-                    <th class="col-actions">⚡ ACTIONS</th>
-                </tr>
-            </thead>
-            <tbody>
+        <?php if (isset($success)): ?>
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-800 p-4 my-4 rounded">
+                <strong>✅ Success:</strong> <?= htmlspecialchars($success) ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="overflow-x-auto bg-white rounded-lg shadow-md p-4">
+            <table class="min-w-full border-collapse">
+                <thead>
+                    <tr class="bg-indigo-600 text-white text-left">
+                        <th class="px-4 py-3">👤 Username</th>
+                        <th class="px-4 py-3">🏷️ Role</th>
+                        <th class="px-4 py-3">🔄 Status</th>
+                        <th class="px-4 py-3">📅 Created At</th>
+                        <th class="px-4 py-3">👨‍💼 Created By</th>
+                        <th class="px-4 py-3">✏️ Edited At</th>
+                        <th class="px-4 py-3">🧑 Edited By</th>
+                        <th class="px-4 py-3 text-center">⚡ Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
                 <?php while ($row = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td style="font-weight: 600;"><?= htmlspecialchars($row['username']) ?></td>
-                        <td><?= $row['role'] === 'super_admin' ? '👑 Super Admin' : '👤 Admin' ?></td>
-                        <td>
-                            <?php if ($row['id'] != $_SESSION['user_id']): ?>
-                                <a href="?toggle_status=<?= $row['id'] ?>" 
-                                   class="status-button <?= $row['status'] == 1 ? 'status-active' : 'status-inactive' ?>"
-                                   onclick="return confirm('Are you sure you want to <?= $row['status'] == 1 ? 'deactivate' : 'activate' ?> this user?')">
-                                    <?= $row['status'] == 1 ? '✅ Active' : '❌ Inactive' ?>
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-3 font-semibold"><?= htmlspecialchars($row['username']) ?></td>
+                        <td class="px-4 py-3"><?= $row['role'] === 'super_admin' ? '👑 Super Admin' : '👤 Admin' ?></td>
+
+                        <td class="px-4 py-3">
+                            <?php if ((int)$row['id'] !== (int)$_SESSION['user_id']): ?>
+                                <a href="?toggle_status=<?= (int)$row['id'] ?>"
+                                   class="status-button <?= ((int)$row['status'] === 1) ? 'status-active' : 'status-inactive' ?>"
+                                   onclick="return confirm('Are you sure you want to <?= ((int)$row['status'] === 1) ? 'deactivate' : 'activate' ?> this user?')">
+                                    <?= ((int)$row['status'] === 1) ? '✅ Active' : '❌ Inactive' ?>
                                 </a>
                             <?php else: ?>
-                                <span class="status-button status-active" style="cursor: not-allowed; opacity: 0.7;">
+                                <span class="status-button status-active" style="cursor:not-allowed; opacity:0.7;">
                                     ✅ Active
                                 </span>
                             <?php endif; ?>
                         </td>
-                        <td><?= date('M j, Y', strtotime($row['created_at'])) ?></td>
-                        <td><?= htmlspecialchars($row['created_by_username'] ?? 'System') ?></td>
-                        <td><?= $row['edited_at'] ? date('M j, Y', strtotime($row['edited_at'])) : '-' ?></td>
-                        <td><?= $row['edited_by_username'] ?? '-' ?></td>
-                        <td>
-                            <?php if ($row['id'] != $_SESSION['user_id']): ?>
-                                <a href="edit_user.php?id=<?= $row['id'] ?>" class="edit-button">✏️ Edit</a>
-                                <a href="?delete=<?= $row['id'] ?>" class="delete-button" onclick="return confirm('⚠️ Are you sure you want to delete this user?')">🗑️ Delete</a>
+
+                        <td class="px-4 py-3"><?= date('M j, Y', strtotime($row['created_at'])) ?></td>
+                        <td class="px-4 py-3"><?= htmlspecialchars($row['created_by_username'] ?? 'System') ?></td>
+                        <td class="px-4 py-3"><?= $row['edited_at'] ? date('M j, Y', strtotime($row['edited_at'])) : '-' ?></td>
+                        <td class="px-4 py-3"><?= htmlspecialchars($row['edited_by_username'] ?? '-') ?></td>
+
+                        <td class="px-4 py-3 text-center">
+                            <?php if ((int)$row['id'] !== (int)$_SESSION['user_id']): ?>
+                                <a href="edit_user.php?id=<?= (int)$row['id'] ?>" class="edit-button">✏️ Edit</a>
+                                <a href="?delete=<?= (int)$row['id'] ?>" class="delete-button"
+                                   onclick="return confirm('⚠️ Are you sure you want to delete this user?')">
+                                   🗑️ Delete
+                                </a>
                             <?php else: ?>
-                                <span style="color: #999; font-size: 12px;">Current User</span>
+                                <span class="text-gray-400 text-xs">Current User</span>
                             <?php endif; ?>
                         </td>
                     </tr>
                 <?php endwhile; ?>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
+
     </div>
+</div>
 
-    <!-- User Info + Logout -->
-    <div style="margin-top: 10px;">
-        <span style="color: navy; padding: 8px 16px; border-radius: 20px; font-size: 18px; font-weight: 600;;">
-            <?= isSuperAdmin() ? '👑 Super Admin' : '👤 Admin' ?>: <?= htmlspecialchars($_SESSION['username']) ?>
-        </span>
-        <a href="../logout.php" style="background: #f44336; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; margin-left: 10px;">
-            🚪 Logout
-        </a>
-    </div>
+<?php include __DIR__ . '/includes/footer.php'; ?>
 
-    <!-- <div class="footer-divider"></div>
-    <footer class="footer" style="margin-top: 0; text-align: center;">
-        &copy; <?= date('Y') ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
-        © All rights reserved, 2008 - Wijeya Newspapers Ltd.
-    </footer> -->
+<script>
+    // Auto-hide success/error messages
+    setTimeout(() => {
+        document.querySelectorAll('.bg-red-100, .bg-green-100').forEach(el => el.style.display = 'none');
+    }, 2000);
+</script>
 
-    <script>
-        // Auto-hide success/error messages
-        setTimeout(() => {
-            document.querySelectorAll('div[style*="border-left"]').forEach(el => el.style.display = 'none');
-        }, 2000);
-    </script>
-
-<div class="footer-divider"></div>
-<?php include 'includes/footer.php'; ?>
+</body>
+</html>

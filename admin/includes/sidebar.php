@@ -79,7 +79,7 @@
 
                 <?php endif; ?>
                 <li>
-                    <a href="../index.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                    <a href="../index.php" target="_blank" rel="noopener noreferrer" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
                         <i class="fas fa-calendar w-6 text-center mr-3"></i> View Calendar
                     </a>
                 </li>
