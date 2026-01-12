@@ -182,10 +182,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_special_date']
                         </label>
 
                         <label class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-100 transition">
-                            <input type="radio" name="color" value="#dbdbdbff"
-                                   <?= ($data['color'] === '#dbdbdbff') ? 'checked' : '' ?>
+                            <input type="radio" name="color" value="#dbdbdb"
+                                   <?= ($data['color'] === '#dbdbdb') ? 'checked' : '' ?>
                                    required>
-                            <span class="w-5 h-5 rounded-full border border-gray-700" style="background:#dbdbdbff;"></span>
+                            <span class="w-5 h-5 rounded-full border border-gray-700" style="background:#dbdbdb;"></span>
                             <span class="text-sm font-semibold text-gray-700">Other</span>
                         </label>
                     </div>

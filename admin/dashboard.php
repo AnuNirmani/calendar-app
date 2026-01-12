@@ -96,7 +96,9 @@ include 'includes/sidebar.php';
 
                     <?php endif; ?>
 
-                    <a href="../index.php" class="flex flex-col items-center justify-center p-6 lg:p-8 bg-gradient-to-br from-orange-500 to-orange-700 text-white rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[140px] text-center">
+                    <a href="../index.php" 
+                    target="_blank" rel="noopener noreferrer" 
+                    class="flex flex-col items-center justify-center p-6 lg:p-8 bg-gradient-to-br from-orange-500 to-orange-700 text-white rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[140px] text-center">
                         <i class="fas fa-calendar text-4xl lg:text-5xl mb-3"></i>
                         <span class="text-sm lg:text-base font-semibold uppercase tracking-wide">View Calendar</span>
                     </a>
