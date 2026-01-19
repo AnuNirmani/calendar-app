@@ -216,34 +216,16 @@ $stmt_next->close();
             transition: all 0.3s ease;
         }
         
-        .logo-wrapper:hover {
+        /* .logo-wrapper:hover {
             transform: rotate(5deg) scale(1.05);
             box-shadow: var(--shadow-heavy);
-        }
+        } */
         
         .logo {
             width: 100%;
             height: 100%;
             object-fit: contain;
             border-radius: 10px;
-        }
-        
-        .logo-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ff4757;
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: bold;
-            box-shadow: 0 3px 8px rgba(255, 71, 87, 0.3);
-            animation: pulse 2s infinite;
         }
         
         @keyframes pulse {
@@ -1003,9 +985,6 @@ $stmt_next->close();
                     <div class="logo-container">
                         <div class="logo-wrapper">
                             <img src="images/logo.jpg" alt="Wijeya Newspapers" class="logo">
-                            <div class="logo-badge">
-                                <i class="fas fa-bookmark"></i>
-                            </div>
                         </div>
                         <div>
                             <h1 class="company-name">WIJEYA NEWSPAPERS</h1>

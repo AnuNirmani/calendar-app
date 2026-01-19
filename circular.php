@@ -252,35 +252,17 @@ if ($phone_result) {
             overflow: hidden;
         }
         
-        .logo-wrapper:hover {
+        /* .logo-wrapper:hover {
             transform: rotate(5deg) scale(1.05);
             box-shadow: var(--shadow-heavy);
-        }
+        } */
         
         .logo {
             width: 100%;
             height: 100%;
             object-fit: contain;
             border-radius: 15px;
-        }
-        
-        .logo-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #ff4757;
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
-            box-shadow: 0 3px 8px rgba(255, 71, 87, 0.3);
-            animation: pulse 2s infinite;
-        }
+        }        
         
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -1223,9 +1205,6 @@ if ($phone_result) {
                 <div class="logo-container">
                     <div class="logo-wrapper">
                         <img src="images/logo.jpg" alt="Wijeya Newspapers" class="logo">
-                        <div class="logo-badge">
-                            <i class="fas fa-star"></i>
-                        </div>
                     </div>
                     <div class="company-info">
                         <h1 class="company-name">WIJEYA NEWSPAPERS</h1>
@@ -1244,7 +1223,7 @@ if ($phone_result) {
                         </li>
                         <li class="nav-item">
                             <a href="circular.php?tab=directory" class="nav-link <?php echo $current_tab == 'directory' ? 'active' : ''; ?>">
-                                <i class="fas fa-address-book"></i>
+                                <i class="fas fa-phone"></i>
                                 <span>Directory</span>
                                 <div class="nav-indicator"></div>
                             </a>
@@ -1459,6 +1438,19 @@ if ($phone_result) {
                         <div class="search-card">
                             <form method="GET" action="" class="row g-3">
                                 <input type="hidden" name="tab" value="directory">
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Filter by Department</label>
+                                    <select name="phone_dept" class="form-select">
+                                        <option value="all" <?php echo $phone_dept == 'all' ? 'selected' : ''; ?>>All Departments</option>
+                                        <?php foreach ($departments as $dept): ?>
+                                            <option value="<?php echo $dept['id']; ?>" 
+                                                    <?php echo $phone_dept == $dept['id'] ? 'selected' : ''; ?>>
+                                                <?php echo htmlspecialchars($dept['name']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
                                 
                                 <div class="col-md-6">
                                     <label class="form-label">Search Contacts</label>
@@ -1472,19 +1464,6 @@ if ($phone_result) {
                                                class="form-control border-start-0" 
                                                placeholder="Search by name, phone, email, position, or department...">
                                     </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <label class="form-label">Filter by Department</label>
-                                    <select name="phone_dept" class="form-select">
-                                        <option value="all" <?php echo $phone_dept == 'all' ? 'selected' : ''; ?>>All Departments</option>
-                                        <?php foreach ($departments as $dept): ?>
-                                            <option value="<?php echo $dept['id']; ?>" 
-                                                    <?php echo $phone_dept == $dept['id'] ? 'selected' : ''; ?>>
-                                                <?php echo htmlspecialchars($dept['name']); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
                                 </div>
                                 
                                 <div class="col-md-2 d-flex align-items-end">
