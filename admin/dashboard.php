@@ -28,57 +28,27 @@ $currentYearDates = $stmt->fetch_assoc()['current_year_dates'];
 if (isSuperAdmin()) {
     $stmt = $conn->query("SELECT COUNT(*) as total_users FROM users");
     $totalUsers = $stmt->fetch_assoc()['total_users'];
-}
+}?>
 
-            <div class="m-5 bg-blue-800 bg-opacity-50 p-4 rounded-xl text-center">
-                <div class="text-lg font-semibold mb-1">👤 <?= htmlspecialchars($_SESSION['username']) ?></div>
-                <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold mt-2 <?= isSuperAdmin() ?>">
-                    <?= isSuperAdmin() ? '👑 Super Admin' : '🔰 Admin' ?>
-                </span>
-            </div>
 
-            <ul class="space-y-1 py-4">
-                <li>
-                    <a href="dashboard.php" class="flex items-center px-6 py-3 text-white bg-blue-800 bg-opacity-75 border-l-4 border-white font-semibold transition-all">
-                        <i class="fas fa-home w-6 text-center mr-3"></i> Dashboard
-                    </a>
-                </li>
-                <li>
-                    <a href="index.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
-                        <i class="fas fa-calendar-day w-6 text-center mr-3"></i> See Special Dates
-                    </a>
-                </li>
-                <li>
-                    <a href="add.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
-                        <i class="fas fa-plus-circle w-6 text-center mr-3"></i> Add Special Dates
-                    </a>
-                </li>
-                <?php if (isSuperAdmin()): ?>
-                    <li>
-                        <a href="manage_users.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
-                            <i class="fas fa-users-cog w-6 text-center mr-3"></i> Manage Users
-                        </a>
-                    </li>
-                    <li>
-                        <a href="add_user.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
-                            <i class="fas fa-user-plus w-6 text-center mr-3"></i> Add User
-                        </a>
-                    </li>
-                <?php endif; ?>
-                <li>
-                    <a href="../index.php" target="_blank" rel="noopener noreferrer" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
-                        <i class="fas fa-calendar w-6 text-center mr-3"></i> View Calendar
-                    </a>
-                </li>
-            </ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Calendar App</title>
+    <link rel="icon" href="../images/logo.jpg" type="image/png">
+    <link rel="stylesheet" href="../assets/css/fontawesome.min.css">
+    <script src="../assets/js/tailwind.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
 
-            <a href="../logout.php" class="block mx-5 my-8 bg-red-600 hover:bg-red-700 text-white text-center py-3 px-6 rounded-full font-semibold border-2 border-red-600 hover:border-red-700 transition-all transform hover:-translate-y-1 hover:shadow-lg">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </a>
-        </aside>
+<div class="flex min-h-screen">
+    <?php 
+    $base_path = '../';
+    include __DIR__ . '/includes/slidebar2.php'; 
+    ?>
 
-        <!-- Main Content -->
-        <main class="flex-1">
             <!-- Desktop Header -->
             <div class="hidden lg:block bg-white shadow-md border-b border-gray-200 sticky top-0 z-20">
                 <div class="flex items-center justify-center gap-6 py-6 px-6">
@@ -159,44 +129,7 @@ if (isSuperAdmin()) {
                 </div>
             </div>
 
-            <!-- Footer -->
-            <div class="mt-10 pt-6 border-t border-gray-300">
-                <div class="footer-divider"></div>
-    <footer class="footer" style="margin-top: 0; text-align: center;">
-        &copy; <?= date('Y') ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
-        © All rights reserved, 2008 - Wijeya Newspapers Ltd.
-    </footer>
-
-    </div>
-            
-            </div><!-- End Content Area -->
-        </main>
-    </div>
-
-    <!-- Mobile Menu Script -->
-    <script>
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const closeSidebar = document.getElementById('close-sidebar');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        const mobileHeader = document.getElementById('mobile-header');
-
-        function openSidebar() {
-            sidebar.classList.remove('-translate-x-full');
-            overlay.classList.remove('hidden');
-            mobileHeader.classList.add('-translate-y-full');
-        }
-
-        function closeSidebarMenu() {
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
-            mobileHeader.classList.remove('-translate-y-full');
-        }
-
-        mobileMenuBtn.addEventListener('click', openSidebar);
-        closeSidebar.addEventListener('click', closeSidebarMenu);
-        overlay.addEventListener('click', closeSidebarMenu);
-    </script>
+<?php include __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>
 
