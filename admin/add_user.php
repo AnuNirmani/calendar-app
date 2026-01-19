@@ -31,7 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
     } elseif (!preg_match("/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/", $password)) {
         $error = "Password must contain both letters and numbers!";
     } else {
-        $password = password_hash($password, PASSWORD_DEFAULT);
+        $password_hashed = password_hash($password, PASSWORD_DEFAULT);
+
         $checkStmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
         $checkStmt->bind_param("s", $username);
         $checkStmt->execute();
@@ -40,10 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
             $error = "Username already exists!";
         } else {
             $stmt = $conn->prepare("INSERT INTO users (username, password, role, created_by, status) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssii", $username, $password, $role, $created_by, $status);
+            $stmt->bind_param("sssii", $username, $password_hashed, $role, $created_by, $status);
+
             if ($stmt->execute()) {
                 $success = "User added successfully!";
-                // Redirect after 2 seconds
                 header("refresh:2;url=manage_users.php");
             } else {
                 $error = "Error adding user!";
@@ -52,331 +53,212 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
     }
 }
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Add User - Super Admin</title>
-    <link rel="stylesheet" href="../css/fonts/fonts.css">
-    <link rel="stylesheet" href="../css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../images/logo.jpg" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
+    <link rel="stylesheet" href="../assets/css/fontawesome.min.css">
+    <script src="../assets/js/tailwind.js"></script>
+
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/jquery.validate.min.js"></script>
+
     <style>
-        /* Password validation styles */
+        /* jQuery Validation Styles (Tailwind friendly) */
+        input.error, select.error {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+        }
+        input.valid, select.valid {
+            border-color: #22c55e !important;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15) !important;
+        }
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border-left: 4px solid #ef4444;
+            font-size: 13px;
+        }
+
         .password-validation {
-            margin-top: 5px;
-            font-size: 11px;
-            color: #f44336;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #b91c1c;
             display: none;
         }
-
-        .password-validation.show {
-            display: block;
-        }
-
-        .password-input-container {
-            position: relative;
-        }
-
-        .password-input {
-            transition: border-color 0.3s ease;
-        }
-
-        .password-input.valid {
-            border-color: #4caf50;
-        }
-
-        .password-input.invalid {
-            border-color: #f44336;
-        }
-
-        .form-container {
-            background: transparent;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: none;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            border-color: #2196f3;
-            outline: none;
-        }
-
-        /* jQuery Validation Styles */
-        .form-group input.error,
-        .form-group select.error {
-            border-color: #f44336;
-            box-shadow: 0 0 5px rgba(244, 67, 54, 0.3);
-        }
-
-        .form-group input.valid,
-        .form-group select.valid {
-            border-color: #4caf50;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-        }
-
-        label.error {
-            color: #f44336;
-            font-size: 12px;
-            margin-top: 5px;
-            display: block;
-            font-weight: normal;
-        }
-
-        .error-message {
-            background: #ffebee;
-            color: #c62828;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            border-left: 4px solid #f44336;
-            font-size: 14px;
-        }
-
-        .success-message {
-            background: #e8f5e8;
-            color: #2e7d32;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            border-left: 4px solid #4caf50;
-            font-size: 14px;
-        }
+        .password-validation.show { display: block; }
     </style>
 </head>
 
-<body class="admin-page">
-    <!-- Header with Back Button and Title -->
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="font-size: 28px;">➕ Add New User</h1>
+<body class="bg-gray-100 font-sans">
+<div class="flex min-h-screen">
+    <?php
+    $base_path = '../';
+    include __DIR__ . '/includes/slidebar2.php';
+    ?>
 
-        <a href="dashboard.php" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
-        color: white !important; 
-        padding: 10px 20px !important; 
-        border-radius: 20px !important; 
-        font-weight: 600 !important; 
-        text-transform: uppercase !important; 
-        letter-spacing: 0.5px !important; 
-        margin: 10px !important; 
-        display: inline-block !important; 
-        transition: all 0.3s ease !important;
-        font-size: 14px !important;">
-        <i class="fas fa-home"></i> Back to Dashboard
-        </a>
-    </div>
+    <div class="flex-1 p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">➕ Add New User</h1>
 
-    <?php if (isset($error)): ?>
-        <div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f44336; max-width: 600px; margin: 0 auto 20px auto;">
-            <strong>⚠️ Error:</strong> <?= htmlspecialchars($error) ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if (isset($success)): ?>
-        <div style="background: #e8f5e8; color: #2e7d32; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #4caf50; max-width: 600px; margin: 0 auto 20px auto;">
-            <strong>✅ Success:</strong> <?= htmlspecialchars($success) ?>
-            <br><small>Redirecting to Manage Users...</small>
-        </div>
-    <?php endif; ?>
-
-    <!-- Add User Form -->
-    <div class="form-container">
-        <form method="POST" id="addUserForm">
-            <div class="form-group">
-                <label for="username">👤 Username:</label>
-                <input type="text" id="username" name="username" required 
-                       placeholder="Enter username"
-                       value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>">
+        <?php if (isset($error)): ?>
+            <div class="max-w-xl mx-auto bg-red-100 border-l-4 border-red-500 text-red-700 p-4 my-4 rounded">
+                <strong>⚠️ Error:</strong> <?= htmlspecialchars($error) ?>
             </div>
+        <?php endif; ?>
 
-            <div class="form-group">
-                <label for="password">🔒 Password:</label>
-                <div class="password-input-container">
-                    <input type="password" name="password" id="passwordInput" required 
-                           class="password-input"
-                           placeholder="At least 8 characters, Contains letters, Contains numbers"
-                           oninput="validatePassword()">
-                    <span onclick="togglePassword()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">
-                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
-                    </span>
+        <?php if (isset($success)): ?>
+            <div class="max-w-xl mx-auto bg-green-100 border-l-4 border-green-500 text-green-800 p-4 my-4 rounded">
+                <strong>✅ Success:</strong> <?= htmlspecialchars($success) ?>
+                <div class="text-xs mt-1">Redirecting to Manage Users...</div>
+            </div>
+        <?php endif; ?>
+
+        <div class="max-w-xl mx-auto bg-white rounded-lg shadow-md p-6">
+            <form method="POST" id="addUserForm" class="space-y-5">
+                <input type="hidden" name="add_user" value="1">
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">👤 Username</label>
+                    <input type="text" id="username" name="username"
+                           value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>"
+                           placeholder="Enter username"
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
-                <div class="password-validation" id="passwordValidation">
-                    ❌ At least 8 characters, Contains letters and numbers
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">🔒 Password</label>
+
+                    <div class="relative">
+                        <input type="password" name="password" id="passwordInput"
+                               placeholder="At least 8 characters, letters + numbers"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 pr-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+
+                        <button type="button"
+                                onclick="togglePassword()"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                            <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+
+                    <div class="password-validation" id="passwordValidation">
+                        ❌ Password must be at least 8 characters and contain letters and numbers
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="role">🏷️ Role:</label>
-                <select name="role" id="role" required>
-                    <option value="">Select Role</option>
-                    <option value="admin" <?= (isset($_POST['role']) && $_POST['role'] == 'admin') ? 'selected' : '' ?>>Admin</option>
-                    <option value="super_admin" <?= (isset($_POST['role']) && $_POST['role'] == 'super_admin') ? 'selected' : '' ?>>Super Admin</option>
-                </select>
-            </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">🏷️ Role</label>
+                    <select name="role" id="role"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="">Select Role</option>
+                        <option value="admin" <?= (isset($_POST['role']) && $_POST['role'] == 'admin') ? 'selected' : '' ?>>Admin</option>
+                        <option value="super_admin" <?= (isset($_POST['role']) && $_POST['role'] == 'super_admin') ? 'selected' : '' ?>>Super Admin</option>
+                    </select>
+                </div>
 
-            <button type="submit" 
-            class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-md font-semibold hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center gap-2">
-            <i class="fas fa-user-plus "></i>
-               Add User
-            </button>
-        </form>
+                <button type="submit"
+                        class="w-full bg-sky-500 text-white px-4 py-3 rounded-md font-semibold hover:bg-sky-600 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-user-plus"></i>
+                    Add User
+                </button>
+            </form>
+        </div>
+
     </div>
+</div>
 
-    <!-- User Info + Logout -->
-    <div style="margin-top: 30px; text-align: center;">
-        <span style="color: navy; padding: 8px 16px; border-radius: 20px; font-size: 18px; font-weight: 600;">
-            <?= isSuperAdmin() ? '👑 Super Admin' : '👤 Admin' ?>: <?= htmlspecialchars($_SESSION['username']) ?>
-        </span>
-        <a href="../logout.php" style="background: #f44336; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; margin-left: 10px;">
-            🚪 Logout
-        </a>
-    </div>
+<?php include __DIR__ . '/includes/footer.php'; ?>
 
-    <div class="footer-divider"></div>
-    <footer class="footer" style="margin-top: 0; text-align: center;">
-        &copy; <?= date('Y') ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
-        © All rights reserved, 2008 - Wijeya Newspapers Ltd.
-    </footer>
+<script>
+    // Toggle password visibility
+    function togglePassword() {
+        const passwordInput = $("#passwordInput");
+        const eyeIcon = $("#eyeIcon");
 
-    <script>
-        $(document).ready(function() {
-            // Auto-hide success messages
-            setTimeout(() => {
-                $('div[style*="border-left"]').each(function() {
-                    if ($(this).text().includes('Success')) {
-                        $(this).hide();
-                    }
-                });
-            }, 2000);
+        if (passwordInput.attr("type") === "password") {
+            passwordInput.attr("type", "text");
+            eyeIcon.removeClass("fa-eye").addClass("fa-eye-slash");
+        } else {
+            passwordInput.attr("type", "password");
+            eyeIcon.removeClass("fa-eye-slash").addClass("fa-eye");
+        }
+    }
 
-            // Toggle password visibility
-            window.togglePassword = function() {
-                const passwordInput = $("#passwordInput");
-                const eyeIcon = $("#eyeIcon");
+    $(document).ready(function () {
+        // Auto-hide messages
+        setTimeout(() => {
+            $('.bg-red-100, .bg-green-100').hide();
+        }, 2000);
 
-                if (passwordInput.attr("type") === "password") {
-                    passwordInput.attr("type", "text");
-                    eyeIcon.removeClass("fa-eye").addClass("fa-eye-slash");
+        // Custom validation methods
+        $.validator.addMethod("hasLetters", function(value, element) {
+            return this.optional(element) || /[A-Za-z]/.test(value);
+        }, "Password must contain at least one letter");
+
+        $.validator.addMethod("hasNumbers", function(value, element) {
+            return this.optional(element) || /[0-9]/.test(value);
+        }, "Password must contain at least one number");
+
+        // Validation
+        $("#addUserForm").validate({
+            rules: {
+                username: { required: true, minlength: 3, maxlength: 50 },
+                password: { required: true, minlength: 8, hasLetters: true, hasNumbers: true },
+                role: { required: true }
+            },
+            messages: {
+                username: {
+                    required: "👤 Username is required",
+                    minlength: "Username must be at least 3 characters",
+                    maxlength: "Username cannot exceed 50 characters"
+                },
+                password: {
+                    required: "🔒 Password is required",
+                    minlength: "Password must be at least 8 characters",
+                    hasLetters: "Password must contain letters",
+                    hasNumbers: "Password must contain numbers"
+                },
+                role: { required: "🏷️ Please select a role" }
+            },
+            errorElement: "div",
+            errorClass: "error-message",
+            validClass: "valid",
+            errorPlacement: function(error, element) {
+                if (element.attr("name") === "password") {
+                    error.insertAfter(element.closest(".relative"));
                 } else {
-                    passwordInput.attr("type", "password");
-                    eyeIcon.removeClass("fa-eye-slash").addClass("fa-eye");
-                }
-            };
-
-            // jQuery Validation Setup
-            $("#addUserForm").validate({
-                rules: {
-                    username: {
-                        required: true,
-                        minlength: 3,
-                        maxlength: 50
-                    },
-                    password: {
-                        required: true,
-                        minlength: 8,
-                        hasLetters: true,
-                        hasNumbers: true
-                    },
-                    role: {
-                        required: true
-                    }
-                },
-                messages: {
-                    username: {
-                        required: "👤 Username is required",
-                        minlength: "Username must be at least 3 characters",
-                        maxlength: "Username cannot exceed 50 characters"
-                    },
-                    password: {
-                        required: "🔒 Password is required",
-                        minlength: "Password must be at least 8 characters",
-                        hasLetters: "Password must contain letters",
-                        hasNumbers: "Password must contain numbers"
-                    },
-                    role: {
-                        required: "🏷️ Please select a role"
-                    }
-                },
-                errorElement: "div",
-                errorClass: "error-message",
-                validClass: "valid",
-                errorPlacement: function(error, element) {
-                    error.addClass("error-message");
                     error.insertAfter(element);
-                },
-                success: function(label, element) {
-                    $(element).removeClass("error").addClass("valid");
-                    label.remove();
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).removeClass(validClass).addClass(errorClass);
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).removeClass(errorClass).addClass(validClass);
-                },
-                submitHandler: function(form) {
-                    // This will only run if client-side validation passes
-                    form.submit();
                 }
-            });
-
-            // Custom validation methods
-            $.validator.addMethod("hasLetters", function(value, element) {
-                return this.optional(element) || /[A-Za-z]/.test(value);
-            }, "Password must contain at least one letter");
-
-            $.validator.addMethod("hasNumbers", function(value, element) {
-                return this.optional(element) || /[0-9]/.test(value);
-            }, "Password must contain at least one number");
-
-            // Real-time password validation feedback
-            $("#passwordInput").on('input', function() {
-                const password = $(this).val();
-                const hasMinLength = password.length >= 8;
-                const hasLetters = /[A-Za-z]/.test(password);
-                const hasNumbers = /[0-9]/.test(password);
-                
-                if (password.length > 0) {
-                    if (hasMinLength && hasLetters && hasNumbers) {
-                        $("#passwordValidation").removeClass('show');
-                        $(this).removeClass('invalid').addClass('valid');
-                    } else {
-                        $("#passwordValidation").addClass('show');
-                        $(this).removeClass('valid').addClass('invalid');
-                    }
-                } else {
-                    $("#passwordValidation").removeClass('show');
-                    $(this).removeClass('valid invalid');
-                }
-            });
+            },
+            success: function(label, element) {
+                $(element).removeClass("error").addClass("valid");
+                label.remove();
+            }
         });
-    </script>
+
+        // Real-time password feedback
+        $("#passwordInput").on("input", function() {
+            const password = $(this).val();
+            const ok = password.length >= 8 && /[A-Za-z]/.test(password) && /[0-9]/.test(password);
+
+            if (password.length === 0) {
+                $("#passwordValidation").removeClass("show");
+                return;
+            }
+
+            if (ok) {
+                $("#passwordValidation").removeClass("show");
+            } else {
+                $("#passwordValidation").addClass("show");
+            }
+        });
+    });
+</script>
 </body>
 </html>
-

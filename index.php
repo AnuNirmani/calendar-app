@@ -74,8 +74,10 @@ function renderCalendar($month, $year, $specialDates, $today) {
         $dayText = sprintf('%02d', $d);
         $dayNumber = "<span class='day-number'>$dayText</span>";
 
-        echo "<td class='$class' title='$desc' style='cursor: pointer; color: black; $style'
-             onclick=\"window.open('https://time.wnl/source/" . str_replace('-', '/', $dateStr) . "/sheet.pdf', '_blank')\">
+        // OFFLINE MODE: External URL removed for offline access
+        // To enable online PDF viewing, uncomment the line below:
+        // onclick=\"window.open('https://time.wnl/source/" . str_replace('-', '/', $dateStr) . "/sheet.pdf', '_blank')\"
+        echo "<td class='$class' title='$desc' style='cursor: pointer; color: black; $style'>
              $dayNumber$tooltip</td>";
 
         if ((($d + $pad) % 7) == 0) echo "</tr><tr>";
@@ -92,9 +94,9 @@ function adjustBrightness($hex, $percent) {
     $g = hexdec(substr($hex, 2, 2));
     $b = hexdec(substr($hex, 4, 2));
     
-    $r = max(0, min(255, $r * $percent));
-    $g = max(0, min(255, $g * $percent));
-    $b = max(0, min(255, $b * $percent));
+    $r = (int) max(0, min(255, $r * $percent));
+    $g = (int) max(0, min(255, $g * $percent));
+    $b = (int) max(0, min(255, $b * $percent));
     
     return '#' . str_pad(dechex($r), 2, '0', STR_PAD_LEFT) . 
                  str_pad(dechex($g), 2, '0', STR_PAD_LEFT) . 
