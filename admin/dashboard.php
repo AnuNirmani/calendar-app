@@ -30,12 +30,68 @@ if (isSuperAdmin()) {
     $totalUsers = $stmt->fetch_assoc()['total_users'];
 }
 
-// Include header
-include 'includes/header.php';
+            <div class="m-5 bg-blue-800 bg-opacity-50 p-4 rounded-xl text-center">
+                <div class="text-lg font-semibold mb-1">👤 <?= htmlspecialchars($_SESSION['username']) ?></div>
+                <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold mt-2 <?= isSuperAdmin() ?>">
+                    <?= isSuperAdmin() ? '👑 Super Admin' : '🔰 Admin' ?>
+                </span>
+            </div>
 
-// Include sidebar
-include 'includes/sidebar.php';
-?>
+            <ul class="space-y-1 py-4">
+                <li>
+                    <a href="dashboard.php" class="flex items-center px-6 py-3 text-white bg-blue-800 bg-opacity-75 border-l-4 border-white font-semibold transition-all">
+                        <i class="fas fa-home w-6 text-center mr-3"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="index.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                        <i class="fas fa-calendar-day w-6 text-center mr-3"></i> See Special Dates
+                    </a>
+                </li>
+                <li>
+                    <a href="add.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                        <i class="fas fa-plus-circle w-6 text-center mr-3"></i> Add Special Dates
+                    </a>
+                </li>
+                <?php if (isSuperAdmin()): ?>
+                    <li>
+                        <a href="manage_users.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                            <i class="fas fa-users-cog w-6 text-center mr-3"></i> Manage Users
+                        </a>
+                    </li>
+                    <li>
+                        <a href="add_user.php" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                            <i class="fas fa-user-plus w-6 text-center mr-3"></i> Add User
+                        </a>
+                    </li>
+                <?php endif; ?>
+                <li>
+                    <a href="../index.php" target="_blank" rel="noopener noreferrer" class="flex items-center px-6 py-3 text-white hover:bg-blue-800 hover:bg-opacity-50 hover:border-l-4 hover:border-white transition-all">
+                        <i class="fas fa-calendar w-6 text-center mr-3"></i> View Calendar
+                    </a>
+                </li>
+            </ul>
+
+            <a href="../logout.php" class="block mx-5 my-8 bg-red-600 hover:bg-red-700 text-white text-center py-3 px-6 rounded-full font-semibold border-2 border-red-600 hover:border-red-700 transition-all transform hover:-translate-y-1 hover:shadow-lg">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1">
+            <!-- Desktop Header -->
+            <div class="hidden lg:block bg-white shadow-md border-b border-gray-200 sticky top-0 z-20">
+                <div class="flex items-center justify-center gap-6 py-6 px-6">
+                    <img src="../images/logo.png" alt="WNL Logo" class="w-24 h-24 object-contain rounded-lg shadow-lg">
+                    <div class="text-center">
+                        <h1 class="text-4xl font-semibold text-blue-900 tracking-wide mb-2">Welcome to WNL</h1>
+                        <p class="text-lg text-gray-600">Manage calendar events</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="p-6 lg:p-10 pt-20 lg:pt-6">
 
             <!-- Statistics Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-8 lg:mb-10">
@@ -96,16 +152,51 @@ include 'includes/sidebar.php';
 
                     <?php endif; ?>
 
-                    <a href="../index.php" 
-                    target="_blank" rel="noopener noreferrer" 
-                    class="flex flex-col items-center justify-center p-6 lg:p-8 bg-gradient-to-br from-orange-500 to-orange-700 text-white rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[140px] text-center">
-                        <i class="fas fa-calendar text-4xl lg:text-5xl mb-3"></i>
-                        <span class="text-sm lg:text-base font-semibold uppercase tracking-wide">View Calendar</span>
-                    </a>
+                    <a href="../index.php" target="_blank" rel="noopener noreferrer" class="flex flex-col items-center justify-center p-6 lg:p-8 bg-gradient-to-br from-orange-500 to-orange-700 text-white rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[140px] text-center">
+                            <i class="fas fa-calendar text-4xl lg:text-5xl mb-3"></i>
+                            <span class="text-sm lg:text-base font-semibold uppercase tracking-wide">View Calendar</span>
+                        </a>
                 </div>
             </div>
 
-<?php
-// Include footer
-include 'includes/footer.php';
-?>
+            <!-- Footer -->
+            <div class="mt-10 pt-6 border-t border-gray-300">
+                <div class="footer-divider"></div>
+    <footer class="footer" style="margin-top: 0; text-align: center;">
+        &copy; <?= date('Y') ?> Developed and Maintained by WNL in collaboration with Web Publishing Department <br>
+        © All rights reserved, 2008 - Wijeya Newspapers Ltd.
+    </footer>
+
+    </div>
+            
+            </div><!-- End Content Area -->
+        </main>
+    </div>
+
+    <!-- Mobile Menu Script -->
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeSidebar = document.getElementById('close-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const mobileHeader = document.getElementById('mobile-header');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+            mobileHeader.classList.add('-translate-y-full');
+        }
+
+        function closeSidebarMenu() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+            mobileHeader.classList.remove('-translate-y-full');
+        }
+
+        mobileMenuBtn.addEventListener('click', openSidebar);
+        closeSidebar.addEventListener('click', closeSidebarMenu);
+        overlay.addEventListener('click', closeSidebarMenu);
+    </script>
+</body>
+</html>
+
