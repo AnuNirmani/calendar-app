@@ -1,23 +1,26 @@
-# 🗓️ PHP Calendar with Admin Panel
+# 🗓️ Calendar, 📄 Circulars & 📇 Employee Directory
 
-This is a responsive PHP-based calendar web application that displays special dates (e.g. holidays, poya days, etc.) with color-coded cells and optional descriptions. An admin panel allows managing these special dates via a secure login system.
+This project is a PHP web app that bundles three modules in one UI:
+- A responsive calendar for special dates (holidays, poya days, etc.)
+- A company circulars board with categories and pagination
+- An employee telephone directory with department filters, search, and quick actions
+
+The Circulars + Directory live together in `circular.php` with tab navigation.
 
 ---
 
 ## 🚀 Features
 
-- ✅ **4-month dynamic calendar view**
-- ✅ **Special dates from MySQL database**
-- ✅ **Color-coded cells for holidays and poya days**
-- ✅ **Colored dates for weekends**
-- ✅ **Tooltip hover for date descriptions**
-- ✅ **Clickable date cells (to open attendance PDFs)**
-- ✅ **Admin panel for managing special dates**
-- ✅ **Super Admin panel for managing Admins**
-- ✅ **Pagination based on year (admin side)**
-- ✅ **Search a date by dropdowns**
-- ✅ **Hashed passwords**
-- ✅ **SQL Injection Protection**
+- ✅ Calendar: 4‑month dynamic view with database‑driven special dates
+- ✅ Calendar: Color coding for holidays/poya + weekend highlighting
+- ✅ Calendar: Tooltip descriptions and optional PDF links per date
+- ✅ Admin: Manage special dates + super admin for user management
+- ✅ Security: Hashed passwords and SQL‑injection‑safe queries
+- ✅ Circulars: Category support and pagination (see `admin/posts/`)
+- ✅ Directory: Department filter, keyword search, and grouped results
+- ✅ Directory: Shows position, extension, multiple phone numbers, and email
+- ✅ Directory: Quick actions — Call and Email buttons stay visible on all rows
+- ✅ Directory: Phone numbers have small copy buttons next to each number
 
 ---
 
@@ -26,73 +29,23 @@ This is a responsive PHP-based calendar web application that displays special da
 ✅ Frontend: HTML5, CSS3, JavaScript
 ✅ Backend: PHP 8+
 ✅ Database: MySQL (via phpMyAdmin)
-✅ Server: WAMP / XAMPP (localhost testing)
+✅ Server: WAMP / XAMPP / Laragon (localhost testing)
+
+> Tip (Laragon): Place this folder in `C:\laragon\www\` and browse to
+> `http://localhost/calendar-app/circular.php`.
 
 ---
 
-## 🗃️ Database Schema
+## 🧭 Modules Overview
 
-### 1. `users with default users`  
-Stores user login credentials and roles.
-```sql
-CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('super_admin', 'admin') NOT NULL DEFAULT 'admin',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by INT,
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
-);
+- **Calendar** — traditional 4‑month grid, data from MySQL.
+- **Circulars** — end‑user list with pagination; managed via `admin/posts/`.
+- **Employee Directory** — searchable list grouped by Department with actions:
+   - Call button (`tel:`) and Email button (`mailto:`)
+   - Copy buttons for individual phone numbers
+   - We removed the old “Copy Details” button from the Actions column so the Call/Email buttons remain visible.
 
-INSERT INTO users (username, password, role) VALUES ('superadmin', 'YOUR_HASHED_PASSWORD', 'super_admin')
-ON DUPLICATE KEY UPDATE role = 'super_admin';
-
-INSERT INTO users (username, password, role, created_by) VALUES ('admin1', 'YOUR_HASHED_PASSWORD', 'admin', 1)
-ON DUPLICATE KEY UPDATE role = 'admin';
-
-> 🔐 *Use the update_passwords.php script to set secure passwords. Never commit actual passwords to the repository.*
-
-````
-
-### 2. `special_types`
-
-Stores types of special dates (e.g. Holiday, Poya).
-
-```sql
-CREATE TABLE special_types (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  type VARCHAR(100) NOT NULL,
-  description TEXT
-);
-```
-
-### 3. `special_dates`
-
-Stores the actual dates.
-
-```sql
-CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('super_admin', 'admin') NOT NULL DEFAULT 'admin',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by INT,
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
-);
-```
-
-
----
-
-## 0️⃣ Default Special Dates
-
-```sql
-INSERT INTO special_types (type, description) VALUES
-('holiday', 'Public Holiday'),
-('poya', 'Full Moon Poya Day');
-```
+Open the combined view at: `circular.php` → tabs “Circulars” and “Employee Directory”.
 
 ---
 
@@ -108,56 +61,6 @@ Use the included `update_passwords.php` script:
 
 ---
 
-## 📂 Folder Structure
-
-```
-calendar-app/
-│
-├── admin/
-│   ├── add.php
-│   ├── edit.php
-│   ├── edit_user.php
-│   ├── index.php
-│   ├── manage_users.php
-│   └── save.php
-│
-├── css/
-│   ├── fonts/
-│   │   └── static/
-│   │       ├── Inter-Bold.woff
-│   │       ├── Inter-Bold.woff2
-│   │       ├── Inter-Light.woff
-│   │       ├── Inter-Light.woff2
-│   │       ├── Inter-Medium.woff
-│   │       ├── Inter-Medium.woff2
-│   │       ├── Inter-Regular.woff
-│   │       ├── Inter-Regular.woff2
-│   │       ├── Inter-SemiBold.woff
-│   │       └── Inter-SemiBold.woff2
-│   ├── fonts.css
-│   └── style.css
-│
-├── images/
-│   └── logo.jpg
-│
-├── .hintrc
-├── auth.php
-├── circular.html
-├── db.php
-├── index.html
-├── index.php
-├── login.php
-├── logout.php
-├── README.md
-├── update_passwords.php
-```
-- **admin/**: Admin panel PHP files  
-- **css/**: Stylesheets and font files  
-- **images/**: App images  
-- Root: Main PHP/HTML files
-
----
-
 ## 🔧 Setup Instructions
 
 1. ✅ Clone the repo:
@@ -168,9 +71,11 @@ calendar-app/
    git checkout main
    ```
 
-2. ✅ Start XAMPP or MAMP and place files in your `htdocs` folder.
+2. ✅ Start WAMP/XAMPP/Laragon and place files in your web root
+   - XAMPP: `htdocs/calendar-app`
+   - Laragon: `C:\laragon\www\calendar-app`
 
-3. ✅ Create a MySQL database called `calendar_app` and run the SQL scripts from the schema section above.
+3. ✅ Create a MySQL database (e.g., `calendar_app`) and run the SQL from the schema section above.
 
 4. ✅ **Configure Database Connection:**
    - Copy `db.example.php` to `db.php`
@@ -185,15 +90,14 @@ calendar-app/
 6. ✅ Access via browser:
 
    ```
-   http://localhost/calendar-app/index.php
-   http://localhost/calendar-app/login.php
+http://localhost/calendar-app/circular.php       # Circulars + Directory
+http://localhost/calendar-app/index.php          # Calendar
+http://localhost/calendar-app/admin/             # Admin (login)
    ```
 
----
-
-## 💡 Future Improvements
-
-* Export calendar as PDF
+7. ✅ (Optional) Initialize Circulars/Directory tables
+   - Visit `admin/posts/create_posts_table.php` once (if present) to create base tables.
+   - Manage directory and circular entries via pages in `admin/posts/`.
 
 ---
 
