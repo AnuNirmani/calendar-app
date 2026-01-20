@@ -26,10 +26,10 @@ The Circulars + Directory live together in `circular.php` with tab navigation.
 
 ## 🛠️ Tech Stack
 
-✅ Frontend: HTML5, CSS3, JavaScript
-✅ Backend: PHP 8+
-✅ Database: MySQL (via phpMyAdmin)
-✅ Server: WAMP / XAMPP / Laragon (localhost testing)
+- ✅ Frontend: HTML5, CSS3, JavaScript
+- ✅ Backend: PHP 8+
+- ✅ Database: MySQL (via phpMyAdmin)
+- ✅ Server: WAMP / XAMPP / Laragon (localhost testing)
 
 > Tip (Laragon): Place this folder in `C:\laragon\www\` and browse to
 > `http://localhost/calendar-app/circular.php`.
@@ -63,7 +63,7 @@ Use the included `update_passwords.php` script:
 
 ## 🔧 Setup Instructions
 
-1. ✅ Clone the repo:
+ 1️⃣ Clone the repo:
 
    ```bash
    git clone https://github.com/AnuNirmani/calendar-app
@@ -71,35 +71,34 @@ Use the included `update_passwords.php` script:
    git checkout main
    ```
 
-2. ✅ Start WAMP/XAMPP/Laragon and place files in your web root
+2️⃣ Start WAMP/XAMPP/Laragon and place files in your web root
    - XAMPP: `htdocs/calendar-app`
    - Laragon: `C:\laragon\www\calendar-app`
 
-3. ✅ Create a MySQL database (e.g., `calendar_app`) and run the SQL from the schema section above.
+3️⃣ Create a MySQL database (e.g., `calendar_app`) and run the SQL from the schema section above.
 
-4. ✅ **Configure Database Connection:**
+4️⃣ **Configure Database Connection:**
    - Copy `db.example.php` to `db.php`
    - Update `db.php` with your actual database credentials
    - **NEVER commit db.php to the repository**
 
-5. ✅ **Set Secure Passwords:**
+5️⃣ **Set Secure Passwords:**
    - Edit `update_passwords.php` with your desired passwords
    - Run it once: `php update_passwords.php`
    - Delete or secure `update_passwords.php` after running
 
-6. ✅ Access via browser:
+6️⃣ Access via browser:
 
-   ```
-http://localhost/calendar-app/circular.php       # Circulars + Directory
-http://localhost/calendar-app/index.php          # Calendar
-http://localhost/calendar-app/admin/             # Admin (login)
-   ```
+   - http://localhost/calendar-app/circular.php       # Circulars + Directory
+   - http://localhost/calendar-app/index.php          # Calendar
+   - http://localhost/calendar-app/admin/             # Admin (login)
 
-7. ✅ (Optional) Initialize Circulars/Directory tables
+7️⃣ (Optional) Initialize Circulars/Directory tables
    - Visit `admin/posts/create_posts_table.php` once (if present) to create base tables.
    - Manage directory and circular entries via pages in `admin/posts/`.
 
 ---
+
 
 ## 🙌 Credits
 
