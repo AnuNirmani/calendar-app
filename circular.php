@@ -1193,6 +1193,28 @@ if ($phone_result) {
         .active-filter i:hover {
             opacity: 1;
         }
+
+        /* .contact-position-name {
+    font-weight: 600;
+    color: var(--dark-blue);
+    font-size: 1.05rem;
+    margin: 0;
+} */
+
+
+        .contact-strong {
+            font-weight: 600;
+            color: var(--dark-blue);
+            font-size: 1.05rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .contact-strong.muted {
+            opacity: 0.5;
+        }
+
+
     </style>
 </head>
 <body>
@@ -1428,261 +1450,293 @@ if ($phone_result) {
                     <?php endif; ?>
                 </div>
 
-                <!-- Directory Tab Content - UPDATED for position field and multiple phone numbers -->
-                <div id="directory-tab-content" class="tab-pane-content <?php echo $current_tab == 'directory' ? 'active' : 'd-none'; ?>">
-                    <div class="search-section">
-                        <h3 class="search-title">
-                            <i class="fas fa-address-book"></i>
-                            Employee Directory
-                        </h3>
-                        <div class="search-card">
-                            <form method="GET" action="" class="row g-3">
-                                <input type="hidden" name="tab" value="directory">
+<!-- Directory Tab Content - UPDATED for position field and multiple phone numbers -->
+<div id="directory-tab-content" class="tab-pane-content <?php echo $current_tab == 'directory' ? 'active' : 'd-none'; ?>">
+    <div class="search-section">
+        <h3 class="search-title">
+            <i class="fas fa-address-book"></i>
+            Employee Directory
+        </h3>
+        <div class="search-card">
+            <form method="GET" action="" class="row g-3">
+                <input type="hidden" name="tab" value="directory">
 
-                                <div class="col-md-4">
-                                    <label class="form-label">Filter by Department</label>
-                                    <select name="phone_dept" class="form-select">
-                                        <option value="all" <?php echo $phone_dept == 'all' ? 'selected' : ''; ?>>All Departments</option>
-                                        <?php foreach ($departments as $dept): ?>
-                                            <option value="<?php echo $dept['id']; ?>" 
-                                                    <?php echo $phone_dept == $dept['id'] ? 'selected' : ''; ?>>
-                                                <?php echo htmlspecialchars($dept['name']); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label class="form-label">Search Contacts</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light border-end-0">
-                                            <i class="fas fa-search text-primary"></i>
-                                        </span>
-                                        <input type="text" 
-                                               name="phone_search" 
-                                               value="<?php echo htmlspecialchars($phone_search); ?>" 
-                                               class="form-control border-start-0" 
-                                               placeholder="Search by name, phone, email, position, or department...">
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-2 d-flex align-items-end">
-                                    <div class="d-grid gap-2 w-100">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-search me-1"></i>Search
-                                        </button>
-                                        <?php if (!empty($phone_search) || $phone_dept !== 'all'): ?>
-                                        <a href="circular.php?tab=directory" class="btn btn-outline-primary">
-                                            <i class="fas fa-times me-1"></i>Clear
-                                        </a>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            </form>
-                            
-                            <?php if (!empty($phone_search) || $phone_dept !== 'all'): ?>
-                            <div class="directory-summary mt-3">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <h6 class="mb-1">Active Filters:</h6>
-                                        <div class="d-flex flex-wrap gap-2 mt-2">
-                                            <?php if (!empty($phone_search)): ?>
-                                            <span class="active-filter">
-                                                Search: "<?php echo htmlspecialchars($phone_search); ?>"
-                                                <i class="fas fa-times" onclick="clearFilter('phone_search')"></i>
-                                            </span>
-                                            <?php endif; ?>
-                                            
-                                            <?php if ($phone_dept !== 'all'): 
-                                                $selected_dept = '';
-                                                foreach ($departments as $dept) {
-                                                    if ($dept['id'] == $phone_dept) {
-                                                        $selected_dept = $dept['name'];
-                                                        break;
-                                                    }
-                                                }
-                                            ?>
-                                            <span class="active-filter">
-                                                Department: <?php echo htmlspecialchars($selected_dept); ?>
-                                                <i class="fas fa-times" onclick="clearFilter('phone_dept')"></i>
-                                            </span>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <small class="text-muted"><?php echo $phone_total_records; ?> contact(s) found</small>
-                                    </div>
-                                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Filter by Department</label>
+                    <select name="phone_dept" class="form-select">
+                        <option value="all" <?php echo $phone_dept == 'all' ? 'selected' : ''; ?>>All Departments</option>
+                        <?php foreach ($departments as $dept): ?>
+                            <option value="<?php echo $dept['id']; ?>"
+                                    <?php echo $phone_dept == $dept['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($dept['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Search Contacts</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fas fa-search text-primary"></i>
+                        </span>
+                        <input type="text"
+                               name="phone_search"
+                               value="<?php echo htmlspecialchars($phone_search); ?>"
+                               class="form-control border-start-0"
+                               placeholder="Search by name, phone, email, position, or department...">
+                    </div>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <div class="d-grid gap-2 w-100">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>Search
+                        </button>
+                        <?php if (!empty($phone_search) || $phone_dept !== 'all'): ?>
+                            <a href="circular.php?tab=directory" class="btn btn-outline-primary">
+                                <i class="fas fa-times me-1"></i>Clear
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </form>
+
+            <?php if (!empty($phone_search) || $phone_dept !== 'all'): ?>
+                <!-- <div class="directory-summary mt-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="mb-1">Active Filters:</h6>
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <?php if (!empty($phone_search)): ?>
+                                    <span class="active-filter">
+                                        Search: "<?php echo htmlspecialchars($phone_search); ?>"
+                                        <i class="fas fa-times" onclick="clearFilter('phone_search')"></i>
+                                    </span>
+                                <?php endif; ?>
+
+                                <?php if ($phone_dept !== 'all'):
+                                    $selected_dept = '';
+                                    foreach ($departments as $dept) {
+                                        if ($dept['id'] == $phone_dept) {
+                                            $selected_dept = $dept['name'];
+                                            break;
+                                        }
+                                    }
+                                ?>
+                                    <span class="active-filter">
+                                        Department: <?php echo htmlspecialchars($selected_dept); ?>
+                                        <i class="fas fa-times" onclick="clearFilter('phone_dept')"></i>
+                                    </span>
+                                <?php endif; ?>
                             </div>
-                            <?php endif; ?>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted"><?php echo $phone_total_records; ?> contact(s) found</small>
+                        </div>
+                    </div>
+                </div> -->
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <?php if (!empty($phone_entries)): ?>
+        <?php
+        $grouped_contacts = [];
+        foreach ($phone_entries as $entry) {
+            $dept_name = !empty($entry['department_name']) ? $entry['department_name'] : 'Unassigned';
+            $grouped_contacts[$dept_name][] = $entry;
+        }
+        ksort($grouped_contacts);
+        ?>
+
+        <div class="directory-results" id="directory-view">
+            <?php foreach ($grouped_contacts as $dept_name => $contacts): ?>
+                <div class="department-group">
+                    <div class="department-header">
+                        <div class="department-name">
+                            <i class="fas fa-building"></i>
+                            <?php echo htmlspecialchars($dept_name); ?>
+                        </div>
+                        <div class="department-count">
+                            <?php echo count($contacts); ?> employee(s)
                         </div>
                     </div>
 
-                    <?php if (!empty($phone_entries)): ?>
-                        <!-- Group contacts by department -->
-                        <?php 
-                        $grouped_contacts = [];
-                        foreach ($phone_entries as $entry) {
-                            $dept_name = !empty($entry['department_name']) ? $entry['department_name'] : 'Unassigned';
-                            $grouped_contacts[$dept_name][] = $entry;
-                        }
-                        
-                        // Sort departments alphabetically
-                        ksort($grouped_contacts);
-                        ?>
-                        
-                        <div class="directory-results" id="directory-view">
-                            <?php foreach ($grouped_contacts as $dept_name => $contacts): ?>
-                            <div class="department-group">
-                                <div class="department-header">
-                                    <div class="department-name">
-                                        <i class="fas fa-building"></i>
-                                        <?php echo htmlspecialchars($dept_name); ?>
-                                    </div>
-                                    <div class="department-count">
-                                        <?php echo count($contacts); ?> employee(s)
-                                    </div>
+                    <!-- Table Headers -->
+                    <div class="contact-row" style="background:#f8fafc; border-bottom:2px solid #e2e8f0; display:flex; align-items:center;">
+                        <div class="contact-info-col" style="flex:1; min-width:200px;">
+                            <div class="contact-name" style="color:#64748b; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px; margin:0;">
+                                Employee
+                            </div>
+                        </div>
+
+                        <div style="flex:0.8; min-width:150px; padding:0 1.5rem;">
+                            <div class="detail-label" style="color:#64748b; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px; margin:0;">
+                                Position
+                            </div>
+                        </div>
+
+                        <div style="flex:0.6; min-width:100px; padding:0 1.5rem;">
+                            <div class="detail-label" style="color:#64748b; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px; margin:0;">
+                                Extension
+                            </div>
+                        </div>
+
+                        <!-- ✅ NEW: Phone column -->
+                        <div style="flex:0.75; min-width:180px;">
+                            <div class="detail-label" style="color:#64748b; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px; margin:0;">
+                                Phone
+                            </div>
+                        </div>
+
+                        <!-- ✅ NEW: Email column -->
+                        <div style="flex:0.75; min-width:220px;">
+                            <div class="detail-label" style="color:#64748b; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px; margin:0;">
+                                Email
+                            </div>
+                        </div>
+
+                        <div class="contact-actions-col">
+                            <div style="width:36px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Rows -->
+                    <?php foreach ($contacts as $entry): ?>
+                        <div class="contact-row" style="display:flex; align-items:flex-start; padding:1rem 1.5rem; border-bottom:1px solid #f1f5f9;">
+                            <div class="contact-info-col" style="flex:1; min-width:200px;">
+                                <div class="contact-name" style="color:var(--dark-blue); font-weight:600; font-size:1.05rem; margin:0;">
+                                    <?php echo htmlspecialchars($entry['name']); ?>
                                 </div>
-                                
-                                <div class="department-contacts">
-                                    <!-- Table Headers -->
-                                    <div class="contact-row" style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-                                        <div class="contact-info-col">
-                                            <div class="contact-name" style="color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                                                Employee Details
-                                            </div>
-                                        </div>
-                                        <div class="contact-details-col">
-                                            <div class="contact-detail">
-                                                <div class="detail-label" style="visibility: hidden;">Phone</div>
-                                                <div class="detail-value" style="color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                                                    Contact Information
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="contact-actions-col">
-                                            <div style="width: 36px;"></div>
-                                        </div>
+                            </div>
+
+                            <div style="flex:0.8; min-width:150px; padding:0 1.5rem;">
+                                <?php if (!empty($entry['position'])): ?>
+                                    <div class="contact-strong"><?php echo htmlspecialchars($entry['position']); ?></div>
+                                <?php else: ?>
+                                    <div class="contact-strong muted">Not available</div>
+                                <?php endif; ?>
+                            </div>
+
+
+                            <div style="flex:0.6; min-width:100px; padding:0 1.5rem;">
+                                <?php if (!empty($entry['extension'])): ?>
+                                    <div class="contact-strong">
+                                        <?php echo htmlspecialchars($entry['extension']); ?>
                                     </div>
-                                    
-                                    <!-- Contact Rows -->
-                                    <?php foreach ($contacts as $entry): ?>
-                                    <div class="contact-row">
-                                        <div class="contact-info-col">
-                                            <div class="contact-name">
-                                                <?php echo htmlspecialchars($entry['name']); ?>
-                                            </div>
-                                            <?php if (!empty($entry['position'])): ?>
-                                            <div class="contact-position">
-                                                <i class="fas fa-user-tie"></i>
-                                                <?php echo htmlspecialchars($entry['position']); ?>
-                                            </div>
-                                            <?php endif; ?>
-                                            <?php if (!empty($entry['extension'])): ?>
-                                            <div class="contact-extension">
-                                                <i class="fas fa-phone-volume"></i>
-                                                Extension: <?php echo htmlspecialchars($entry['extension']); ?>
-                                            </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        
-                                        <div class="contact-details-col">
-                                            <div class="contact-detail">
-                                                <div class="detail-label">Phone Numbers</div>
-                                                <div class="detail-value">
-                                                    <?php if (!empty($entry['phone_numbers'])): ?>
-                                                    <div class="phone-numbers">
-                                                        <?php foreach ($entry['phone_numbers'] as $phone): ?>
-                                                        <div class="phone-number-item">
-                                                            <a href="tel:<?php echo htmlspecialchars($phone); ?>" class="text-decoration-none">
-                                                                <?php echo htmlspecialchars($phone); ?>
-                                                            </a>
-                                                            <button class="copy-phone-btn" onclick="copyToClipboard('<?php echo htmlspecialchars($phone); ?>')" title="Copy number">
-                                                                <i class="fas fa-copy"></i>
-                                                            </button>
-                                                        </div>
-                                                        <?php endforeach; ?>
-                                                    </div>
-                                                    <?php else: ?>
-                                                    <span style="color: #94a3b8;">Not available</span>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="contact-detail">
-                                                <div class="detail-label">Email Address</div>
-                                                <div class="detail-value">
-                                                    <?php if (!empty($entry['email'])): ?>
-                                                    <a href="mailto:<?php echo htmlspecialchars($entry['email']); ?>" class="text-decoration-none">
-                                                        <?php echo htmlspecialchars($entry['email']); ?>
-                                                    </a>
-                                                    <?php else: ?>
-                                                    <span style="color: #94a3b8;">Not available</span>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="contact-actions-col">
-                                            <?php if (!empty($entry['phone_numbers']) && count($entry['phone_numbers']) > 0): ?>
-                                            <button class="action-btn" onclick="callNumber('<?php echo htmlspecialchars($entry['phone_numbers'][0]); ?>')" title="Call">
-                                                <i class="fas fa-phone"></i>
-                                            </button>
-                                            <?php endif; ?>
-                                            
-                                            <?php if (!empty($entry['email'])): ?>
-                                            <button class="action-btn" onclick="sendEmail('<?php echo htmlspecialchars($entry['email']); ?>')" title="Email">
-                                                <i class="fas fa-envelope"></i>
-                                            </button>
-                                            <?php endif; ?>
-                                            
-                                            <button class="action-btn" onclick="copyContactDetails(this)" title="Copy Details">
+                                <?php else: ?>
+                                    <div class="contact-strong muted">-</div>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- ✅ Phone column -->
+                            <div style="flex:0.75; min-width:180px;">
+                                <?php if (!empty($entry['phone_numbers'])): ?>
+                                    <?php foreach ($entry['phone_numbers'] as $phone): ?>
+                                        <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                                            <a href="tel:<?php echo htmlspecialchars($phone); ?>"
+                                            class="contact-strong"
+                                            style="text-decoration:none; color:var(--dark-blue);">
+                                                <?php echo htmlspecialchars($phone); ?>
+                                            </a>
+                                            <button class="copy-phone-btn"
+                                                    onclick="copyToClipboard('<?php echo htmlspecialchars($phone); ?>', event)"
+                                                    title="Copy number">
                                                 <i class="fas fa-copy"></i>
                                             </button>
                                         </div>
-                                    </div>
                                     <?php endforeach; ?>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                        
-                        <?php if (empty($phone_search) && $phone_dept === 'all' && $phone_total_records >= 50): ?>
-                        <div class="alert alert-info mt-4">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Showing 50 most recent contacts. Use search or department filter to find specific contacts.
-                        </div>
-                        <?php endif; ?>
-                        
-                    <?php else: ?>
-                        <div class="empty-directory">
-                            <div class="empty-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <h4 class="text-muted mb-3">
-                                <?php if (!empty($phone_search) || $phone_dept !== 'all'): ?>
-                                    No contacts found matching your criteria
                                 <?php else: ?>
-                                    Employee Directory is Empty
+                                    <div class="contact-strong muted">Not available</div>
                                 <?php endif; ?>
-                            </h4>
-                            <p class="text-muted mb-4">
-                                <?php if (!empty($phone_search)): ?>
-                                    No results found for "<?php echo htmlspecialchars($phone_search); ?>"
-                                <?php elseif ($phone_dept !== 'all'): ?>
-                                    No employees found in the selected department
+                            </div>
+
+
+                            <!-- ✅ Email column -->
+                            <div style="flex:0.75; min-width:220px;">
+                                <?php if (!empty($entry['email'])): ?>
+                                    <a href="mailto:<?php echo htmlspecialchars($entry['email']); ?>"
+                                    class="contact-strong"
+                                    style="text-decoration:none; color:var(--dark-blue);">
+                                        <?php echo htmlspecialchars($entry['email']); ?>
+                                    </a>
                                 <?php else: ?>
-                                    There are no contacts in the directory yet.
+                                    <div class="contact-strong muted">Not available</div>
                                 <?php endif; ?>
-                            </p>
-                            <?php if (!empty($phone_search) || $phone_dept !== 'all'): ?>
-                            <a href="circular.php?tab=directory" class="btn btn-primary">
-                                <i class="fas fa-redo me-1"></i>Show All Contacts
-                            </a>
-                            <?php endif; ?>
+                            </div>
+
+
+                            <!-- Actions -->
+                            <div class="contact-actions-col" style="flex:0.3; display:flex; gap:0.5rem;">
+                                <?php if (!empty($entry['phone_numbers']) && count($entry['phone_numbers']) > 0): ?>
+                                    <button class="action-btn"
+                                            onclick="callNumber('<?php echo htmlspecialchars($entry['phone_numbers'][0]); ?>')"
+                                            style="width:36px; height:36px; border-radius:8px; border:1px solid #e2e8f0; background:white; color:var(--primary-blue); display:flex; align-items:center; justify-content:center; cursor:pointer;"
+                                            title="Call">
+                                        <i class="fas fa-phone"></i>
+                                    </button>
+                                <?php endif; ?>
+
+                                <?php if (!empty($entry['email'])): ?>
+                                    <button class="action-btn"
+                                            onclick="sendEmail('<?php echo htmlspecialchars($entry['email']); ?>')"
+                                            style="width:36px; height:36px; border-radius:8px; border:1px solid #e2e8f0; background:white; color:var(--primary-blue); display:flex; align-items:center; justify-content:center; cursor:pointer;"
+                                            title="Email">
+                                        <i class="fas fa-envelope"></i>
+                                    </button>
+                                <?php endif; ?>
+
+                                <button class="action-btn"
+                                        onclick="copyContactDetails(this)"
+                                        style="width:36px; height:36px; border-radius:8px; border:1px solid #e2e8f0; background:white; color:var(--primary-blue); display:flex; align-items:center; justify-content:center; cursor:pointer;"
+                                        title="Copy Details">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
                         </div>
-                    <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
+            <?php endforeach; ?>
+        </div>
+
+        <?php if (empty($phone_search) && $phone_dept === 'all' && $phone_total_records >= 50): ?>
+            <div class="alert alert-info mt-4">
+                <i class="fas fa-info-circle me-2"></i>
+                Showing 50 most recent contacts. Use search or department filter to find specific contacts.
+            </div>
+        <?php endif; ?>
+
+    <?php else: ?>
+        <div class="empty-directory">
+            <div class="empty-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <h4 class="text-muted mb-3">
+                <?php if (!empty($phone_search) || $phone_dept !== 'all'): ?>
+                    No contacts found matching your criteria
+                <?php else: ?>
+                    Employee Directory is Empty
+                <?php endif; ?>
+            </h4>
+            <p class="text-muted mb-4">
+                <?php if (!empty($phone_search)): ?>
+                    No results found for "<?php echo htmlspecialchars($phone_search); ?>"
+                <?php elseif ($phone_dept !== 'all'): ?>
+                    No employees found in the selected department
+                <?php else: ?>
+                    There are no contacts in the directory yet.
+                <?php endif; ?>
+            </p>
+            <?php if (!empty($phone_search) || $phone_dept !== 'all'): ?>
+                <a href="circular.php?tab=directory" class="btn btn-primary">
+                    <i class="fas fa-redo me-1"></i>Show All Contacts
+                </a>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+</div>
+
             </div>
         </div>
     </main>
@@ -1819,7 +1873,7 @@ if ($phone_result) {
         }
         
         // Copy phone number to clipboard
-        function copyToClipboard(text) {
+        function copyToClipboard(text, e) {
             navigator.clipboard.writeText(text).then(function() {
                 const btn = event.target.closest('button');
                 const originalHtml = btn.innerHTML;

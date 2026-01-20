@@ -43,6 +43,7 @@
       {
         "label": "off"
       }
-    ]
+    ],
+    "meta-charset-utf-8": "off"
   }
 }
