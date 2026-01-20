@@ -1215,6 +1215,63 @@ if ($phone_result) {
         }
 
 
+
+/* ONE grid template for both header row and data row */
+.contact-row,
+.contact-header-row {
+    display: grid;
+    grid-template-columns: 260px 260px 120px 180px 260px 90px; 
+    /*  Employee | Position | Extension | Phone | Email | Actions  */
+    align-items: center;
+    column-gap: 16px;
+}
+
+/* header row style */
+.contact-header-row {
+    background: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 12px 24px;
+}
+
+/* data rows */
+.contact-row {
+    padding: 16px 24px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.contact-row:hover {
+    background: #f8fafc;
+}
+
+/* prevent wrapping so everything stays one line */
+.col-nowrap {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* phone row items in one line */
+.phone-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* actions aligned */
+.contact-actions-col {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* Make long emails/positions not break layout */
+.position-col,
+.email-col {
+    min-width: 0;
+}
+
+
+
     </style>
 </head>
 <body>
@@ -1564,56 +1621,33 @@ if ($phone_result) {
                     </div>
 
                     <!-- Table Headers -->
-                    <div class="contact-row" style="background:#f8fafc; border-bottom:2px solid #e2e8f0; display:flex; align-items:center;">
-                        <div class="contact-info-col" style="flex:1; min-width:200px;">
-                            <div class="contact-name" style="color:#64748b; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px; margin:0;">
-                                Employee
-                            </div>
-                        </div>
+                    <div class="contact-header-row">
 
-                        <div style="flex:0.8; min-width:150px; padding:0 1.5rem;">
-                            <div class="detail-label" style="color:#64748b; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px; margin:0;">
-                                Position
-                            </div>
-                        </div>
+<div class="detail-label">Employee</div>
+<div class="detail-label">Position</div>
+<div class="detail-label">Extension</div>
+<div class="detail-label">Phone</div>
+<div class="detail-label">Email</div>
+<div class="detail-label text-end">Actions</div>
 
-                        <div style="flex:0.6; min-width:100px; padding:0 1.5rem;">
-                            <div class="detail-label" style="color:#64748b; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px; margin:0;">
-                                Extension
-                            </div>
-                        </div>
-
-                        <!-- ✅ NEW: Phone column -->
-                        <div style="flex:0.75; min-width:180px;">
-                            <div class="detail-label" style="color:#64748b; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px; margin:0;">
-                                Phone
-                            </div>
-                        </div>
-
-                        <!-- ✅ NEW: Email column -->
-                        <div style="flex:0.75; min-width:220px;">
-                            <div class="detail-label" style="color:#64748b; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px; margin:0;">
-                                Email
-                            </div>
-                        </div>
-
-                        <div class="contact-actions-col">
-                            <div style="width:36px;"></div>
-                        </div>
                     </div>
 
                     <!-- Contact Rows -->
                     <?php foreach ($contacts as $entry): ?>
-                        <div class="contact-row" style="display:flex; align-items:flex-start; padding:1rem 1.5rem; border-bottom:1px solid #f1f5f9;">
+                        <div class="contact-row">
                             <div class="contact-info-col" style="flex:1; min-width:200px;">
-                                <div class="contact-name" style="color:var(--dark-blue); font-weight:600; font-size:1.05rem; margin:0;">
-                                    <?php echo htmlspecialchars($entry['name']); ?>
-                                </div>
+                                <div class="contact-name col-nowrap">
+    <?php echo htmlspecialchars($entry['name']); ?>
+</div>
+
                             </div>
 
                             <div style="flex:0.8; min-width:150px; padding:0 1.5rem;">
                                 <?php if (!empty($entry['position'])): ?>
-                                    <div class="contact-strong"><?php echo htmlspecialchars($entry['position']); ?></div>
+                                    <div class="contact-strong col-nowrap position-col">
+    <?php echo !empty($entry['position']) ? htmlspecialchars($entry['position']) : 'Not available'; ?>
+</div>
+
                                 <?php else: ?>
                                     <div class="contact-strong muted">Not available</div>
                                 <?php endif; ?>
@@ -1668,7 +1702,7 @@ if ($phone_result) {
 
 
                             <!-- Actions -->
-                            <div class="contact-actions-col" style="flex:0.3; display:flex; gap:0.5rem;">
+                            <div class="contact-actions-col" style="flex:0.6; display:flex; gap:0.5rem;">
                                 <?php if (!empty($entry['phone_numbers']) && count($entry['phone_numbers']) > 0): ?>
                                     <button class="action-btn"
                                             onclick="callNumber('<?php echo htmlspecialchars($entry['phone_numbers'][0]); ?>')"
@@ -1687,12 +1721,12 @@ if ($phone_result) {
                                     </button>
                                 <?php endif; ?>
 
-                                <button class="action-btn"
+                                <!-- <button class="action-btn"
                                         onclick="copyContactDetails(this)"
                                         style="width:36px; height:36px; border-radius:8px; border:1px solid #e2e8f0; background:white; color:var(--primary-blue); display:flex; align-items:center; justify-content:center; cursor:pointer;"
                                         title="Copy Details">
                                     <i class="fas fa-copy"></i>
-                                </button>
+                                </button> -->
                             </div>
                         </div>
                     <?php endforeach; ?>
