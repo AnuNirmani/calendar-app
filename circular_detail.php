@@ -9,46 +9,8 @@ if (!$circular_id) {
     exit;
 }
 
-// Function to get correct image path
-function getImagePath($image_name) {
-    if (empty($image_name) || $image_name == 'NULL') {
-        return 'images/logo.jpg';
-    }
-    
-    // If it's already a full URL, return as is
-    if (filter_var($image_name, FILTER_VALIDATE_URL)) {
-        return $image_name;
-    }
-    
-    // Check different possible locations
-    $possible_paths = [
-        $image_name, // Original path
-        'images/' . $image_name,
-        'images/circulars/' . $image_name,
-        'uploads/' . $image_name,
-        '../images/' . $image_name,
-        'images/posts/' . $image_name,
-        'assets/images/' . $image_name,
-        'img/' . $image_name,
-        'media/' . $image_name
-    ];
-    
-    foreach ($possible_paths as $path) {
-        // Check if file exists
-        if (file_exists($path)) {
-            return $path;
-        }
-        // Check relative to current directory
-        if (file_exists(__DIR__ . '/' . $path)) {
-            return $path;
-        }
-    }
-    
-    return 'images/logo.jpg'; // Default fallback
-}
-
 // Fetch the circular details from the posts table
-$sql = "SELECT id, title, content, featured_image, publish_date FROM posts WHERE id = ? AND status = 'published'";
+$sql = "SELECT id, title, content, publish_date FROM posts WHERE id = ? AND status = 'published'";
 $stmt = $conn->prepare($sql);
 
 if (!$stmt) {
@@ -66,9 +28,6 @@ if ($result->num_rows === 0) {
 
 $circular = $result->fetch_assoc();
 $stmt->close();
-
-// Get correct image path
-$circular['featured_image'] = getImagePath($circular['featured_image']);
 
 // Format dates
 $formatted_date = date("F j, Y", strtotime($circular['publish_date']));
@@ -92,9 +51,6 @@ $next_result = $stmt_next->get_result();
 $next_circular = $next_result->fetch_assoc();
 $stmt_next->close();
 
-// Debug info (comment out in production)
-// echo "<!-- Debug: Image path = " . htmlspecialchars($circular['featured_image']) . " -->";
-// echo "<!-- Debug: File exists = " . (file_exists($circular['featured_image']) ? 'Yes' : 'No') . " -->";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -109,9 +65,6 @@ $stmt_next->close();
     <meta property="og:description" content="<?php echo htmlspecialchars(substr(strip_tags($circular['content']), 0, 160)); ?>">
     <meta property="og:type" content="article">
     <meta property="og:url" content="<?php echo "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>">
-    <?php if (!empty($circular['featured_image']) && $circular['featured_image'] != 'images/logo.jpg'): ?>
-    <meta property="og:image" content="<?php echo htmlspecialchars($circular['featured_image']); ?>">
-    <?php endif; ?>
     <meta property="article:published_time" content="<?php echo $datetime_iso; ?>">
     
     <!-- Bootstrap CSS -->
@@ -390,78 +343,6 @@ $stmt_next->close();
         
         .meta-item i {
             font-size: 1.2rem;
-        }
-        
-        /* Featured Image */
-        .featured-image-container {
-            position: relative;
-            height: 450px;
-            overflow: hidden;
-            margin: 0 2.5rem;
-            border-radius: 20px;
-            transform: translateY(-25px);
-            box-shadow: var(--shadow-heavy);
-            z-index: 3;
-            background: var(--light-blue);
-        }
-        
-        .featured-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.8s ease;
-            background: linear-gradient(135deg, var(--light-blue) 0%, #f0f8ff 100%);
-        }
-        
-        .featured-image-container:hover .featured-image {
-            transform: scale(1.05);
-        }
-        
-        .image-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
-            color: white;
-            padding: 2rem;
-            transform: translateY(0);
-            transition: transform 0.3s ease;
-        }
-        
-        .featured-image-container:hover .image-overlay {
-            transform: translateY(-10px);
-        }
-        
-        /* Image Fallback Styling */
-        .image-fallback {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-            background: linear-gradient(135deg, var(--light-blue) 0%, #f0f8ff 100%);
-        }
-        
-        .image-fallback-icon {
-            font-size: 5rem;
-            color: var(--accent-blue);
-            margin-bottom: 1.5rem;
-        }
-        
-        .image-fallback-text {
-            color: var(--dark-blue);
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-        
-        .image-fallback-subtext {
-            color: #666;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
         }
         
         /* Circular Body */
@@ -926,11 +807,6 @@ $stmt_next->close();
                 gap: 1rem;
             }
             
-            .featured-image-container {
-                height: 250px;
-                margin: 0 1.5rem;
-            }
-            
             .circular-body {
                 padding: 2rem 1.5rem;
             }
@@ -1055,66 +931,6 @@ $stmt_next->close();
                     </div>
                 </div>
             </div>
-
-            <!-- Featured Image -->
-<div class="featured-image-container">
-    <?php 
-    $image_src = htmlspecialchars($circular['featured_image']);
-    $image_alt = htmlspecialchars($circular['title']);
-    $is_logo = ($circular['featured_image'] == 'images/logo.jpg');
-    
-    // Debug output (remove in production)
-    // echo "<!-- Debug: Image path = $image_src -->";
-    // echo "<!-- Debug: Is logo = " . ($is_logo ? 'Yes' : 'No') . " -->";
-    // echo "<!-- Debug: File exists = " . (file_exists($circular['featured_image']) ? 'Yes' : 'No') . " -->";
-    
-    // Try to find the image in multiple locations
-    $found_image = false;
-    $actual_image_path = '';
-    
-    if (!empty($circular['featured_image']) && $circular['featured_image'] != 'images/logo.jpg') {
-        $possible_paths = [
-            $circular['featured_image'],
-            'images/' . basename($circular['featured_image']),
-            'images/circulars/' . basename($circular['featured_image']),
-            'uploads/' . basename($circular['featured_image']),
-            '../images/' . basename($circular['featured_image']),
-            'images/posts/' . basename($circular['featured_image'])
-        ];
-        
-        foreach ($possible_paths as $path) {
-            if (file_exists($path)) {
-                $found_image = true;
-                $actual_image_path = $path;
-                break;
-            }
-        }
-    }
-    
-    if ($found_image && !$is_logo): 
-    ?>
-        <img src="<?php echo htmlspecialchars($actual_image_path); ?>" 
-             alt="<?php echo $image_alt; ?>" 
-             class="featured-image"
-             onerror="this.onerror=null; this.src='images/logo.jpg'; this.classList.add('image-error');">
-        <div class="image-overlay">
-            <h4><?php echo htmlspecialchars($circular['title']); ?></h4>
-            <p class="mb-0">Published on <?php echo $formatted_date; ?></p>
-        </div>
-    <?php else: ?>
-        <div class="image-fallback">
-            <i class="fas fa-image image-fallback-icon"></i>
-            <div class="image-fallback-text">Circular Image</div>
-            <div class="image-fallback-subtext">
-                <?php if ($is_logo): ?>
-                    Using company logo as featured image
-                <?php else: ?>
-                    No featured image available
-                <?php endif; ?>
-            </div>
-        </div>
-    <?php endif; ?>
-</div>
 
             <!-- Circular Body -->
             <div class="circular-body">
@@ -1271,28 +1087,82 @@ $stmt_next->close();
                 pdf.text(`Time: <?php echo $time; ?>`, 20, 76);
                 pdf.text(`Document ID: CIR-<?php echo str_pad($circular['id'], 5, '0', STR_PAD_LEFT); ?>`, 20, 82);
                 
-                // Add content
-                pdf.setFontSize(11);
-                const content = `<?php echo addslashes(strip_tags($circular['content'])); ?>`;
-                const contentLines = pdf.splitTextToSize(content, 170);
-                
-                let yPosition = 90;
-                const pageHeight = pdf.internal.pageSize.height;
-                
-                for (let i = 0; i < contentLines.length; i++) {
-                    if (yPosition > pageHeight - 20) {
-                        pdf.addPage();
-                        yPosition = 20;
-                        
-                        // Add page header
-                        pdf.setFontSize(10);
-                        pdf.setTextColor(100, 100, 100);
-                        pdf.text(`Circular: ${title}`, 105, 10, { align: 'center' });
-                        pdf.setFontSize(11);
-                        pdf.setTextColor(0, 0, 0);
+                // Add content (render actual HTML content so text/images are included)
+                const contentElement = document.querySelector('.content-wrapper');
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const marginX = 20;
+                const firstPageTop = 90;
+                const nextPageTop = 20;
+                const bottomMargin = 20;
+                const contentWidthMm = pageWidth - (marginX * 2);
+
+                if (contentElement) {
+                    const contentCanvas = await html2canvas(contentElement, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff',
+                        logging: false
+                    });
+
+                    const fullHeightMm = (contentCanvas.height * contentWidthMm) / contentCanvas.width;
+                    const pxPerMm = contentCanvas.height / fullHeightMm;
+
+                    let remainingHeightMm = fullHeightMm;
+                    let sourceYpx = 0;
+                    let pageIndex = 0;
+
+                    while (remainingHeightMm > 0.1) {
+                        const currentTop = pageIndex === 0 ? firstPageTop : nextPageTop;
+                        const usableHeightMm = pageHeight - currentTop - bottomMargin;
+                        const chunkHeightMm = Math.min(usableHeightMm, remainingHeightMm);
+                        const chunkHeightPx = Math.max(1, Math.floor(chunkHeightMm * pxPerMm));
+
+                        const chunkCanvas = document.createElement('canvas');
+                        chunkCanvas.width = contentCanvas.width;
+                        chunkCanvas.height = chunkHeightPx;
+                        const chunkCtx = chunkCanvas.getContext('2d');
+
+                        chunkCtx.fillStyle = '#ffffff';
+                        chunkCtx.fillRect(0, 0, chunkCanvas.width, chunkCanvas.height);
+                        chunkCtx.drawImage(
+                            contentCanvas,
+                            0,
+                            sourceYpx,
+                            contentCanvas.width,
+                            chunkHeightPx,
+                            0,
+                            0,
+                            chunkCanvas.width,
+                            chunkCanvas.height
+                        );
+
+                        if (pageIndex > 0) {
+                            pdf.addPage();
+                            pdf.setFontSize(10);
+                            pdf.setTextColor(100, 100, 100);
+                            pdf.text(`Circular: ${title}`, 105, 10, { align: 'center' });
+                        }
+
+                        pdf.addImage(
+                            chunkCanvas.toDataURL('image/png'),
+                            'PNG',
+                            marginX,
+                            currentTop,
+                            contentWidthMm,
+                            chunkHeightMm
+                        );
+
+                        sourceYpx += chunkHeightPx;
+                        remainingHeightMm -= chunkHeightMm;
+                        pageIndex++;
                     }
-                    pdf.text(contentLines[i], 20, yPosition);
-                    yPosition += 7;
+                } else {
+                    pdf.setFontSize(11);
+                    pdf.setTextColor(0, 0, 0);
+                    const fallbackLines = pdf.splitTextToSize('No content available.', 170);
+                    pdf.text(fallbackLines, 20, 90);
                 }
                 
                 // Add footer

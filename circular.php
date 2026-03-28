@@ -1,6 +1,13 @@
 <?php
 include 'db.php';
 
+function normalizeDirectorySearchText($text) {
+    $text = strtolower((string)$text);
+    $text = preg_replace('/[^a-z0-9]+/i', ' ', $text);
+    $text = preg_replace('/\s+/', ' ', $text);
+    return trim($text);
+}
+
 // Pagination configuration
 $records_per_page = 9; // 3x3 grid
 
@@ -74,6 +81,8 @@ if (!$result) {
 // Fetch telephone directory entries with enhanced filtering
 $phone_search = isset($_GET['phone_search']) ? trim($_GET['phone_search']) : '';
 $phone_dept = isset($_GET['phone_dept']) ? trim($_GET['phone_dept']) : 'all';
+$phone_search_normalized = normalizeDirectorySearchText($phone_search);
+$phone_search_email = strtolower(trim($phone_search));
 $phone_entries = [];
 $phone_total_records = 0;
 
@@ -90,16 +99,6 @@ if ($dept_result) {
 // Build directory query - UPDATED to include position field
 $phone_where = [];
 $phone_params = [];
-
-if (!empty($phone_search)) {
-    $phone_search_clean = $conn->real_escape_string($phone_search);
-    $phone_where[] = "(td.name LIKE '%$phone_search_clean%' 
-                     OR td.phone_number LIKE '%$phone_search_clean%' 
-                     OR td.email LIKE '%$phone_search_clean%' 
-                     OR td.extension LIKE '%$phone_search_clean%' 
-                     OR td.position LIKE '%$phone_search_clean%' 
-                     OR d.name LIKE '%$phone_search_clean%')";
-}
 
 if ($phone_dept !== 'all') {
     $phone_dept_clean = $conn->real_escape_string($phone_dept);
@@ -126,6 +125,20 @@ if (!$phone_show_all) {
 $phone_result = $conn->query($phone_sql);
 if ($phone_result) {
     while ($row = $phone_result->fetch_assoc()) {
+        if (!empty($phone_search_normalized)) {
+            $employee_name_normalized = normalizeDirectorySearchText($row['name'] ?? '');
+            $needle = ' ' . $phone_search_normalized . ' ';
+            $haystack = ' ' . $employee_name_normalized . ' ';
+            $email_haystack = strtolower(trim($row['email'] ?? ''));
+
+            $matches_name = ($employee_name_normalized !== '' && strpos($haystack, $needle) !== false);
+            $matches_email = ($phone_search_email !== '' && $email_haystack !== '' && strpos($email_haystack, $phone_search_email) !== false);
+
+            if (!$matches_name && !$matches_email) {
+                continue;
+            }
+        }
+
         // Process phone numbers - split comma-separated values
         if (!empty($row['phone_number'])) {
             $row['phone_numbers'] = explode(',', $row['phone_number']);
@@ -1541,7 +1554,7 @@ if ($phone_result) {
                                name="phone_search"
                                value="<?php echo htmlspecialchars($phone_search); ?>"
                                class="form-control border-start-0"
-                               placeholder="Search by name, phone, email, position, or department...">
+                               placeholder="Search by full employee name or email...">
                     </div>
                 </div>
 

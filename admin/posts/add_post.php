@@ -24,9 +24,14 @@ function getActiveCategories() {
     $categories = [];
 
     // Check if posts table exists, if not create it
-    $table_check = "SHOW TABLES LIKE 'posts'";
-    $table_result = mysqli_query($conn, $table_check);
-    if (mysqli_num_rows($table_result) == 0) {
+$table_check = "SHOW TABLES LIKE 'posts'";
+$table_result = mysqli_query($conn, $table_check);
+
+if ($table_result === false) {
+    die("Table check failed: " . mysqli_error($conn));
+}
+
+if (mysqli_num_rows($table_result) == 0) {
         // Create posts table
         $create_table = "CREATE TABLE posts (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -54,8 +59,12 @@ function getActiveCategories() {
     ];
 
     // Check if categories table is empty, if so, insert predefined categories
-    $sql_check = "SELECT COUNT(*) as count FROM categories";
-    $result_check = mysqli_query($conn, $sql_check);
+$sql_check = "SELECT COUNT(*) as count FROM categories";
+$result_check = mysqli_query($conn, $sql_check);
+
+if ($result_check === false) {
+    die("Categories check failed: " . mysqli_error($conn));
+}
     if ($result_check) {
         $row_check = mysqli_fetch_assoc($result_check);
 
@@ -98,40 +107,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($postAuthor)) $errors[] = "Author name is required";
     if (empty($postContent) || $postContent === '<p><br></p>') $errors[] = "Post content is required";
 
-    // Handle file upload
-    $featuredImage = null;
-    if (isset($_FILES['featuredImage']) && $_FILES['featuredImage']['error'] === UPLOAD_ERR_OK) {
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-        $maxSize = 5 * 1024 * 1024;
-        $fileType = $_FILES['featuredImage']['type'];
-        $fileSize = $_FILES['featuredImage']['size'];
-
-        if (!in_array($fileType, $allowedTypes)) {
-            $errors[] = "Invalid file type. Only JPG, PNG, WebP, and GIF are allowed";
-        }
-        if ($fileSize > $maxSize) {
-            $errors[] = "File size exceeds 5MB limit";
-        }
-
-        if (empty($errors)) {
-            $uploadDir = '../Uploads/posts/';
-            if (!file_exists($uploadDir)) mkdir($uploadDir, 0755, true);
-            $fileExtension = pathinfo($_FILES['featuredImage']['name'], PATHINFO_EXTENSION);
-            $fileName = 'post_' . time() . '_' . uniqid() . '.' . $fileExtension;
-            $uploadPath = $uploadDir . $fileName;
-
-            if (move_uploaded_file($_FILES['featuredImage']['tmp_name'], $uploadPath)) {
-                $featuredImage = mysqli_real_escape_string($conn, $fileName);
-            } else {
-                $errors[] = "Failed to upload image";
-            }
-        }
-    }
-
     if (empty($errors)) {
-        $sql = "INSERT INTO posts (title, category_id, author, excerpt, content, featured_image, publish_date, status, created_at)
-                VALUES ('$postTitle', $postCategory, '$postAuthor', '$postExcerpt', '$postContent', " .
-                ($featuredImage ? "'$featuredImage'" : "NULL") . ", '$publishDate', '$status', NOW())";
+        $sql = "INSERT INTO posts (title, category_id, author, excerpt, content, publish_date, status, created_at)
+                VALUES ('$postTitle', $postCategory, '$postAuthor', '$postExcerpt', '$postContent', '$publishDate', '$status', NOW())";
 
         if (mysqli_query($conn, $sql)) {
             $_SESSION['success'] = $status === 'draft' ? "Draft saved successfully!" : "Post published successfully!";
@@ -245,31 +223,6 @@ $categories = getActiveCategories();
             border-top: none;
             border-radius: 0 0 0.375rem 0.375rem;
         }
-        .file-upload-label {
-            border: 2px dashed #d1d5db;
-            border-radius: 0.375rem;
-            padding: 1.5rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .file-upload-label:hover {
-            border-color: #3b82f6;
-            background: #eff6ff;
-        }
-        .file-preview {
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            background: #f0fdf4;
-            border-radius: 0.375rem;
-            color: #166534;
-        }
-        .preview-image {
-            max-width: 200px;
-            max-height: 150px;
-            margin-top: 10px;
-            border-radius: 0.375rem;
-        }
         .char-counter {
             font-size: 0.75rem;
             color: #6b7280;
@@ -315,7 +268,7 @@ $categories = getActiveCategories();
             <?php endif; ?>
 
             <div class="bg-white p-6 rounded-lg shadow-md">
-                <form id="postForm" method="POST" action="" enctype="multipart/form-data">
+                <form id="postForm" method="POST" action="">
                     <input type="hidden" name="status" id="postStatus" value="published">
                     <input type="hidden" name="postContent" id="postContent">
 
@@ -398,18 +351,6 @@ $categories = getActiveCategories();
                                    value="<?php echo isset($_POST['publishDate']) ? $_POST['publishDate'] : date('Y-m-d\TH:i'); ?>">
                         </div>
 
-                        <div class="mb-4">
-                            <label for="featuredImage" class="block text-gray-700 font-semibold mb-2">Featured Image</label>
-                            <input type="file" id="featuredImage" name="featuredImage" accept="image/*" class="hidden">
-                            <label for="featuredImage" class="file-upload-label block cursor-pointer">
-                                <div class="text-center">
-                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                                    <p class="text-gray-600 font-medium">Click to upload or drag and drop</p>
-                                    <p class="text-gray-500 text-sm mt-1">JPG, PNG, WebP, GIF - Max 5MB</p>
-                                </div>
-                            </label>
-                            <div class="file-preview hidden" id="filePreview"></div>
-                        </div>
                     </div>
 
                     <!-- Action Buttons -->
@@ -481,69 +422,11 @@ $categories = getActiveCategories();
             updateCharacterCount(this, 'excerptCounter', 500);
         });
 
-        // File upload handling
-        document.getElementById('featuredImage').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const preview = document.getElementById('filePreview');
-
-            if (file) {
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('File size must be less than 5MB');
-                    this.value = '';
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.innerHTML = `
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <strong>Selected:</strong> ${file.name}<br>
-                                <small>Size: ${(file.size / 1024 / 1024).toFixed(2)} MB</small>
-                                <img src="${e.target.result}" class="preview-image" alt="Preview">
-                            </div>
-                            <button type="button" onclick="clearFilePreview()" class="text-red-500 hover:text-red-700">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    `;
-                    preview.classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
         setTimeout(() => {
             document.querySelectorAll('.bg-green-100, .bg-red-100').forEach(el => {
                 el.style.display = 'none';
             });
         }, 5000);
-    });
-
-    // Drag and drop for file upload
-    const fileUploadLabel = document.querySelector('.file-upload-label');
-    ['dragover', 'dragenter'].forEach(eventName => {
-        fileUploadLabel.addEventListener(eventName, function(e) {
-            e.preventDefault();
-            this.classList.add('border-indigo-500', 'bg-blue-50');
-        });
-    });
-
-    ['dragleave', 'dragend'].forEach(eventName => {
-        fileUploadLabel.addEventListener(eventName, function(e) {
-            e.preventDefault();
-            this.classList.remove('border-indigo-500', 'bg-blue-50');
-        });
-    });
-
-    fileUploadLabel.addEventListener('drop', function(e) {
-        e.preventDefault();
-        this.classList.remove('border-indigo-500', 'bg-blue-50');
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            document.getElementById('featuredImage').files = files;
-            document.getElementById('featuredImage').dispatchEvent(new Event('change'));
-        }
     });
 
     function saveDraft() {
@@ -570,12 +453,6 @@ $categories = getActiveCategories();
         document.getElementById('postContent').value = content;
         document.getElementById('postForm').submit();
         return true;
-    }
-
-    function clearFilePreview() {
-        document.getElementById('featuredImage').value = '';
-        document.getElementById('filePreview').classList.add('hidden');
-        document.getElementById('filePreview').innerHTML = '';
     }
 
     function createPostsTable() {
