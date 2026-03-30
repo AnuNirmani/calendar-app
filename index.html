@@ -148,11 +148,11 @@
     
     <div class="calendar-grid">
         <?php
-$startMonth = (clone $today)->modify('-3 months');
-for ($i = 0; $i < 4; $i++) {
-    $target = (clone $startMonth)->modify("+$i month");
-    renderCalendar((int)$target->format('n'), (int)$target->format('Y'), $specialDates, $today);
-}
+    $startMonth = (clone $today)->modify('first day of this month')->modify('-3 months');
+    for ($i = 0; $i < 4; $i++) {
+        $target = (clone $startMonth)->modify("+$i month");
+        renderCalendar((int)$target->format('n'), (int)$target->format('Y'), $specialDates, $today);
+    }
         ?>
     </div>
 
